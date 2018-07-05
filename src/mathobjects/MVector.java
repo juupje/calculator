@@ -42,7 +42,7 @@ public class MVector extends MathObject {
 		if(other.size() != size)
 			throw new InvalidOperationException("To add two vectors, they need to be the same size! Sizes: " + size + " and " +other.size());
 		for(int i = 0; i < size; i++)
-			Operator.ADD.evaluate(v[i], other.get(i));
+			v[i] = Operator.ADD.evaluate(v[i], other.get(i));
 		return this;
 	}
 	
@@ -100,5 +100,12 @@ public class MVector extends MathObject {
 	 */
 	public static MathObject identity(int size) {
 		return new MVector(size, new MScalar(1));
+	}
+	
+	public static MVector createMVector(MathObject[] list) {
+		MathObject[] list2 = new MathObject[list.length];
+		for(int i = 0; i < list.length; i++)
+			list2[i] = list[i].copy();
+		return new MVector(list2);
 	}
 }
