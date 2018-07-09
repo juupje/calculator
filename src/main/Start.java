@@ -19,6 +19,8 @@ public class Start {
 		System.out.println(s2);
 		System.out.println("OPERATIONS:");
 		System.out.println(Operator.ADD.evaluate(v1, v2));
+		MVector v3 = (MVector) v2.copy();
+		v3.set(2, 10);
 		System.out.println(Operator.ADD.evaluate(s1, s2));
 		//System.out.println(Operator.ADD.evaluate(v1, s1));
 		System.out.println("AFTER:");

@@ -3,7 +3,7 @@ package mathobjects;
 import helpers.InvalidOperationException;
 import main.Operator;
 
-public class MVector extends MathObject {
+public class MVector implements MathObject {
 	MathObject[] v;
 	int size;
 	
@@ -14,7 +14,7 @@ public class MVector extends MathObject {
 			v[i] = new MScalar();
 	}
 	
-	public MVector(double[] list) {
+	public MVector(double... list) {
 		size = list.length;
 		v = new MathObject[size];
 		for(int i = 0; i < size; i++)
@@ -47,14 +47,54 @@ public class MVector extends MathObject {
 	}
 	
 	/**
+	 * Subtracts another vector element-wise from this one. Note that this will change the vector on which this method is called.
+	 * If that is not your wish, consider using {@link Operator.SUBTRACT}
+	 * @param other the {@code MVvector} to be subtracted, this one will not be changed.
+	 * @return {@code this} after the subtraction.
+	 */
+	public MVector subtract(MVector other) {
+		if(other.size() != size)
+			throw new InvalidOperationException("To subtract two vectors, they need to be the same size! Sizes: " + size + " and " +other.size());
+		for(int i = 0; i < size; i++)
+			v[i] = Operator.SUBTRACT.evaluate(v[i], other.get(i));
+		return this;
+	}
+
+	/**
+	 * Builds the dot product of {@code this} and the given {@code MVector} and returns it.
+	 * @param other the vector that needs to be dot-multiplied with {@code this}.
+	 * @return the resulting dot product.
+	 */
+	public MathObject dot(MVector other) {
+		if(other.size() != size)
+			throw new InvalidOperationException("The dot product is only defined for vectors of the same size. Sizes: " + size + ", " + other.size());
+		MathObject mo = null;
+		for(int i = 0; i < size; i++)
+			if(i == 0)
+				mo = Operator.MULTIPLY.evaluate(v[i], other.get(i));
+			else
+				mo = Operator.ADD.evaluate(mo, Operator.MULTIPLY.evaluate(v[i], other.get(i)));
+		return mo;
+	}
+	
+	/**
 	 * returns the i-th element of the vector. (Note that the vector starts at index 0).
 	 * @param i the element's index.
 	 * @return the i-the element.
 	 */
 	public MathObject get(int i) {
+		if(i < 0 || i >=size)
+			throw new IndexOutOfBoundsException("You're trying to access the " + i + "-th component of a vector with " + size + " elements.");
 		return v[i];
 	}
 	
+	public void set(int index, MathObject m) {
+		v[index] = m;
+	}
+	
+	public void set(int index, double d) {
+		v[index] = new MScalar(d);
+	}
 	/**
 	 * @return the length of the vector. This equals the mathematical dimension.
 	 */
@@ -62,19 +102,37 @@ public class MVector extends MathObject {
 		return size;
 	}
 	
+	/**
+	 * Negates the vector. To do so, every component will be negated separately.
+	 * @return {@code this}
+	 */
+	@Override
+	public MathObject negate() {
+		for(MathObject element : v)
+			element.negate();
+		return this;
+	}
 	
 	/**
 	 * Inverts the vector. This means that every component will inverted separately.
+	 * @return {@code this}
 	 */
 	@Override
-	public void invert() {
+	public MathObject invert() {
 		for(MathObject element : v)
 			element.invert();
+		return this;
 	}
 	
+	/**
+	 * Returns a copy of the vector.
+	 */
 	@Override
 	public MathObject copy() {
-		return new MVector(v);
+		MathObject v2[] = new MathObject[size];
+		for(int i = 0; i < size; i++)
+			v2[i] = v[i].copy();
+		return new MVector(v2);
 	}
 	
 	@Override

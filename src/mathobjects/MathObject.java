@@ -1,6 +1,7 @@
 package mathobjects;
 
-public abstract class MathObject {
-	public abstract void invert();
+public interface MathObject {
+	public abstract MathObject negate();
+	public abstract MathObject invert();
 	public abstract MathObject copy();
 }

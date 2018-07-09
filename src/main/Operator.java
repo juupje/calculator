@@ -6,27 +6,74 @@ import mathobjects.MVector;
 import mathobjects.MathObject;
 
 public enum Operator {
+	//###### double argument operators #######
 	ADD {
 		@Override
-		public MathObject evaluate(MathObject a, MathObject b) {
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length != 1) throw new IllegalArgumentException("You can only add exactly two MathObjects, got " + (1+b.length));
 			if(a instanceof MVector) 
-				if(b instanceof MVector)
-					return ((MVector)a.copy()).add((MVector) b);
-				else throw new InvalidOperationException("Only other vectors can be added to vectors. You're trying to add " + b.getClass() + " to a vector.");
+				if(b[0] instanceof MVector)
+					return ((MVector)a.copy()).add((MVector) b[0]);
+				else throw new InvalidOperationException("Only other vectors can be added to vectors. You're trying to add " + b[0].getClass() + " to a vector.");
 			else if(a instanceof MScalar)
-				if(b instanceof MScalar)
-					return ((MScalar)a.copy()).add((MScalar) b);
-				else throw new InvalidOperationException("Only other scalars can be added to scalars. You're trying to add " + b.getClass() + " to a scalar.");
-			throw new InvalidOperationException("ADD operator is not defined for " + a.getClass() + " and " + b.getClass());
+				if(b[0] instanceof MScalar)
+					return ((MScalar)a.copy()).add((MScalar) b[0]);
+				else throw new InvalidOperationException("Only other scalars can be added to scalars. You're trying to add " + b[0].getClass() + " to a scalar.");
+			throw new InvalidOperationException("ADD operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
 	},
 	
-	SUBSTACT {
+	SUBTRACT {
 		@Override
-		public MathObject evaluate(MathObject a, MathObject b) {
-			return null;
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length != 1) throw new IllegalArgumentException("You can only substract exactly two MathObjects, got " + (1+b.length));
+			if(a instanceof MVector) 
+				if(b[0] instanceof MVector)
+					return ((MVector)a.copy()).subtract((MVector) b[0]);
+				else throw new InvalidOperationException("Only other vectors can be subtracted off vectors. You're trying to subtract " + b[0].getClass() + " off a vector.");
+			else if(a instanceof MScalar)
+				if(b[0] instanceof MScalar)
+					return ((MScalar)a.copy()).subtract((MScalar) b[0]);
+				else throw new InvalidOperationException("Only other scalars can be subtracted off scalars. You're trying to subtract " + b[0].getClass() + " off a scalar.");
+			throw new InvalidOperationException("SUBTRACT operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
-	};
+	},
 	
-	public abstract MathObject evaluate(MathObject a, MathObject b);
+	MULTIPLY {
+		@Override
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length != 1) throw new IllegalArgumentException("You can only build the multiply exactly two MathObjects, got " + (1+b.length));
+			if(a instanceof MVector) 
+				if(b[0] instanceof MVector)
+					return ((MVector) a).dot((MVector) b[0]); //copy is not needed, because MVector.dot() doesn't change the MVector.
+				if(b[0] instanceof MScalar)
+					return ((MVector) a.copy()).multiply((MScalar) b[0]);
+			else if(a instanceof MScalar)
+				if(b[0] instanceof MScalar)
+					return ((MScalar)a.copy()).multiply((MScalar) b[0]);
+				if(b[0] instanceof MVector)
+					return ((MVector) b[0].copy()).multiply((MScalar) a);
+			throw new InvalidOperationException("MULTIPLY operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+		}
+	},
+	
+	//###### single argument operators #######
+	INVERT {
+		@Override
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length != 0) throw new IllegalArgumentException("You can only invert exactly one MathObject, got " + (1+b.length));
+			return a.copy().invert();
+		}
+	},
+	
+	NEGATE {
+		@Override
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length != 0) throw new IllegalArgumentException("You can only negate exactly one MathObject, got " + (1+b.length));
+			return a.copy().negate();
+		}
+	}
+	;
+	
+	public abstract MathObject evaluate(MathObject a, MathObject... b);
 }
