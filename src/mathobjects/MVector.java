@@ -34,7 +34,7 @@ public class MVector implements MathObject {
 	
 	/**
 	 * Adds another vector element-wise to this one. Note that this will change the vector on which this method is called.
-	 * If that is not your wish, consider using {@link Operator.ADD}
+	 * If that is not your wish, consider using {@link Operator#ADD}
 	 * @param other the {@code MVvector} to be added, this one will not be changed.
 	 * @return {@code this} after the addition.
 	 */
@@ -60,6 +60,47 @@ public class MVector implements MathObject {
 		return this;
 	}
 
+	/**
+	 * Multiplies this {@code MVector} element-wise with the value in the given {@code MScalar}
+	 * @param other the {@code MScalar} to be multiplied with.
+	 * @return {@code this}
+	 */
+	public MVector multiply(MScalar other) {
+		for(MathObject element : v)
+			element = Operator.MULTIPLY.evaluate(element, other);
+		return this;
+	}
+	
+	/**
+	 * Calls {@code multiply(new MScalar(d));} where d is the given double.
+	 * @param d the value to be passed as an {@code MScalar} to {@code multiply()}
+	 * @return the result of the call: {@code this}.
+	 * @see #multiply(MScalar)
+	 */
+	public MVector multiply(double d) {
+		return multiply(new MScalar(d));
+	}
+	
+	/**
+	 * Divides this {@code MVector} element-wise by the value in the given {@code MScalar}.
+	 * @param other the {@code MScalar containing the value to be divided by.
+	 * @return {@code this}
+	 */
+	public MVector divide(MScalar other) {
+		for(MathObject element : v)
+			element = Operator.DIVIDE.evaluate(element, other);
+		return this;
+	}
+	
+	/**
+	 * Calls {@code divide(new MScalar(d));} where d is the given double.
+	 * @param d the value to be passed as an {@code MScalar} to {@code divide()}
+	 * @return the result of the call: {@code this}.
+	 * @see #divide(MScalar)
+	 */
+	public MVector divide(double d) {
+		return divide(new MScalar(d));
+	}
 	/**
 	 * Builds the dot product of {@code this} and the given {@code MVector} and returns it.
 	 * @param other the vector that needs to be dot-multiplied with {@code this}.
