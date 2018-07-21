@@ -1,6 +1,8 @@
 package mathobjects;
 
-public class MScalar implements MathObject{
+import helpers.exceptions.InvalidOperationException;
+
+public class MScalar implements MathObject {
 	
 	double value = 0;
 	public MScalar() {}
@@ -89,6 +91,52 @@ public class MScalar implements MathObject{
 	}
 	
 	/**
+	 * Raises the value of this {@code MScalar} to the power of the value of the given one.
+	 * @param other the {@code MScalar} containing the value of the exponent.
+	 * @return {@code this}
+	 */
+	public MScalar power(MScalar other) {
+		value = Math.pow(value, other.getValue());
+		return this;
+	}
+	
+	/**
+	 * Raises the value of this {@code MScalar} to the power the given {@code double}.
+	 * @param d the exponent.
+	 * @return {@code this}
+	 */
+	public MScalar power(double d) {
+		value = Math.pow(value, d);
+		return this;
+	}
+	
+	/**
+	 * Converts the value of this {@code MScalar} into the module of the other.
+	 * @param other
+	 * @return {@code this}
+	 */
+	public MScalar mod(MScalar other) {
+		if(!other.isInteger())
+			throw new InvalidOperationException("Can't perform modulo operation on double and non-integer");
+		value %= other.getValue();
+		return this;
+	}
+	
+	/**
+	 * Converts the value of this {@code MScalar} into the module of the given {@code int}.
+	 * @param d.
+	 * @return {@code this}
+	 */
+	public MScalar mod(int d) {
+		value %= d;
+		return this;
+	}
+	
+	public boolean isInteger() {
+		return Math.floor(value) == Math.ceil(value);
+	}
+	
+	/**
 	 * Seriously? Checking the JavaDoc for a getter? What do you think this does?!
 	 * @return Dude... think for yourself for once.
 	 */
@@ -147,5 +195,10 @@ public class MScalar implements MathObject{
 	@Override
 	public MathObject copy() {
 		return new MScalar(value);
+	}
+	
+	@Override
+	public MathObject evaluate() {
+		return copy();
 	}
 }

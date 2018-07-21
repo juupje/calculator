@@ -1,4 +1,4 @@
-package helpers;
+package helpers.exceptions;
 
 public class InvalidOperationException extends RuntimeException {
 	private static final long serialVersionUID = -6711004550271986717L;

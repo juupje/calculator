@@ -1,6 +1,7 @@
 package mathobjects;
 
-import helpers.InvalidOperationException;
+import algorithms.Norm;
+import helpers.exceptions.InvalidOperationException;
 import main.Operator;
 
 public class MVector implements MathObject {
@@ -118,6 +119,23 @@ public class MVector implements MathObject {
 		return mo;
 	}
 	
+	public MathObject power(MScalar other) {
+		if(Math.ceil(other.value) != Math.floor(other.value))
+			throw new InvalidOperationException("Vectors can only be raised to integer powers.");
+		int exp = (int) other.value;
+		if(exp % 2 == 0) //even power
+			return Norm.eucl(this).power(exp);
+		else //uneven power
+			return Operator.MULTIPLY.evaluate(this, Norm.eucl(this).power((int) Math.floor(exp/2)));
+	}
+	
+	/**
+	 * Returns the elements in this <tt>MVector</tt> as an 1D array.
+	 * @return an 1D array containing the elements.
+	 */
+	public MathObject[] elements() {
+		return v;
+	}
 	/**
 	 * returns the i-th element of the vector. (Note that the vector starts at index 0).
 	 * @param i the element's index.
@@ -206,5 +224,13 @@ public class MVector implements MathObject {
 		for(int i = 0; i < list.length; i++)
 			list2[i] = list[i].copy();
 		return new MVector(list2);
+	}
+
+	@Override
+	public MathObject evaluate() {
+		MVector v = (MVector) copy();
+		for(MathObject e : v.elements())
+			e = e.evaluate();
+		return v;
 	}
 }
