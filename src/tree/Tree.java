@@ -1,9 +1,14 @@
 package tree;
 
+import java.util.function.Consumer;
+
 import algorithms.Functions.Function;
+import helpers.exceptions.TreeException;
 import main.Operator;
 import main.Variable;
 import mathobjects.MConst;
+import mathobjects.MFunction;
+import mathobjects.MVector;
 import mathobjects.MathObject;
 
 public class Tree {
@@ -32,16 +37,19 @@ public class Tree {
 		updateRoot();
 	}
 	
-	public MathObject evaluateTree() {
+	public MathObject evaluateTree() throws TreeException {
 		return evaluateNode(root);
 	}
 	
-	private MathObject evaluateNode(Node<?> n) {
+	protected MathObject evaluateNode(Node<?> n) throws TreeException {
 		if(n.isInternal()) {
 			if(n.data instanceof Function)
 				return ((Function) n.data).evaluate(evaluateNode(n.left()));
-			else
+			else if(n.data instanceof Operator)
 				return ((Operator) n.data).evaluate(evaluateNode(n.left()), evaluateNode(n.right()));
+			else if(n.data instanceof Variable && ((Variable) n.data).get() instanceof MFunction) {
+				return ((MFunction) ((Variable) n.data).get()).evaluateAt(((MVector) ((MVector) n.left().data).evaluate()).elements());
+			}
 		} //else
 		if(n.data instanceof Variable)
 			return ((Variable) n.data).evaluate();
@@ -56,4 +64,33 @@ public class Tree {
 			root = root.parent;
 		return root;
 	}
+	
+	public void DFS(Node<?> n, Consumer<Node<?>> c) {
+		if(n.left() != null)
+			DFS(n.left(), c);
+		if(n.right() != null)
+			DFS(n.right(), c);
+		c.accept(n);
+	}
+	
+	public abstract class DFSTask implements Consumer<Node<?>>{
+		Object[] obj;
+		public DFSTask(Object... obj) {
+			this.obj = obj;
+		}
+	}
+	
+	public Node<?> copy(Node<?> n, java.util.function.Function<Node<?>, Node<?>> func) {
+		Node<?> copy = func.apply(n);
+		if(n.left() != null)
+			copy.left(copy(n.left(), func));
+		if(n.right() != null)
+			copy.right(copy(n.right(), func));
+		return copy;
+	}
+	
+	public Tree copy(java.util.function.Function<Node<?>, Node<?>> func) {
+		return new Tree(copy(root, func));
+	}
+
 }

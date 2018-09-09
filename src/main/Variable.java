@@ -25,6 +25,14 @@ public class Variable {
 		this.name = name;
 	}
 	
+	public MathObject get() {
+		return Variables.get(name);
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
 	/**
 	 * Evaluates the <tt>MathObject</tt> saved under the name of this variable, and returns it.
 	 * @return {@code Variables.get(name).evaluate();}
@@ -36,6 +44,13 @@ public class Variable {
 		} catch(NullPointerException e) {
 			throw new UndefinedException("Variable with name " + name + " is not defined.");
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Variable) return ((Variable) obj).name.equals(name);
+		else if(obj instanceof String) return name.equals(obj);
+		return false;
 	}
 	
 	@Override

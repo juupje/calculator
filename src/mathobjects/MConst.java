@@ -10,11 +10,11 @@ public enum MConst {
 	}
 	
 	public static boolean isConstant(String s) {
-		try {get(s);}catch(IllegalArgumentException e) {return false;}return true;
+		try {get(s.toUpperCase());}catch(IllegalArgumentException e) {return false;}return true;
 	}
 	
 	public static MConst get(String name) {
-		return valueOf(name);
+		return valueOf(name.toUpperCase());
 	}
 	
 	public MScalar evaluate() {

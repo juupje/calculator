@@ -67,8 +67,8 @@ public class MVector implements MathObject {
 	 * @return {@code this}
 	 */
 	public MVector multiply(MScalar other) {
-		for(MathObject element : v)
-			element = Operator.MULTIPLY.evaluate(element, other);
+		for(int i = 0; i < size; i++)
+			v[i] = Operator.MULTIPLY.evaluate(v[i], other);
 		return this;
 	}
 	
@@ -88,8 +88,8 @@ public class MVector implements MathObject {
 	 * @return {@code this}
 	 */
 	public MVector divide(MScalar other) {
-		for(MathObject element : v)
-			element = Operator.DIVIDE.evaluate(element, other);
+		for(int i = 0; i < size; i++)
+			v[i] = Operator.DIVIDE.evaluate(v[i], other);
 		return this;
 	}
 	
@@ -119,14 +119,23 @@ public class MVector implements MathObject {
 		return mo;
 	}
 	
-	public MathObject power(MScalar other) {
-		if(Math.ceil(other.value) != Math.floor(other.value))
-			throw new InvalidOperationException("Vectors can only be raised to integer powers.");
-		int exp = (int) other.value;
+	/**
+	 * Raises this <tt>MVector</tt> to the <tt>n</tt>-th power, where n is a positive integer. Note that this method applies the mathematical definition of raising a vector to a power,
+	 * meaning that this is not an element-wise operation.
+	 * Let <tt>v</tt> be a vector, than the follow holds:
+	 * <ul><li>if <tt>n</tt> is even: <tt>v^n=|v|^n</tt></li><li>if <tt>n</tt> is uneven: <tt>v^n=v|v|^(n-1)</tt></li><ul>
+	 * @param n the <tt>MScalar</tt> containing <tt>n</tt>.
+	 * @return <tt>this</tt>
+	 * @throws InvalidOperationException if <tt>n</tt> is not an positive integer value.
+	 */
+	public MathObject power(MScalar n) {
+		if(Math.ceil(n.value) != Math.floor(n.value) || n.value<=0)
+			throw new InvalidOperationException("Vectors can only be raised to positive integer powers.");
+		int exp = (int) n.value;
 		if(exp % 2 == 0) //even power
 			return Norm.eucl(this).power(exp);
 		else //uneven power
-			return Operator.MULTIPLY.evaluate(this, Norm.eucl(this).power((int) Math.floor(exp/2)));
+			return multiply(Norm.eucl(this).power((int) Math.floor(exp/2)).value);
 	}
 	
 	/**
@@ -154,6 +163,7 @@ public class MVector implements MathObject {
 	public void set(int index, double d) {
 		v[index] = new MScalar(d);
 	}
+	
 	/**
 	 * @return the length of the vector. This equals the mathematical dimension.
 	 */
@@ -164,6 +174,7 @@ public class MVector implements MathObject {
 	/**
 	 * Negates the vector. To do so, every component will be negated separately.
 	 * @return {@code this}
+	 * @see MathObject#negate()
 	 */
 	@Override
 	public MathObject negate() {
@@ -175,6 +186,7 @@ public class MVector implements MathObject {
 	/**
 	 * Inverts the vector. This means that every component will inverted separately.
 	 * @return {@code this}
+	 * @see MathObject#invert()
 	 */
 	@Override
 	public MathObject invert() {
@@ -184,7 +196,9 @@ public class MVector implements MathObject {
 	}
 	
 	/**
-	 * Returns a copy of the vector.
+	 * Copies the <tt>MVector</tt> element-wise.
+	 * @return a new <tt>MVector</tt> of the copied elements.
+	 * @see MathObject#copy()
 	 */
 	@Override
 	public MathObject copy() {
@@ -192,6 +206,18 @@ public class MVector implements MathObject {
 		for(int i = 0; i < size; i++)
 			v2[i] = v[i].copy();
 		return new MVector(v2);
+	}
+	
+	/**
+	 * Returns a new <tt>MMatrix</tt> consisting of the evaluated elements in <tt>this</tt>.
+	 * @
+	 */
+	@Override
+	public MathObject evaluate() {
+		MVector v = new MVector(size);
+		for(int i = 0; i < v.size; i++)
+			v.set(i, get(i).evaluate());
+		return v;
 	}
 	
 	@Override
@@ -215,22 +241,19 @@ public class MVector implements MathObject {
 	 * @param size the length of the vector to be made
 	 * @return a new {@code MVector} of length {@code size} consisting of {@code MConst}s with value 1.
 	 */
-	public static MathObject identity(int size) {
+	public static MathObject ones(int size) {
 		return new MVector(size, new MScalar(1));
 	}
 	
+	/**
+	 * Creates an MVector of the elements in the given list.
+	 * @param list an <tt>MathObject[]</tt> to be turned into a vector.
+	 * @return the created <tt>MVector</tt>
+	 */
 	public static MVector createMVector(MathObject[] list) {
 		MathObject[] list2 = new MathObject[list.length];
 		for(int i = 0; i < list.length; i++)
 			list2[i] = list[i].copy();
 		return new MVector(list2);
-	}
-
-	@Override
-	public MathObject evaluate() {
-		MVector v = (MVector) copy();
-		for(MathObject e : v.elements())
-			e = e.evaluate();
-		return v;
 	}
 }

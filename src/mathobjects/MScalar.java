@@ -1,5 +1,6 @@
 package mathobjects;
 
+import helpers.Printer;
 import helpers.exceptions.InvalidOperationException;
 
 public class MScalar implements MathObject {
@@ -167,7 +168,7 @@ public class MScalar implements MathObject {
 	 */
 	@Override
 	public String toString() {
-		return String.valueOf(value);
+		return Printer.numToString(value);
 	}
 
 	/**

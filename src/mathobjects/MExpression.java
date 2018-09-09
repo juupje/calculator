@@ -1,8 +1,9 @@
 package mathobjects;
 
-import helpers.Parser;
+import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Operator;
+import main.Parser;
 import tree.Node;
 import tree.Tree;
 
@@ -41,7 +42,12 @@ public class MExpression implements MathObject {
 
 	@Override
 	public MathObject evaluate() {
-		return tree.evaluateTree();
+		try {
+			return tree.evaluateTree();
+		} catch (TreeException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	@Override

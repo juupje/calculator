@@ -16,4 +16,12 @@ public class Variables {
 	public static boolean exists(String str) {
 		return vars.containsKey(str);
 	}
+
+	public static void remove(String string) {
+		vars.remove(string);
+	}
+
+	public static HashMap<String, MathObject> getAll() {
+		return vars;
+	}
 }

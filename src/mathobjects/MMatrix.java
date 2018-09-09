@@ -2,6 +2,8 @@ package mathobjects;
 
 import java.util.List;
 
+import algorithms.linalg.JordanElimination;
+import helpers.Dimension;
 import helpers.exceptions.InvalidOperationException;
 import main.Operator;
 
@@ -9,11 +11,24 @@ public class MMatrix implements MathObject {
 	
 	MathObject m[][];
 	Dimension dim;
+	
 	public MMatrix(MathObject[][] m) {
 		this.m = m;
 		dim = new Dimension(m.length, m[0].length);
 	}
 	
+	public MMatrix(double[][] m) {
+		this.m = new MathObject[m.length][m[0].length];
+		for(int i = 0; i < m.length; i++)
+			for(int j = 0; j < m[i].length; j++)
+				this.m[i][j] = new MScalar(m[i][j]);
+		dim = new Dimension(m.length, m[0].length);
+	}
+	
+	/**
+	 * Constructs an empty (all entries are <tt>null</tt>) matrix with the given {@code Dimension}. 
+	 * @param dim the {@link Dimension} of the matrix to be made.
+	 */
 	public MMatrix(Dimension dim) {
 		this.dim = dim;
 		m = new MathObject[dim.rows()][dim.cols()];
@@ -118,6 +133,17 @@ public class MMatrix implements MathObject {
 		return m;
 	}
 	
+	public MMatrix getSubMatrix(int lefttoprow, int lefttopcol, int rightbottomrow, int rightbottomcol) {
+		if(lefttoprow < 0 || lefttopcol < 0 || rightbottomrow >= dim.rows() || rightbottomcol >= dim.cols())
+			throw new IndexOutOfBoundsException("Bounds of submatrix out of bounds! (" + lefttoprow + ", " + lefttopcol + ", " + rightbottomrow + ", " + rightbottomcol +
+					") does not fit inside matrix of dimension " + dim);
+		MMatrix result = new MMatrix(new Dimension(rightbottomrow-lefttoprow+1, rightbottomcol - lefttopcol+1));
+		for(int i = lefttoprow; i <= rightbottomrow; i++)
+			for(int j = lefttopcol; j <= rightbottomcol; j++)
+				result.set(i-lefttoprow, j-lefttopcol, m[i][j]);
+		return result;
+	}
+	
 	/**
 	 * Adds another vector element-wise to this one. Note that this will change the vector on which this method is called.
 	 * If that is not your wish, consider using {@link Operator#ADD}
@@ -155,8 +181,8 @@ public class MMatrix implements MathObject {
 	 */
 	public MMatrix multiply(MScalar other) {
 		for(MathObject[] row : m)
-			for(MathObject element : row)
-				element = Operator.MULTIPLY.evaluate(element, other);
+			for(int i = 0; i < row.length; i++)
+				row[i] = Operator.MULTIPLY.evaluate(row[i], other);
 		return this;
 	}
 	
@@ -171,28 +197,6 @@ public class MMatrix implements MathObject {
 	}
 	
 	/**
-	 * Divides this {@code MVector} element-wise by the value in the given {@code MScalar}.
-	 * @param other the {@code MScalar containing the value to be divided by.
-	 * @return {@code this}
-	 */
-	public MMatrix divide(MScalar other) {
-		for(MathObject[] row : m)
-			for(MathObject element : row)
-				element = Operator.DIVIDE.evaluate(element, other);
-		return this;
-	}
-	
-	/**
-	 * Calls {@code divide(new MScalar(d));} where d is the given double.
-	 * @param d the value to be passed as an {@code MScalar} to {@code divide()}
-	 * @return the result of the call: {@code this}.
-	 * @see #divide(MScalar)
-	 */
-	public MMatrix divide(double d) {
-		return divide(new MScalar(d));
-	}
-
-	/**
 	 * Builds the matrix product of {@code this} and the given {@code MMatrix} and returns it.
 	 * The matrix product of A (m x n) and B (n x k) is defined as:
 	 * {@code C_ij = (AB)_ij = Sum(l=1 to n, A_il*B_lj), i=1,...,m  j=1,...,k}
@@ -201,7 +205,7 @@ public class MMatrix implements MathObject {
 	 * @throws InvalidOperationException if the columncount of A does not equal the rowcount of B.
 	 */
 	public MathObject multiply(MMatrix other) {
-		if(dim.cols() == other.dim().rows())
+		if(dim.cols() != other.dim().rows())
 			throw new InvalidOperationException("Matrix product is only defined for n x m and m x k Matrices. Dimensions: " + dim() + ", " + other.dim());
 		MMatrix C = new MMatrix(new Dimension(dim.rows(), other.dim().cols()));
 		for(int i = 0; i < C.dim().rows(); i++) {
@@ -224,29 +228,70 @@ public class MMatrix implements MathObject {
 	 * @throws InvalidOperationException if the columncount of A does not equal the rowcount of B.
 	 */
 	public MathObject multiply(MVector other) {
-		if(dim.cols() == other.size())
-			throw new InvalidOperationException("The Matrix-Vector product is only defined for an (n x m)-matrix and n-Vector. Dimensions: " + dim() + ", " + other.size());
+		if(dim.cols() != other.size())
+			throw new InvalidOperationException("The Matrix-Vector product is only defined for an (m x n)-matrix and n-Vector. Dimensions: " + dim() + ", " + other.size());
 		MVector b = new MVector(dim.rows());
 		for(int i = 0; i < b.size(); i++) {
 			MathObject b_i = null;
 			for(int j = 0; j < dim().cols(); j++) {
-					b_i = Operator.ADD.evaluate(b_i, Operator.MULTIPLY.evaluate(get(i,j), other.get(j)));
+				b_i = Operator.ADD.evaluate(b_i, Operator.MULTIPLY.evaluate(get(i,j), other.get(j)));
 				b.set(i, b_i);
 			}
 		}				
 		return b;
 	}
-	//TODO method to raise matrix to a integer power. First the algorithm for Jordan-Normal Form is needed.
-	/*public MathObject power(MScalar other) {
-		if(Math.ceil(other.value) != Math.floor(other.value))
-			throw new InvalidOperationException("Vectors can only be raised to integer powers.");
-		int exp = (int) other.value;
-		if(exp % 2 == 0) //even power
-			return Norm.eucl(this).power(exp);
-		else //uneven power
-			return Operator.MULTIPLY.evaluate(this, Norm.eucl(this).power((int) Math.floor(exp/2)));
-	}*/
 	
+	/**
+	 * Divides this {@code MVector} element-wise by the value in the given {@code MScalar}.
+	 * @param other the {@code MScalar containing the value to be divided by.
+	 * @return {@code this}
+	 */
+	public MMatrix divide(MScalar other) {
+		for(MathObject[] row : m)
+			for(int i = 0; i < row.length; i++)
+				row[i] = Operator.DIVIDE.evaluate(row[i], other);
+		return this;
+	}
+	
+	/**
+	 * Calls {@code divide(new MScalar(d));} where d is the given double.
+	 * @param d the value to be passed as an {@code MScalar} to {@code divide()}
+	 * @return the result of the call: {@code this}.
+	 * @see #divide(MScalar)
+	 */
+	public MMatrix divide(double d) {
+		return divide(new MScalar(d));
+	}
+	
+	/**
+	 * Creates an augmented matrix of <tt>this</tt> and <tt>b</tt>.
+	 * The augmented matrix is basically two matrices (or matrix and vector) glued together.
+	 * Note that the elements of <tt>this</tt> and <tt>b</tt> are copied into the augmented matrix,
+	 * so any changes made to the elements in the augmented matrix, will not affect the originals.
+	 * @param b the <tt>MMatrix</tt> this one should be augmented with.
+	 * @return a new, augmented <tt>MMatrix</tt>, or <tt>this</tt> if <tt>b==null</tt>.
+	 */
+	public MMatrix augment(MMatrix b) {
+		if(b == null) return this;
+		MathObject augm[][] = new MathObject[dim.rows()][dim.cols()+b.dim().cols()];
+		for(int i = 0; i < dim.rows(); i++) {
+			for(int j = 0; j < dim.cols(); j++)
+				augm[i][j]=m[i][j].copy();
+			for(int k = dim.cols; k < dim.cols + b.dim().cols; k++) {
+				augm[i][k] = b.get(i, k-dim.cols).copy();
+			}
+		}
+		return new MMatrix(augm);
+	}
+
+	//TODO method to raise matrix to a integer power. First the algorithm for Jordan-Normal Form is needed.
+	
+	/**
+	 * Negates the <tt>MMatrix</tt>. <br/>
+	 * Every element in the matrix will be negated using {@link MathObject#negate()}.
+	 * @return this
+	 * @see MathObject#negate()
+	 */
 	@Override
 	public MathObject negate() {
 		for(MathObject[] row : m)
@@ -255,14 +300,26 @@ public class MMatrix implements MathObject {
 		return this;
 	}
 
+	/**
+	 * Sets this <tt>MMatrix</tt> to its inverse.
+	 * @return <tt>this</tt>
+	 * @see MathObject#invert()
+	 * @throws InvalidOperationException if the matrix is not square.
+	 */
 	@Override
 	public MathObject invert() {
-		for(MathObject[] row : m)
-			for(MathObject mo : row)
-				mo.invert();
+		if(dim.cols() != dim.rows())
+			throw new InvalidOperationException("Only square matrices can be inverted: dimension" + dim);
+		m = new JordanElimination(this, identity(dim.rows())).execute().getSubMatrix(0, dim.cols(), dim.rows()-1, dim.cols()*2-1).elements();
 		return this;
 	}
 
+	/**
+	 * Sets this <tt>MMatrix</tt> to its inverse.
+	 * @return <tt>this</tt>
+	 * @see MathObject#invert()
+	 * @throws InvalidOperationException if the matrix is not square.
+	 */
 	@Override
 	public MathObject copy() {
 		MathObject[][] co = new MathObject[m.length][m[0].length];
@@ -272,40 +329,34 @@ public class MMatrix implements MathObject {
 		return new MMatrix(co);
 	}
 
+	/**
+	 * Evaluates every element in the Matrix 
+	 */
 	@Override
 	public MathObject evaluate() {
 		MMatrix copy = (MMatrix) copy();
 		for(MathObject[] row : copy.elements())
-			for(MathObject mo : row)
-				mo = mo.evaluate();
-		return this;
+			for(int i = 0; i < row.length; i++)
+				row[i] = row[i].evaluate();
+		return copy;
 	}
- 
-	public class Dimension {
-		private int rows = 0, cols = 0;
-		public Dimension(int rows, int cols) {
-			this.rows = rows;
-			this.cols = cols;
+	
+	public static MMatrix identity(int size) {
+		MMatrix matrix = new MMatrix(new Dimension(size, size));
+		for(int i = 0; i < size; i++)
+			for(int  j = 0; j < size; j++)
+				matrix.set(i, j, new MScalar(i == j ? 1 : 0));
+		return matrix;
+	}
+	
+	@Override
+	public String toString() {
+		String s = "[";
+		for(MathObject[] row : m) {
+			for(MathObject mo : row)
+				s += mo.toString() + ", ";
+			s = s.substring(0, s.length()-2) + ";";
 		}
-		
-		public int rows() {
-			return rows;
-		}
-		
-		public int cols() {
-			return cols;
-		}
-		
-		@Override
-		public boolean equals(Object other) {
-			if(other instanceof Dimension)
-				return ((Dimension) other).cols() == cols && ((Dimension) other).rows() == rows;
-			return false;
-		}
-		
-		@Override
-		public String toString() {
-			return "(" + rows + ", " + cols + ")";
-		}
+		return s.substring(0, s.length()-1) + "]";
 	}
 }

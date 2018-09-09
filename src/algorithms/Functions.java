@@ -243,7 +243,7 @@ public class Functions {
 
 	public static boolean isFunction(String s) {
 		try {
-			Function.valueOf(s);
+			Function.valueOf(s.toUpperCase());
 			return true;
 		} catch (IllegalArgumentException e) {
 			return false;
@@ -251,6 +251,6 @@ public class Functions {
 	}
 
 	public static Function getFunction(String name) {
-		return Function.valueOf(name);
+		return Function.valueOf(name.toUpperCase());
 	}
 }

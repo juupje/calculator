@@ -48,13 +48,24 @@ public class Node<T> {
 			n.right(this);
 	}
 	
+	public void replace(Node<?> n) {
+		if(parent.left() == this)
+			parent.left(n);
+		else
+			parent.right(n);
+		n.left(left);
+		n.right(right);
+	}
+	
 	public void left(Node<?> l) {
-		l.parent = this;
+		if(l != null)
+			l.parent = this;
 		left = l;
 	}
 	
 	public void right(Node<?> r) {
-		r.parent = this;
+		if(r != null)
+			r.parent = this;
 		right = r;
 	}
 	
@@ -64,6 +75,10 @@ public class Node<T> {
 	
 	public Node<?> right() {
 		return right;
+	}
+	
+	public T getData() {
+		return data;
 	}
 	
 	@Override
