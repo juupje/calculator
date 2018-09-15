@@ -59,6 +59,15 @@ public class Tree {
 			return ((MathObject) n.data).evaluate();
 	}
 	
+	public void replace(Node<?> toBeReplaced, Node<?> newNode) {
+		if(toBeReplaced.parent == null) {
+			newNode.left(toBeReplaced.left());
+			newNode.right(toBeReplaced.right());
+			root = newNode;
+		} else
+			toBeReplaced.replace(newNode);
+	}
+	
 	public Node<?> updateRoot() {
 		while(root.parent != null)
 			root = root.parent;

@@ -49,10 +49,12 @@ public class Node<T> {
 	}
 	
 	public void replace(Node<?> n) {
-		if(parent.left() == this)
-			parent.left(n);
-		else
-			parent.right(n);
+		if (parent != null) {
+			if (parent.left() == this)
+				parent.left(n);
+			else
+				parent.right(n);
+		}
 		n.left(left);
 		n.right(right);
 	}

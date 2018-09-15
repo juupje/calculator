@@ -55,7 +55,7 @@ public class VectorParser extends Parser {
 					v[i] = new MScalar(Double.parseDouble(elements.get(i)));
 				} catch(NumberFormatException e) {
 					MExpression me =  new MExpression(elements.get(i));
-					if(!me.getTree().getRoot().isInternal())
+					if(!me.getTree().getRoot().isInternal() && me.getTree().getRoot().getData() instanceof MathObject)
 						v[i] = (MathObject) me.getTree().getRoot().data;
 					else v[i] = me;
 				}

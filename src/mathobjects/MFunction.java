@@ -14,6 +14,8 @@ import tree.Node;
 import tree.Tree;
 
 public class MFunction extends MExpression {
+	
+	public static final short INIT_PARAM_CAP = 4;
 
 	String[] vars;
 	boolean defined;
@@ -23,7 +25,7 @@ public class MFunction extends MExpression {
 		super(tr);
 		this.vars = vars;
 		this.defined = defined;
-		paramMap = new HashMap<String, MathObject>();
+		paramMap = new HashMap<String, MathObject>(INIT_PARAM_CAP);
 	}
 	
 	public MFunction(String[] vars, Tree tr, boolean defined) {
@@ -31,7 +33,7 @@ public class MFunction extends MExpression {
 		this.vars = vars;
 		this.defined = defined;
 		tree = new FunctionTree(tr.getRoot());
-		paramMap = new HashMap<String, MathObject>();
+		paramMap = new HashMap<String, MathObject>(INIT_PARAM_CAP);
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public class MFunction extends MExpression {
 
 	@Override
 	public MathObject copy() {
-		return new MFunction(vars, ((FunctionTree) tree).copy((n) -> {
+		return new MFunction(vars, tree.copy((n) -> {
 			return new Node<Object>(n.data);
 		}), defined);
 	}
@@ -71,7 +73,7 @@ public class MFunction extends MExpression {
 	 */
 	@Override
 	public MathObject evaluate() {
-		return new MFunction(vars, new FunctionTree(tree.copy((n) -> {
+		return new MFunction(vars, tree.copy((n) -> {
 			if (n.data instanceof Variable) {
 				for (String v : vars)
 					if (!n.data.equals(v)) {
@@ -82,7 +84,7 @@ public class MFunction extends MExpression {
 			} else if (n.data instanceof MathObject)
 				return new Node<MathObject>(((MathObject) n.data).evaluate());
 			return new Node<Object>(n.data);
-		}).getRoot()), defined);
+		}), defined);
 	}
 
 	/**
@@ -127,18 +129,29 @@ public class MFunction extends MExpression {
 			if (Variables.get(v) == null)
 				Variables.set(v, null);
 		Tree tr = new Parser(expr).getTree();
-		if (!defined)
-			tr.DFS(tr.getRoot(), n -> {
-				if (n.isInternal())
-					return;
-				if (n.data instanceof Variable) {
-					for (String var : vars)
-						if (n.data.equals(var))
-							return;
-					n.replace(new Node<MathObject>(((Variable) n.data).evaluate()));
-				} else if (n.data instanceof MathObject)
-					n.replace(new Node<MathObject>(((MathObject) n.data).evaluate()));
-			});
+		
+		tr.DFS(tr.getRoot(), n -> {
+			//If the node is a vector containing functions: turn it into a vector-function (field)
+			if (n.data instanceof MVector) {
+				for (MathObject e : ((MVector) n.data).elements()) {
+					if (e instanceof MExpression || e instanceof MFunction) {
+						tr.replace(n, new Node<MVectorFunction>(new MVectorFunction(vars, ((MVector) n.data), defined)));
+						return;
+					}
+				}
+			}
+			
+			//If the node is internal and this function is not defined, replace this node with its evaluated value.
+			if (defined || n.isInternal())
+				return;
+			if (n.data instanceof Variable) {
+				for (String var : vars)
+					if (n.data.equals(var))
+						return;
+				n.replace(new Node<MathObject>(((Variable) n.data).evaluate()));
+			} else if (n.data instanceof MathObject)
+				n.replace(new Node<MathObject>(((MathObject) n.data).evaluate()));
+		});
 		// Remove the temporary variables.
 		for (String v : vars)
 			if (Variables.get(v) == null)
@@ -175,22 +188,6 @@ public class MFunction extends MExpression {
 			paramMap.put(vars[i], paramVals[i]);
 		return evaluateAt();
 	}
-	
-	public void putVariable(String name, MathObject mo) {
-		paramMap.put(name, mo);
-	}
-
-	/**
-	 * Evaluates the {@link Tree} defined by this {@code MFunction}
-	 * 
-	 * @return A {@link MathObject} containing the result of the evaluation.
-	 * @throws TreeException
-	 *             as thrown by {@link Tree#evaluateTree()}
-	 * @see Tree#evaluateTree()
-	 */
-	public MathObject evaluateAt() throws TreeException {
-		return ((FunctionTree) tree).evaluateTree();
-	}
 
 	/**
 	 * Evaluates the function at the values as given in the String. The values will
@@ -221,6 +218,32 @@ public class MFunction extends MExpression {
 					"Function expected " + vars.length + " arguments, got " + paramVals.length);
 		return evaluateAt(paramVals);
 	}
+	
+	public MathObject evaluateAt(HashMap<String, MathObject> map) throws TreeException {
+		setParamMap(map);
+		return evaluateAt();
+	}
+	
+	/**
+	 * Evaluates the {@link Tree} defined by this {@code MFunction}
+	 * 
+	 * @return A {@link MathObject} containing the result of the evaluation.
+	 * @throws TreeException
+	 *             as thrown by {@link Tree#evaluateTree()}
+	 * @see Tree#evaluateTree()
+	 */
+	public MathObject evaluateAt() throws TreeException {
+		return ((FunctionTree) tree).evaluateTree();
+	}
+	
+	public void putVariable(String name, MathObject mo) {
+		paramMap.put(name, mo);
+	}
+	
+	public void setParamMap(HashMap<String, MathObject> map) {
+		paramMap.clear();
+		paramMap.putAll(map);
+	}
 
 	public boolean isDefined() {
 		return defined;
@@ -241,6 +264,7 @@ public class MFunction extends MExpression {
 	}
 	
 	private class FunctionTree extends Tree {
+		
 		public FunctionTree(Node<?> root) {
 			super(root);
 		}
@@ -249,8 +273,19 @@ public class MFunction extends MExpression {
 		protected MathObject evaluateNode(Node<?> n) throws TreeException {
 			if(n.data instanceof Variable) {
 				MathObject var = paramMap.get(((Variable) n.data).getName());
+				if(var instanceof MFunction) {
+					if(n.left() ==  null)
+						return ((MFunction) var).evaluateAt(paramMap);
+					else 
+						return ((MFunction) var).evaluateAt(((MVector) ((MVector) n.left().data).evaluate()).elements());
+				}
 				return var == null ? super.evaluateNode(n) : var;
-			} 
+			} else if(n.data instanceof MVectorFunction) {
+				if(n.left() == null)
+					return ((MVectorFunction) n.data).evaluateAt(paramMap);
+				else
+					return ((MVectorFunction) n.data).evaluateAt(((MVector) ((MVector) n.left().data).evaluate()).elements());
+			}
 			return super.evaluateNode(n);
 		}
 	}

@@ -1,5 +1,6 @@
 package mathobjects;
 
+import helpers.Printer;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Operator;
@@ -52,7 +53,7 @@ public class MExpression implements MathObject {
 	
 	@Override
 	public String toString() {
-		return null;
+		return Printer.toText(this);
 	}
 
 	public Tree getTree() {
