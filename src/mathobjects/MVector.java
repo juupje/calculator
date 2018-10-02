@@ -152,7 +152,7 @@ public class MVector implements MathObject {
 	 */
 	public MathObject get(int i) {
 		if(i < 0 || i >=size)
-			throw new IndexOutOfBoundsException("You're trying to access the " + i + "-th component of a vector with " + size + " elements.");
+			throw new IndexOutOfBoundsException("You're trying to access component " + i + " of a vector with " + size + " elements.");
 		return v[i];
 	}
 	

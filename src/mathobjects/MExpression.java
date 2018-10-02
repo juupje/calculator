@@ -24,21 +24,35 @@ public class MExpression implements MathObject {
 		}
 	}
 	
+	public MExpression add(MScalar other) {
+		Node<Operator> n = new Node<Operator>(Operator.ADD);
+		n.right(new Node<MScalar>(other));
+		tree.insert(tree.getRoot(), n, Node.LEFT);
+		return this;
+	}
+	
+	public MExpression add(MExpression other) {
+		Node<Operator> n = new Node<Operator>(Operator.ADD);
+		n.right(other.getTree().copy().getRoot());
+		tree.insert(tree.getRoot(), n, Node.LEFT);
+		return this;
+	}
+	
 	@Override
 	public MathObject negate() {
-		tree.insert(tree.getRoot(), new Node<Operator>(Operator.NEGATE), 0);
+		tree.insert(tree.getRoot(), new Node<Operator>(Operator.NEGATE), Node.LEFT);
 		return this;
 	}
 
 	@Override
 	public MathObject invert() {
-		tree.insert(tree.getRoot(), new Node<Operator>(Operator.INVERT), 0);
+		tree.insert(tree.getRoot(), new Node<Operator>(Operator.INVERT), Node.LEFT);
 		return this;
 	}
 
 	@Override
 	public MathObject copy() {
-		return new MExpression(tree);
+		return new MExpression(tree.copy());
 	}
 
 	@Override

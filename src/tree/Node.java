@@ -7,8 +7,11 @@ import mathobjects.MConst;
 import mathobjects.MScalar;
 
 public class Node<T> {
-	private Node<?> left = null, right = null;
-	public Node<?> parent = null;
+	
+	public static final byte LEFT = 0, RIGHT = 1;
+	
+	
+	public Node<?> left = null, right = null, parent = null;
 	public T data;
 	
 	public Node(T data) {
@@ -31,7 +34,7 @@ public class Node<T> {
 	 * @param n The node to be inserted.
 	 * @param dir the direction in which <tt>n</tt> will be moved down. 0=left, 1=right;
 	 */
-	public void insert(Node<?> n, int dir) {
+	public void insert(Node<?> n, byte dir) {
 		if(parent != null) {
 			if(parent.left() == this)
 				parent.left(n);
@@ -46,6 +49,17 @@ public class Node<T> {
 			if(n.right() != null)
 				throw new RuntimeException("Trying to insert a node which already has a right child.");
 			n.right(this);
+	}
+	
+	public void replaceWithChildren(Node<?> n) {
+		if (parent != null) {
+			if (parent.left() == this)
+				parent.left(n);
+			else
+				parent.right(n);
+		}
+		if(right != null || left != null)
+			System.out.println("ATTENTION: node was replaced and it's children discarded, left: " + left + " right: " + right + " node: " + left.parent);
 	}
 	
 	public void replace(Node<?> n) {

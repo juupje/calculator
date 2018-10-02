@@ -152,7 +152,9 @@ public class Printer {
 			String s2 = printNodeLatex(n.left());
 			String name = ((Function) n.data).name();
 			s += "\\" + name + "{" + (s2.length() > 2 && !name.equals("sqrt") ? "(" + s2 + ")" : s2) + "}";
-		} else
+		} else if(n.data instanceof MathObject)
+			s += toLatex((MathObject) n.data);
+		else
 			s += n.toString();
 		return s;
 

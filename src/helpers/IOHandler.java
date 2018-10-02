@@ -36,7 +36,7 @@ public class IOHandler {
 			if(line.equals("quit") || line.equals("exit")) break;
 			try {
 				Interpreter.Interpret(line);
-			} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

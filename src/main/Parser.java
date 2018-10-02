@@ -12,6 +12,7 @@ import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import mathobjects.MConst;
 import mathobjects.MFunction;
+import mathobjects.MMatrix;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -93,7 +94,7 @@ public class Parser {
 		nextChar();
 		MathObject val = processExpression();
 		if (pos < expr.length())
-			throw UnexpectedCharacterException.create(expr, pos);
+			throw new UnexpectedCharacterException(expr, pos);
 		return val;
 	}
 
@@ -198,28 +199,28 @@ public class Parser {
 			tree.root = n;
 			return n.right();
 		} else if (consume('*')) {
-			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), 0);
+			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('/')) {
-			tree.insert(p, new Node<Operator>(Operator.DIVIDE), 0);
+			tree.insert(p, new Node<Operator>(Operator.DIVIDE), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('^')) {
-			tree.insert(p, new Node<Operator>(Operator.POWER), 0);
+			tree.insert(p, new Node<Operator>(Operator.POWER), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p;
 		} else if (!Character.isDigit(ch)) { // Does the same as consume('*')
-			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), 0);
+			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
@@ -228,7 +229,7 @@ public class Parser {
 		} else if (consume('(')) {
 			return getSubTree();
 		}
-		throw UnexpectedCharacterException.create(expr, pos);
+		throw new UnexpectedCharacterException(expr, pos);
 	}
 
 	// ################ Evaluate expression to numeric value ################
@@ -286,7 +287,7 @@ public class Parser {
 			d = new MScalar(Double.parseDouble(expr.substring(p, pos)));
 			if (consume('E')) {
 				d = Operator.MULTIPLY.evaluate(d, Operator.POWER.evaluate(new MScalar(10), processFactor()));
-			}
+			} 
 			// Letter, which is part of a variable or function
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_') {
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' || ch >= '0' && ch <= '9')
@@ -295,11 +296,16 @@ public class Parser {
 			if (Variables.exists(letters)) {
 				d = Variables.get(letters);
 				if(d instanceof MFunction) {
-					int position = pos;
-					while(ch != ')')
-						nextChar();
-					d = ((MFunction) d).evaluateAt(expr.substring(position, pos));
-					consume(')');
+					if(!consume('('))
+						throw new UnexpectedCharacterException("Expected '(' after a function instead of '" + (char) ch + "'");
+					d = ((MFunction) d).evaluateAt(findEndOfBrackets());
+				} //No 'else if' because if the result from the MFunction is a matrix or vector, it the following if-statement can be applied as well.
+				if(d instanceof MVector || d instanceof MMatrix) {
+					do {
+						if(consume('['))
+							d = Operator.ELEMENT.evaluate(d, getArgumentsAsMathObject(findEndOfBrackets()));
+						else break;
+					} while(d instanceof MVector || d instanceof MMatrix);
 				} else
 					d = d.evaluate();
 			} else if (MConst.isConstant(letters))
@@ -311,10 +317,10 @@ public class Parser {
 				else if(letters.equals("inv"))
 					d.invert();
 				else
-					throw UnexpectedCharacterException.create(expr, pos);
+					throw new UnexpectedCharacterException(expr, pos);
 			}
 		} else {
-			throw UnexpectedCharacterException.create(expr, pos);
+			throw new UnexpectedCharacterException(expr, pos);
 		}
 
 		// If the factor has to be risen to a power
@@ -323,6 +329,18 @@ public class Parser {
 		if (consume('%'))
 			d = Operator.MOD.evaluate(d, processFactor());
 		return d;
+	}
+	
+	public String findEndOfBrackets() throws UnexpectedCharacterException {
+		int count = 1, position = pos;
+		while(count > 0) {
+			nextChar();
+			if(ch == -1)
+				throw new UnexpectedCharacterException("Expression ended while searching for end of brackets.");
+			count += (ch == '(' || ch == '{' || ch == '[' ? 1 : (ch == ')' || ch == '}' || ch == ']' ? -1 : 0));
+		}
+		nextChar(); //move on to the next character after the closing bracket.
+		return expr.substring(position, pos-1); //-1 because of nextChar() the line above
 	}
 	
 	public static MathObject[] getArgumentsAsMathObject(String s) throws UnexpectedCharacterException, InvalidFunctionException, TreeException {

@@ -32,7 +32,7 @@ public class Tree {
 	 * @param dir the direction in which <tt>n</tt> will be moved down. 0=left, 1=right;
 	 * @see Node#insert(Node, int)
 	 */
-	public void insert(Node<?> n, Node<?> toBeInserted, int dir) {
+	public void insert(Node<?> n, Node<?> toBeInserted, byte dir) {
 		n.insert(toBeInserted, dir);
 		updateRoot();
 	}
@@ -48,7 +48,7 @@ public class Tree {
 			else if(n.data instanceof Operator)
 				return ((Operator) n.data).evaluate(evaluateNode(n.left()), evaluateNode(n.right()));
 			else if(n.data instanceof Variable && ((Variable) n.data).get() instanceof MFunction) {
-				return ((MFunction) ((Variable) n.data).get()).evaluateAt(((MVector) ((MVector) n.left().data).evaluate()).elements());
+				return ((MFunction) ((Variable) n.data).get()).evaluateAt(((MVector) evaluateNode(n.left())).elements());
 			}
 		} //else
 		if(n.data instanceof Variable)
@@ -96,6 +96,10 @@ public class Tree {
 		if(n.right() != null)
 			copy.right(copy(n.right(), func));
 		return copy;
+	}
+	
+	public Tree copy() {
+		return copy(n -> new Node<Object>(n.data));
 	}
 	
 	public Tree copy(java.util.function.Function<Node<?>, Node<?>> func) {

@@ -6,7 +6,6 @@ import helpers.Printer;
 import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
-import main.Operator;
 import main.Parser;
 import main.Variable;
 import main.Variables;
@@ -14,42 +13,26 @@ import tree.Node;
 import tree.Tree;
 
 public class MFunction extends MExpression {
-	
+
 	public static final short INIT_PARAM_CAP = 4;
 
 	String[] vars;
 	boolean defined;
 	HashMap<String, MathObject> paramMap;
-	
+
 	public MFunction(String[] vars, FunctionTree tr, boolean defined) {
 		super(tr);
 		this.vars = vars;
 		this.defined = defined;
 		paramMap = new HashMap<String, MathObject>(INIT_PARAM_CAP);
 	}
-	
+
 	public MFunction(String[] vars, Tree tr, boolean defined) {
 		super(tr);
 		this.vars = vars;
 		this.defined = defined;
 		tree = new FunctionTree(tr.getRoot());
 		paramMap = new HashMap<String, MathObject>(INIT_PARAM_CAP);
-	}
-
-	@Override
-	public MathObject negate() {
-		Node<Operator> opNode = new Node<Operator>(Operator.NEGATE);
-		opNode.left(tree.root);
-		tree.updateRoot();
-		return this;
-	}
-
-	@Override
-	public MathObject invert() {
-		Node<Operator> opNode = new Node<Operator>(Operator.INVERT);
-		opNode.left(tree.root);
-		tree.updateRoot();
-		return this;
 	}
 
 	@Override
@@ -76,11 +59,9 @@ public class MFunction extends MExpression {
 		return new MFunction(vars, tree.copy((n) -> {
 			if (n.data instanceof Variable) {
 				for (String v : vars)
-					if (!n.data.equals(v)) {
-						return new Node<MathObject>(((Variable) n.data).evaluate());
-					} else {
+					if (n.data.equals(v))
 						return new Node<Variable>(new Variable(v));
-					}
+				return new Node<MathObject>(((Variable) n.data).evaluate());
 			} else if (n.data instanceof MathObject)
 				return new Node<MathObject>(((MathObject) n.data).evaluate());
 			return new Node<Object>(n.data);
@@ -100,25 +81,33 @@ public class MFunction extends MExpression {
 	 * DFS on tree in the {@code MExpression} is performed, in which all variables,
 	 * except the ones on which the function depends, are evaluated.
 	 * </p>
+	 * <p>
+	 * Note that if the function to be created depends on other functions there are
+	 * several options:
+	 * <ul>
+	 * <li><tt>f(x)=g+h</tt>, g and h being functions with the same parameter(s) as
+	 * f: g and h will be copied into f</li>
+	 * <li><tt>f(x)=g(x)+h(x)</tt>: g and h will be referenced in f. This is the
+	 * same as <tt>f(x):=g+h</tt></li>
+	 * <li><tt>f(x)=g(x)+h</tt>: g will be referenced and h will be
+	 * copied.</tt></li>
+	 * </ul>
+	 * </p>
 	 * The example <tt>f(x,y)=x^2+a*y^2</tt> will be used in the params section.
 	 * 
-	 * @param s
-	 *            the part before the "=" or ":=" sign in the declaration, in this
-	 *            case <tt>f(x,y)</tt>. The variables will be {@code ["x", "y"]},
-	 *            and the name <tt>f</tt>.
-	 * @param expr
-	 *            the part after the "=" or ":=" sign. In this case "x^2+a*y^2".
-	 *            This will be parsed into a {@code MExpression} using
-	 *            {@link Parser#getTree()}.
-	 * @param defined
-	 *            whether or not the command contains a ":=". If <tt>false</tt> then
-	 *            <tt>a</tt> will be evaluated and its numerical value will be saved
-	 *            instead.
+	 * @param s       the part before the "=" or ":=" sign in the declaration, in
+	 *                this case <tt>f(x,y)</tt>. The variables will be
+	 *                {@code ["x", "y"]}, and the name <tt>f</tt>.
+	 * @param expr    the part after the "=" or ":=" sign. In this case "x^2+a*y^2".
+	 *                This will be parsed into a {@code MExpression} using
+	 *                {@link Parser#getTree()}.
+	 * @param defined whether or not the command contains a ":=". If <tt>false</tt>
+	 *                then <tt>a</tt> will be evaluated and its numerical value will
+	 *                be saved instead.
 	 * @return a new {@code MFunction} containing the variables array and the
 	 *         {@code MExpression}. Note that this {@code MFunction} will
 	 *         automatically be added to {@link Variables}.
-	 * @throws UnexpectedCharacterException
-	 *             as thrown by {@code Parser.getTree()}
+	 * @throws UnexpectedCharacterException as thrown by {@code Parser.getTree()}
 	 */
 	public static MFunction createAndStore(String s, String expr, boolean defined) throws UnexpectedCharacterException {
 		int brIndex = s.indexOf("(");
@@ -129,26 +118,36 @@ public class MFunction extends MExpression {
 			if (Variables.get(v) == null)
 				Variables.set(v, null);
 		Tree tr = new Parser(expr).getTree();
-		
+
 		tr.DFS(tr.getRoot(), n -> {
-			//If the node is a vector containing functions: turn it into a vector-function (field)
+			// If the node is a vector containing functions: turn it into a vector-function
+			// (field)
 			if (n.data instanceof MVector) {
 				for (MathObject e : ((MVector) n.data).elements()) {
 					if (e instanceof MExpression || e instanceof MFunction) {
-						tr.replace(n, new Node<MVectorFunction>(new MVectorFunction(vars, ((MVector) n.data), defined)));
+						tr.replace(n,
+								new Node<MVectorFunction>(new MVectorFunction(vars, ((MVector) n.data), defined)));
 						return;
 					}
 				}
 			}
-			
-			//If the node is internal and this function is not defined, replace this node with its evaluated value.
-			if (defined || n.isInternal())
+
+			// If the node is internal and this function is not defined, replace this node
+			// with its evaluated value.
+			if (defined)
 				return;
 			if (n.data instanceof Variable) {
 				for (String var : vars)
 					if (n.data.equals(var))
 						return;
-				n.replace(new Node<MathObject>(((Variable) n.data).evaluate()));
+				MathObject obj = ((Variable) n.data).get();
+				// if the variable is a function, replace the node with the tree of that
+				// function.
+				//if (obj instanceof MFunction)
+					//n.replace(new Node<MFunction>((MFunction) obj.evaluate()));
+				//else // if the variable is a different type of MathObject, replace the node with a
+						// new node containing the evaluated MathObject
+					n.replace(new Node<MathObject>(obj.evaluate()));
 			} else if (n.data instanceof MathObject)
 				n.replace(new Node<MathObject>(((MathObject) n.data).evaluate()));
 		});
@@ -168,15 +167,15 @@ public class MFunction extends MExpression {
 	 * with the same name as a parameter, the created entry will be removed from
 	 * {@code Variables}.
 	 * 
-	 * @param paramVals
-	 *            an array of {@link MathObject}s containing the values at which the
-	 *            function should be evaluated. Note that the order of the
-	 *            <tt>MathObject</tt>s in the array should correspond to the order
-	 *            of the parameters in the {@code MFunction}'s declaration.
+	 * @param paramVals an array of {@link MathObject}s containing the values at
+	 *                  which the function should be evaluated. Note that the order
+	 *                  of the <tt>MathObject</tt>s in the array should correspond
+	 *                  to the order of the parameters in the {@code MFunction}'s
+	 *                  declaration.
 	 * @return A {@link MathObject} containing the result of the evaluation.
 	 * @throws TreeException
-	 * @throws IllegalArgumentException
-	 *             if {@code paramVals.length != vars.length = true}.
+	 * @throws IllegalArgumentException if
+	 *                                  {@code paramVals.length != vars.length = true}.
 	 * @see #evaluateAt()
 	 */
 	public MathObject evaluateAt(MathObject... paramVals) throws TreeException {
@@ -184,7 +183,7 @@ public class MFunction extends MExpression {
 			throw new IllegalArgumentException(
 					"Function expected " + vars.length + " arguments, got " + paramVals.length);
 		paramMap.clear();
-		for(int i = 0; i < paramVals.length; i++)
+		for (int i = 0; i < paramVals.length; i++)
 			paramMap.put(vars[i], paramVals[i]);
 		return evaluateAt();
 	}
@@ -193,22 +192,20 @@ public class MFunction extends MExpression {
 	 * Evaluates the function at the values as given in the String. The values will
 	 * be retrieved by {@link Parser#getArgumentsAsMathObject(String)}.
 	 * 
-	 * @param s
-	 *            the String containing the values of the parameters, separated by
-	 *            commas. For example: when calling <tt>f(1,2,a)</tt>, <tt>s</tt>
-	 *            will be {@code "1,2,a"}. The function will be evaluated at
-	 *            {@code (1,2,a')} where <tt>a'</tt> is the result of
-	 *            {@code Variables.get("a").evaluate()}.
+	 * @param s the String containing the values of the parameters, separated by
+	 *          commas. For example: when calling <tt>f(1,2,a)</tt>, <tt>s</tt> will
+	 *          be {@code "1,2,a"}. The function will be evaluated at
+	 *          {@code (1,2,a')} where <tt>a'</tt> is the result of
+	 *          {@code Variables.get("a").evaluate()}.
 	 * @return A {@link MathObject} containing the result of the evaluation.
-	 * @throws UnexpectedCharacterException
-	 *             as thrown by {@link Parser#getArgumentsAsMathObject(String)}
-	 * @throws InvalidFunctionException
-	 *             as thrown by {@link Parser#getArgumentsAsMathObject(String)}
-	 * @throws TreeException
-	 *             as thrown by {@link #evaluateAt()}
-	 * @throws IllegalArgumentException
-	 *             if the amount of parameters in <tt>s</tt> does not equal the
-	 *             amount of function parameters.
+	 * @throws UnexpectedCharacterException as thrown by
+	 *                                      {@link Parser#getArgumentsAsMathObject(String)}
+	 * @throws InvalidFunctionException     as thrown by
+	 *                                      {@link Parser#getArgumentsAsMathObject(String)}
+	 * @throws TreeException                as thrown by {@link #evaluateAt()}
+	 * @throws IllegalArgumentException     if the amount of parameters in
+	 *                                      <tt>s</tt> does not equal the amount of
+	 *                                      function parameters.
 	 */
 	public MathObject evaluateAt(String s)
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
@@ -218,28 +215,27 @@ public class MFunction extends MExpression {
 					"Function expected " + vars.length + " arguments, got " + paramVals.length);
 		return evaluateAt(paramVals);
 	}
-	
+
 	public MathObject evaluateAt(HashMap<String, MathObject> map) throws TreeException {
 		setParamMap(map);
 		return evaluateAt();
 	}
-	
+
 	/**
 	 * Evaluates the {@link Tree} defined by this {@code MFunction}
 	 * 
 	 * @return A {@link MathObject} containing the result of the evaluation.
-	 * @throws TreeException
-	 *             as thrown by {@link Tree#evaluateTree()}
+	 * @throws TreeException as thrown by {@link Tree#evaluateTree()}
 	 * @see Tree#evaluateTree()
 	 */
 	public MathObject evaluateAt() throws TreeException {
 		return ((FunctionTree) tree).evaluateTree();
 	}
-	
+
 	public void putVariable(String name, MathObject mo) {
 		paramMap.put(name, mo);
 	}
-	
+
 	public void setParamMap(HashMap<String, MathObject> map) {
 		paramMap.clear();
 		paramMap.putAll(map);
@@ -262,29 +258,34 @@ public class MFunction extends MExpression {
 	public String toString() {
 		return Printer.toText(this);
 	}
-	
+
 	private class FunctionTree extends Tree {
-		
+
 		public FunctionTree(Node<?> root) {
 			super(root);
 		}
 
 		@Override
 		protected MathObject evaluateNode(Node<?> n) throws TreeException {
-			if(n.data instanceof Variable) {
+			if (n.data instanceof Variable) {
 				MathObject var = paramMap.get(((Variable) n.data).getName());
-				if(var instanceof MFunction) {
-					if(n.left() ==  null)
+				if (var instanceof MFunction) {
+					if (n.left() == null)
 						return ((MFunction) var).evaluateAt(paramMap);
-					else 
-						return ((MFunction) var).evaluateAt(((MVector) ((MVector) n.left().data).evaluate()).elements());
+					else
+						return ((MFunction) var).evaluateAt(((MVector) evaluateNode(n.left())).elements());
 				}
 				return var == null ? super.evaluateNode(n) : var;
-			} else if(n.data instanceof MVectorFunction) {
-				if(n.left() == null)
+			} else if (n.data instanceof MVectorFunction) {
+				if (n.left() == null)
 					return ((MVectorFunction) n.data).evaluateAt(paramMap);
 				else
-					return ((MVectorFunction) n.data).evaluateAt(((MVector) ((MVector) n.left().data).evaluate()).elements());
+					return ((MVectorFunction) n.data).evaluateAt(((MVector) evaluateNode(n.left())).elements());
+			} else if(n.data instanceof MFunction) {
+				if (n.left() == null)
+					return ((MFunction) n.data).evaluateAt(paramMap);
+				else
+					return ((MFunction) n.data).evaluateAt(((MVector) evaluateNode(n.left())).elements());
 			}
 			return super.evaluateNode(n);
 		}

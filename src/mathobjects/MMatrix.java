@@ -108,7 +108,7 @@ public class MMatrix implements MathObject {
 	 */
 	public MVector getRow(int i) {
 		MathObject[] v = new MathObject[m[i].length];
-		for(int j = 0; j < m.length; j++)
+		for(int j = 0; j < m[i].length; j++)
 			v[j] = m[i][j];
 		return new MVector(v);
 	}
