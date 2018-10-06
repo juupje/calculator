@@ -220,6 +220,13 @@ public class MVector implements MathObject {
 		return v;
 	}
 	
+	public boolean isOfType(Class<? extends MathObject> c) {
+		for(MathObject mo : v)
+			if(!mo.getClass().isAssignableFrom(c))
+				return false;
+		return true;
+	}
+	
 	@Override
 	public String toString() {
 		String s = "(";

@@ -5,6 +5,7 @@ import static main.Operator.DIVIDE;
 import static main.Operator.MULTIPLY;
 import static main.Operator.SUBTRACT;
 
+import algorithms.Algorithms;
 import algorithms.Functions;
 import algorithms.Functions.Function;
 import helpers.exceptions.InvalidFunctionException;
@@ -296,9 +297,10 @@ public class Parser {
 			if (Variables.exists(letters)) {
 				d = Variables.get(letters);
 				if(d instanceof MFunction) {
-					if(!consume('('))
-						throw new UnexpectedCharacterException("Expected '(' after a function instead of '" + (char) ch + "'");
-					d = ((MFunction) d).evaluateAt(findEndOfBrackets());
+					if(consume('('))
+						d = ((MFunction) d).evaluateAt(findEndOfBrackets());
+					//else
+						//throw new UnexpectedCharacterException("Expected '(' after a function instead of '" + (char) ch + "'.");
 				} //No 'else if' because if the result from the MFunction is a matrix or vector, it the following if-statement can be applied as well.
 				if(d instanceof MVector || d instanceof MMatrix) {
 					do {
@@ -310,7 +312,11 @@ public class Parser {
 					d = d.evaluate();
 			} else if (MConst.isConstant(letters))
 				d = MConst.get(letters).evaluate();
-			else {
+			else if(Algorithms.isAlgorithm(letters)) {
+				if(!consume('('))
+					throw new UnexpectedCharacterException("Expected '(' after a function instead of '" + (char) ch + "'.");
+				d = Algorithms.getAlgorithm(letters).execute(getArgumentsAsMathObject(findEndOfBrackets()));
+			} else {
 				d = processFactor(); // Gets the factor inside the function
 				if(Functions.isFunction(letters))
 					d = Functions.getFunction(letters).evaluate(d);

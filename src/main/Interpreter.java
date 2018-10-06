@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import helpers.Printer;
+import helpers.Timer;
 import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
@@ -30,6 +31,9 @@ public class Interpreter {
 		} else if (s.startsWith("type")) {
 			String name = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
 			Calculator.ioHandler.out(Variables.get(name).getClass());
+		} else if(s.startsWith("time")) {
+			String args = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
+			Calculator.ioHandler.out(Timer.time(args).toString());
 		} else if (s.startsWith("latex")) {
 			String args = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
 			Printer.latex(args);

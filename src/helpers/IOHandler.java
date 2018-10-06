@@ -11,21 +11,34 @@ public class IOHandler {
 	
 	protected Scanner scan;
 	private boolean reading;
+	private boolean enabled = true;
+	
+	public void disable() {
+		enabled = false;
+	}
+	
+	public void enable() {
+		enabled = true;
+	}
 	
 	public void err(String str) {
-		System.err.println(str);
+		if(enabled)
+			System.err.println(str);
 	}
 	
 	public void out(String str) {
-		System.out.println(str);
+		if(enabled)
+			System.out.println(str);
 	}
 	
 	public void out(Object obj) {
-		out(obj.toString());
+		if(enabled)
+			out(obj.toString());
 	}
 	
 	public void outNoLine(String str) {
-		System.out.print(str);
+		if(enabled)
+			System.out.print(str);
 	}
 	
 	public void startConsoleInput() {
