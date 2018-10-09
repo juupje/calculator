@@ -147,6 +147,11 @@ public class Printer {
 			case INVERT:
 				s += "\\frac{1}{" + printNodeLatex(n.left()) + "}";
 				break;
+			case ELEMENT:
+				s += printNodeLatex(n.left()) + "_{" + printNodeLatex(n.right()) + "}"; 
+				break;
+			default:
+				break;
 			}
 		} else if (n.data instanceof Function) {
 			String s2 = printNodeLatex(n.left());
@@ -254,9 +259,9 @@ public class Printer {
 			case POWER:
 				String right = nodeToText(n.right());
 				String left = nodeToText(n.left());
-				if (n.right().isInternal()) //Brackets are needed
+				if (n.right().right() != null) //Brackets are needed
 					right = "(" + right + ")";
-				if(n.left().isInternal())
+				if(n.left().right() != null)
 					left = "(" + left + ")";
 				s += left + (op == Operator.POWER ? "^" : "/") + right;
 				break;
@@ -268,6 +273,11 @@ public class Printer {
 				break;
 			case INVERT:
 				s += "1/" + (n.left().isInternal() ? "(" + nodeToText(n.left()) + ")" : nodeToText(n.left()));
+				break;
+			case ELEMENT:
+				s += nodeToText(n.left()) + "[" + nodeToText(n.right()) + "]";
+				break;
+			default:
 				break;
 			}
 		} else if (n.data instanceof Function)

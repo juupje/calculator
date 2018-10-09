@@ -13,28 +13,40 @@ public class Integrator extends Algorithm{
 	MScalar[] a;
 	MScalar[] b;
 	int steps;
-
+	int multiplier;
+	
 	@Override
 	public MScalar execute(MathObject... args) {
+		multiplier = 1;
 		prepare(args);
-		MScalar[] x = a;
-		return new MScalar(integrate(f, x, a, b, steps, 0));
+		if(multiplier == 0) return new MScalar(0);
+		MScalar[] x = new MScalar[a.length];
+		for(int i = 0; i < a.length; i++)
+			x[i] = (MScalar) a[i].copy();
+		return new MScalar(integrate(f, x, a, b, steps, 0)*multiplier);
 	}
 	
-	private static double integrate(MFunction f, MScalar[] x, MScalar[] a, MScalar[] b, int steps, int index) {
+	private double integrate(MFunction f, MScalar[] x, MScalar[] a, MScalar[] b, int steps, int index) {
+		//System.out.println("Integrating " + index + " from " + a[index] + " to " + b[index]);
 		double delta = (b[index].getValue() - a[index].getValue()) / (double) steps;
 		double sum = 0;
 		try {
-		for(x[index].setValue(a[index].getValue()); x[index].getValue() < b[index].getValue(); x[index].add(delta)) {
-			if(index == x.length-1)
-				sum += ((MScalar) f.evaluateAt(x)).getValue();
-			else
-				sum += integrate(f, x, a, b, steps, index+1);
-		}
+			for (x[index].setValue(a[index].getValue()); x[index].getValue() < b[index].getValue(); x[index]
+					.add(delta)) {
+				if (index == x.length - 1)
+					sum += ((MScalar) f.evaluateAt(x)).getValue();
+				else {
+					sum += integrate(f, x, a, b, steps, index + 1);
+					//reset x to the start values in all higher dimensions
+					for(int i = index+1; i < a.length; i++)
+						x[i] = (MScalar) a[i].copy();
+				}
+			}
 		} catch (TreeException e) {
 			e.printStackTrace();
 		}
-		return sum*delta;
+		//System.out.println("Sum: " + sum);
+		return sum * delta;
 	}
 	
 	@Override
@@ -80,6 +92,18 @@ public class Integrator extends Algorithm{
 			} else
 				//If there is no 4th argument, set steps to the default (10,000).
 				steps = (int) 1e5;
+			
+			for(int i = 0; i < a.length; i++) {
+				if(a[i].getValue() > b[i].getValue()) {
+					MScalar c = a[i];
+					a[i] = b[i];
+					b[i] = c;
+					multiplier *= -1;
+				} else if(a[i].equals(b[i])) {
+					multiplier = 0;
+					return;
+				}
+			}
 		} else {
 			String msg = "Arguments (";
 			for(int i = 0; i < args.length; i++)

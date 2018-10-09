@@ -5,14 +5,15 @@ import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Calculator;
 import main.Interpreter;
+import main.Parser;
 
 public class Timer {
 
 	public static TimerResult time(String s) {
-		String[] args = s.split(",");
+		String[] args = Parser.getArguments(s);
 		if (args.length > 2)
 			throw new IllegalArgumentException("Expected 1 or 2 arguments, got " + args.length);
-		int repeats = 1000;
+		int repeats = 100;
 		if (args.length == 2)
 			try {
 				repeats = (int) Integer.parseInt(args[1]);
@@ -36,23 +37,22 @@ public class Timer {
 	}
 
 	public static class TimerResult {
-		long time;
+		double time;
 		int repeats;
 		double avg;
 		String command;
 
 		public TimerResult(long time, int repeats, String command) {
-			this.time = time;
+			this.time = time*1e-9; //convert from ns to s
 			this.repeats = repeats;
-			this.avg = time / repeats;
+			this.avg = this.time / repeats;
 			this.command = command;
 		}
 
 		@Override
 		public String toString() {
 			return "Timer results for command: " + command + System.lineSeparator() + "  loops: " + repeats
-					+ System.lineSeparator() + "  total time: " + time + System.lineSeparator() + "  avg time: " + avg
-					+ System.lineSeparator();
+					+ System.lineSeparator() + "  total time: " + time + System.lineSeparator() + "  avg time: " + avg;
 		}
 
 	}

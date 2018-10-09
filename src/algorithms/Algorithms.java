@@ -16,7 +16,7 @@ public enum Algorithms {
 	}
 	
 	public static boolean isAlgorithm(String s) {
-		return getAlgorithm(s) != null;
+		try {return getAlgorithm(s) != null;}catch(IllegalArgumentException e) {return false;}
 	}
 	
 	public static Algorithms getAlgorithm(String s) {

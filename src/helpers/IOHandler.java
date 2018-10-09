@@ -2,9 +2,6 @@ package helpers;
 
 import java.util.Scanner;
 
-import helpers.exceptions.InvalidFunctionException;
-import helpers.exceptions.TreeException;
-import helpers.exceptions.UnexpectedCharacterException;
 import main.Interpreter;
 
 public class IOHandler {

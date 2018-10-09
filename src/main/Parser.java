@@ -5,6 +5,8 @@ import static main.Operator.DIVIDE;
 import static main.Operator.MULTIPLY;
 import static main.Operator.SUBTRACT;
 
+import java.util.ArrayList;
+
 import algorithms.Algorithms;
 import algorithms.Functions;
 import algorithms.Functions.Function;
@@ -73,12 +75,19 @@ public class Parser {
 	}
 
 	public Node<?> getSubTree() throws UnexpectedCharacterException {
+		//save variables into temporary ones.
+		Tree oldTree = tree;
+		Node<?> oldP = p;
 		tree = new Tree();
 		nextChar();
 		tree.root = p = getFactor();
 		while (ch > 0 && p != null)
 			p = getTerm();
-		return tree.root;
+		Node<?> root = tree.root;
+		//Restore temp variables.
+		tree = oldTree;
+		p = oldP;
+		return root;
 	}
 
 	/**
@@ -201,9 +210,8 @@ public class Parser {
 			return n.right();
 		} else if (consume('*')) {
 			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), Node.LEFT);
-			n = p;
+			//n = p;
 			p = p.parent;
-			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('/')) {
@@ -358,6 +366,23 @@ public class Parser {
 	}
 	
 	public static String[] getArguments(String s) {
-		return s.replace(" ", "").split(",");
+		int brCount = 0;
+		int lastPos = 0;
+		ArrayList<String> arguments = new ArrayList<String>();
+		for(int i = 0; i < s.length(); i++) {
+			char c= s.charAt(i);
+			if(c==' ') continue;
+			if(c == ',' && brCount == 0) {
+				arguments.add(s.substring(lastPos, i).trim()); 
+				//increment i because s.charAt(i)==',' which shouldn't be included in the next argument
+				lastPos = i+1;
+			} else if(c == '(' || c=='[' || c == '{')
+				brCount++;
+			else if(c==')' || c==']' || c=='}')
+				brCount--;
+		}
+		arguments.add(s.substring(lastPos));
+		String[] args = new String[arguments.size()];
+		return arguments.toArray(args);
 	}
 }
