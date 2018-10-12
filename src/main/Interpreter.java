@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import helpers.Printer;
+import helpers.Setting;
 import helpers.Timer;
 import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.TreeException;
@@ -46,20 +47,25 @@ public class Interpreter {
 				Calculator.ioHandler.err("There exists no variable with that name.");
 			else
 				Calculator.ioHandler.out(Printer.toText(mo));
+		} else if (s.startsWith("setting")){
+			Setting.processCommand(s.substring(s.indexOf("(") + 1, s.lastIndexOf(")")));
 		} else {
-			Calculator.ioHandler.out(new Parser(s).evaluate().toString());
+			MathObject result = new Parser(s).evaluate();
+			Variables.ans(result);
+			Calculator.ioHandler.out(result.toString());
 		}
 	}
 
 	private static void assign(String name, String op, String expr)
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
 		Operator operator = null;
+		MathObject result = null;
 		switch (op) {
 		case ":":
 			if (name.contains("("))
-				MFunction.createAndStore(name, expr, true);
+				result = MFunction.create(name, expr, true);
 			else
-				Variables.set(name, new MExpression(expr));
+				result = new MExpression(expr);
 			break;
 		case "+":
 			operator = Operator.ADD;
@@ -75,16 +81,22 @@ public class Interpreter {
 			break;
 		default:
 			if (name.contains("(")) {
-				MFunction.createAndStore(name, expr, false);
-				Calculator.ioHandler.out(Variables.get(name.substring(0, name.indexOf("("))).toString());
+				result = MFunction.create(name, expr, false);
+				name = name.substring(0, name.indexOf("("));
 			} else {
-				Variables.set(name, new Parser(expr).evaluate());
-				Calculator.ioHandler.out(Variables.get(name).toString());
+				result = new Parser(expr).evaluate();
 			}
 			break;
 		}
 		if (operator != null)
-			Variables.set(name, operator.evaluate(Variables.get(name), new Parser(expr).evaluate()));
+			result = operator.evaluate(Variables.get(name), new Parser(expr).evaluate());
+		
+		if(result != null) {
+			Variables.set(name, result);
+			Variables.ans(result);
+			Calculator.ioHandler.out(result.toString());
+		}
+			
 	}
 
 	public static void execute(File f) throws UnexpectedCharacterException, InvalidFunctionException, TreeException {

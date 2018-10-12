@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
 
+import com.sun.scenario.Settings;
+
 import algorithms.Functions.Function;
 import main.Operator;
 import main.Variables;
@@ -470,15 +472,15 @@ public class Printer {
 	 */
 	public static String numToString(double num) {
 		String s = "";
-		if ((Math.abs(num) >= 0.01 && Math.abs(num) < 1000 && Settings.NOTATION == Settings.ENG) || num == 0 || Settings.NOTATION == Settings.NORMAL || (Settings.NOTATION == Settings.SCI && Math.abs(num) < 10 && Math.abs(num) >= 1)) {
-			s = String.format("%." + Settings.PRECISSION + "f", num);
+		if ((Math.abs(num) >= 0.01 && Math.abs(num) < 1000 && Setting.getInt(Setting.NOTATION) == Setting.ENG) || num == 0 || Setting.getInt(Setting.NOTATION) == Setting.NORMAL || (Setting.getInt(Setting.NOTATION) == Setting.SCI && Math.abs(num) < 10 && Math.abs(num) >= 1)) {
+			s = String.format("%." + Setting.getInt(Setting.PRECISION) + "f", num);
 			while (s.endsWith("0"))
 				s = s.substring(0, s.length() - 1);
 			if (s.endsWith("."))
 				s = s.substring(0, s.length() - 1);
 		} else {
 			String format = "0.";
-			for (int i = 0; i < Settings.PRECISSION; i++) format += "#";
+			for (int i = 0; i < Setting.getInt(Setting.PRECISION); i++) format += "#";
 			format += "E0";
 			s = new DecimalFormat(format).format(num);
 		}

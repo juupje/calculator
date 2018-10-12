@@ -1,6 +1,7 @@
 package algorithms.calculus;
 
 import algorithms.Algorithm;
+import helpers.Setting;
 import helpers.exceptions.TreeException;
 import mathobjects.MFunction;
 import mathobjects.MScalar;
@@ -91,7 +92,7 @@ public class Integrator extends Algorithm{
 					throw new IllegalArgumentException("Argument 4 has to be an integer valued scalar, got " + args[3].toString());
 			} else
 				//If there is no 4th argument, set steps to the default (10,000).
-				steps = (int) 1e5;
+				steps = Setting.getInt(Setting.DEF_INT_STEPS);
 			
 			for(int i = 0; i < a.length; i++) {
 				if(a[i].getValue() > b[i].getValue()) {
@@ -107,7 +108,7 @@ public class Integrator extends Algorithm{
 		} else {
 			String msg = "Arguments (";
 			for(int i = 0; i < args.length; i++)
-				msg += args[i].getClass() + (i==args.length ? "" : ", ");
+				msg += args[i].getClass()+ (i==args.length ? "" : ", ");
 			throw new IllegalArgumentException(msg + ") not applicable for Integration algorithm, expected (MFunction, MScalar, MScalar, MScalar) or "
 					+ "(MFunction, MVector, MVector, MScalar).");			
 		}

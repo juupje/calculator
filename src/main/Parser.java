@@ -161,7 +161,7 @@ public class Parser {
 				nextChar();
 			} while (Character.isDigit(ch) || ch == '.');
 			String s1 = expr.substring(position, pos);
-			if (s1 == "-") {
+			if (s1.equals("-")) {
 				if (p == null)
 					tree.root = p = new Node<Operator>(Operator.MULTIPLY);
 				else

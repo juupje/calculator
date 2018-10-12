@@ -1,0 +1,6 @@
+{
+    "notation": 1,
+    "precision": 3,
+    "def_int_steps": 10000,
+    "def_timer_runs": 100
+}

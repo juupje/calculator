@@ -3,6 +3,7 @@ package main;
 import java.io.File;
 
 import helpers.IOHandler;
+import helpers.Setting;
 import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
@@ -12,6 +13,7 @@ public class Calculator {
 	public static IOHandler ioHandler;
 	
 	public Calculator() {
+		Setting.loadPrefs();
 		ioHandler.startConsoleInput();
 	}
 	

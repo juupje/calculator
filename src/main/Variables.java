@@ -20,6 +20,14 @@ public class Variables {
 	public static void remove(String string) {
 		vars.remove(string);
 	}
+	
+	public static void ans(MathObject mo) {
+		set("ans", mo);
+	}
+	
+	public static MathObject ans() {
+		return get("ans");
+	}
 
 	public static HashMap<String, MathObject> getAll() {
 		return vars;

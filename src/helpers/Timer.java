@@ -13,7 +13,7 @@ public class Timer {
 		String[] args = Parser.getArguments(s);
 		if (args.length > 2)
 			throw new IllegalArgumentException("Expected 1 or 2 arguments, got " + args.length);
-		int repeats = 100;
+		int repeats = Setting.getInt(Setting.DEF_TIMER_RUNS);
 		if (args.length == 2)
 			try {
 				repeats = (int) Integer.parseInt(args[1]);

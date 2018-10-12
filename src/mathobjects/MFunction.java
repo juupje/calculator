@@ -109,7 +109,7 @@ public class MFunction extends MExpression {
 	 *         automatically be added to {@link Variables}.
 	 * @throws UnexpectedCharacterException as thrown by {@code Parser.getTree()}
 	 */
-	public static MFunction createAndStore(String s, String expr, boolean defined) throws UnexpectedCharacterException {
+	public static MFunction create(String s, String expr, boolean defined) throws UnexpectedCharacterException {
 		int brIndex = s.indexOf("(");
 		String[] vars = s.substring(brIndex + 1, s.lastIndexOf(")")).replace(" ", "").split(",");
 		// Add all variables temporary to the Variables list, in order to prevent
@@ -155,7 +155,7 @@ public class MFunction extends MExpression {
 		for (String v : vars)
 			if (Variables.get(v) == null)
 				Variables.remove(v);
-		return (MFunction) new Variable(s.substring(0, brIndex), new MFunction(vars, tr, defined)).get();
+		return new MFunction(vars, tr, defined);
 	}
 
 	/**

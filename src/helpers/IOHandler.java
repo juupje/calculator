@@ -67,4 +67,24 @@ public class IOHandler {
 		scan.close();
 		scan = null;
 	}
+	
+	public boolean askYesNo(String question) {
+		if(ask(question, new String[] {"yes", "y", "1"}, new String[] {"no", "n", "0"}).equals("yes"))
+			return true;
+		return false;
+	}
+	
+	public String ask(String question, String[]... options) {
+		if(options.length == 0) return null;
+		String optionString = "";
+		for(String[] option : options)
+			optionString += option[0] + "/";
+		out(question + " [" + optionString.substring(0, optionString.length()-1) + "]");
+		String result = in();
+		for(String[] option : options)
+			for(String s : option)
+				if(s.equals(result))
+					return option[0];
+		return options[0][0];
+	}
 }
