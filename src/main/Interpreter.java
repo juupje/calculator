@@ -41,6 +41,9 @@ public class Interpreter {
 		} else if (s.startsWith("dot")) {
 			String args = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
 			Printer.dot(args);
+		} else if (s.startsWith("execute")) {
+			String arg = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
+			execute(new File(arg));
 		} else if (s.startsWith("print")) {
 			MathObject mo = Variables.get(s.substring(s.indexOf("(") + 1, s.lastIndexOf(")")));
 			if (mo == null)

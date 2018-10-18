@@ -16,15 +16,50 @@ public class Integrator extends Algorithm{
 	int steps;
 	int multiplier;
 	
-	@Override
-	public MScalar execute(MathObject... args) {
-		multiplier = 1;
-		prepare(args);
-		if(multiplier == 0) return new MScalar(0);
+	public Integrator() {};
+	
+	public Integrator(MFunction f, MScalar[] a, MScalar b[], int steps) {
+		f = (MFunction) f.evaluate();
+		this.a = a;
+		this.b = b;
+		this.steps = steps;
+		this.multiplier = 1;
+		prepared = true;
+	}
+	
+	public Integrator(MFunction f, MScalar[] a, MScalar[] b) {
+		this(f, a, b, Setting.getInt(Setting.DEF_INT_STEPS));
+	}
+	
+	public Integrator(MFunction f, MScalar a, MScalar b, int steps) {
+		this(f, new MScalar[] {a}, new MScalar[] {b}, steps);
+	}
+	
+	public Integrator(MFunction f, MScalar a, MScalar b) {
+		this(f, a, b, Setting.getInt(Setting.DEF_INT_STEPS));
+	}
+	
+	public MScalar execute() {
+		if(!prepared) return null;
+		for(int i = 0; i < a.length; i++) {
+			if(a[i].getValue() > b[i].getValue()) {
+				MScalar c = a[i];
+				a[i] = b[i];
+				b[i] = c;
+				multiplier *= -1;
+			} else if(a[i].equals(b[i]))
+				return new MScalar(0);
+		}
 		MScalar[] x = new MScalar[a.length];
 		for(int i = 0; i < a.length; i++)
 			x[i] = (MScalar) a[i].copy();
 		return new MScalar(integrate(f, x, a, b, steps, 0)*multiplier);
+	}
+	
+	@Override
+	public MScalar execute(MathObject... args) {
+		prepare(args);
+		return execute();
 	}
 	
 	private double integrate(MFunction f, MScalar[] x, MScalar[] a, MScalar[] b, int steps, int index) {
@@ -52,6 +87,7 @@ public class Integrator extends Algorithm{
 	
 	@Override
 	protected void prepare(MathObject[] args) {
+		super.prepare(args);
 		//Evaluate the second and third parameter (lower and upper bound of the integration).
 		//This also copies the values (preventing them from being chanced during the algorithm) and replaces Variables with their values.
 		args[1] = args[1].evaluate();
@@ -93,24 +129,7 @@ public class Integrator extends Algorithm{
 			} else
 				//If there is no 4th argument, set steps to the default (10,000).
 				steps = Setting.getInt(Setting.DEF_INT_STEPS);
-			
-			for(int i = 0; i < a.length; i++) {
-				if(a[i].getValue() > b[i].getValue()) {
-					MScalar c = a[i];
-					a[i] = b[i];
-					b[i] = c;
-					multiplier *= -1;
-				} else if(a[i].equals(b[i])) {
-					multiplier = 0;
-					return;
-				}
-			}
-		} else {
-			String msg = "Arguments (";
-			for(int i = 0; i < args.length; i++)
-				msg += args[i].getClass()+ (i==args.length ? "" : ", ");
-			throw new IllegalArgumentException(msg + ") not applicable for Integration algorithm, expected (MFunction, MScalar, MScalar, MScalar) or "
-					+ "(MFunction, MVector, MVector, MScalar).");			
-		}
+		} else
+			throw new IllegalArgumentException("Arguments " + argTypesToString(args) + " not applicable for Integration algorithm see help for the correct use.");			
 	}
 }

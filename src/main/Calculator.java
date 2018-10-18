@@ -13,7 +13,6 @@ public class Calculator {
 	public static IOHandler ioHandler;
 	
 	public Calculator() {
-		Setting.loadPrefs();
 		ioHandler.startConsoleInput();
 	}
 	
@@ -23,6 +22,7 @@ public class Calculator {
 	
 	public static void main(String[] args) {
 		setHandler(new IOHandler());
+		Setting.loadPrefs();
 		if(args != null && args.length > 0) {
 			if(args[0].equals("run"))
 				try {

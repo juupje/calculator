@@ -265,7 +265,7 @@ public class MMatrix implements MathObject {
 	
 	/**
 	 * Creates an augmented matrix of <tt>this</tt> and <tt>b</tt>.
-	 * The augmented matrix is basically two matrices (or matrix and vector) glued together.
+	 * The augmented matrix is basically two matrices glued together.
 	 * Note that the elements of <tt>this</tt> and <tt>b</tt> are copied into the augmented matrix,
 	 * so any changes made to the elements in the augmented matrix, will not affect the originals.
 	 * @param b the <tt>MMatrix</tt> this one should be augmented with.
@@ -280,6 +280,25 @@ public class MMatrix implements MathObject {
 			for(int k = dim.cols; k < dim.cols + b.dim().cols; k++) {
 				augm[i][k] = b.get(i, k-dim.cols).copy();
 			}
+		}
+		return new MMatrix(augm);
+	}
+	
+	/**
+	 * Creates an augmented matrix of <tt>this</tt> and a <tt>MVector b</tt>.
+	 * The augmented matrix is basically the matrix and the vector glued together.
+	 * Note that the elements of <tt>this</tt> and <tt>b</tt> are copied into the augmented matrix,
+	 * so any changes made to the elements in the augmented matrix, will not affect the originals.
+	 * @param b the <tt>MVector</tt> this matrix should be augmented with.
+	 * @return a new, augmented <tt>MMatrix</tt>, or <tt>this</tt> if <tt>b==null</tt>.
+	 */
+	public MMatrix augment(MVector b) {
+		if(b == null) return this;
+		MathObject augm[][] = new MathObject[dim.rows()][dim.cols()+1];
+		for(int i = 0; i < dim.rows(); i++) {
+			for(int j = 0; j < dim.cols(); j++)
+				augm[i][j]=m[i][j].copy();
+			augm[i][dim.cols()] = b.get(i).copy();
 		}
 		return new MMatrix(augm);
 	}

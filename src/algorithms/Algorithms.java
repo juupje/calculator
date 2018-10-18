@@ -2,9 +2,13 @@ package algorithms;
 
 import mathobjects.MathObject;
 import algorithms.calculus.Integrator;
+import algorithms.linalg.GaussianElimination;
+import algorithms.linalg.JordanElimination;
 
 public enum Algorithms {
-	INTEGRATE(new Integrator());
+	INTEGRATE(new Integrator()),
+	REF(new GaussianElimination()),
+	RREF(new JordanElimination());
 	
 	Algorithm a;
 	Algorithms(Algorithm a) {
