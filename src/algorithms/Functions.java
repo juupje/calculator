@@ -8,6 +8,18 @@ import mathobjects.MathObject;
 public class Functions {
 
 	public enum Function {
+		TODEG {
+			@Override
+			public MathObject evaluate(MathObject m) {
+				return toDegree(m);
+			}
+		},
+		TORAD {
+			@Override
+			public MathObject evaluate(MathObject m) {
+				return toRadians(m);
+			}
+		},
 		SIN {
 			@Override
 			public MScalar evaluate(MathObject m) {
@@ -44,6 +56,30 @@ public class Functions {
 				return tand(m);
 			}
 		},
+		ASIN {
+			@Override
+			public MScalar evaluate(MathObject m) {
+				return asin(m);
+			}
+		},
+		ACOS {
+			@Override
+			public MScalar evaluate(MathObject m) {
+				return acos(m);
+			}
+		},
+		ATAN {
+			@Override
+			public MScalar evaluate(MathObject m) {
+				return atan(m);
+			}
+		},
+		SQRT {
+			@Override
+			public MScalar evaluate(MathObject m) {
+				return sqrt(m);
+			}
+		},
 		ABS {
 			@Override
 			public MScalar evaluate(MathObject m) {
@@ -63,7 +99,7 @@ public class Functions {
 			}
 		};
 
-		public abstract MScalar evaluate(MathObject m);
+		public abstract MathObject evaluate(MathObject m);
 	}
 
 	//############### TRIGONOMETRIC FUNCTIONS ###############
@@ -113,7 +149,7 @@ public class Functions {
 	 * @see #toDegree(MathObject)
 	 */
 	public static MScalar sind(MathObject m) {
-		return sin(toDegree(m));
+		return sin(toRadians(m));
 	}
 
 	/**
@@ -123,7 +159,7 @@ public class Functions {
 	 * @see #toDegree(MathObject)
 	 */
 	public static MScalar cosd(MathObject m) {
-		return cos(toDegree(m));
+		return cos(toRadians(m));
 	}
 
 	/**
@@ -133,7 +169,46 @@ public class Functions {
 	 * @see #toDegree(MathObject)
 	 */
 	public static MScalar tand(MathObject m) {
-		return tan(toDegree(m));
+		return tan(toRadians(m));
+	}
+	
+	/**
+	 * Calculates the arc sine of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * @param m a <tt>MScalar</tt> of which the arc sine should be calculated (in radians).
+	 * @return a <tt>MScalar</tt> containing the arc sine of <tt>m</tt>.
+	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
+	 */
+	public static MScalar asin(MathObject m) {
+		if (m instanceof MScalar)
+			return new MScalar(Math.asin(((MScalar) m).getValue()));
+		else
+			throw new InvalidOperationException("Arc sine is not defined for " + m.getClass());
+	}
+
+	/**
+	 * Calculates the arc cosine of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * @param m a <tt>MScalar</tt> of which the arc cosine should be calculated.
+	 * @return a <tt>MScalar</tt> containing the arc cosine of <tt>m</tt> (in radians).
+	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
+	 */
+	public static MScalar acos(MathObject m) {
+		if (m instanceof MScalar)
+			return new MScalar(Math.acos(((MScalar) m).getValue()));
+		else
+			throw new InvalidOperationException("Arc cosine is not defined for " + m.getClass());
+	}
+
+	/**
+	 * Calculates the arc tangent of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * @param m a <tt>MScalar</tt> of which the arc tangent should be calculated.
+	 * @return a <tt>MScalar</tt> containing the arc tangent of <tt>m</tt> (in radians).
+	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
+	 */
+	public static MScalar atan(MathObject m) {
+		if (m instanceof MScalar)
+			return new MScalar(Math.atan(((MScalar) m).getValue()));
+		else
+			throw new InvalidOperationException("Arc tangent is not defined for " + m.getClass());
 	}
 	
 	//############### CONVERSION FUNCTIONS ###############

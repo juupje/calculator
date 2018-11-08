@@ -30,33 +30,35 @@ public class Interpreter {
 			assign(s.substring(0, index - (containsOp ? 1 : 0)), containsOp ? s.substring(index - 1, index) : "",
 					s.substring(index + 1));
 		} else if (s.startsWith("type")) {
-			String name = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
-			Calculator.ioHandler.out(Variables.get(name).getClass());
+			Calculator.ioHandler.out(Variables.get(argsFromString(s)).getClass());
 		} else if(s.startsWith("time")) {
-			String args = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
-			Calculator.ioHandler.out(Timer.time(args).toString());
+			Calculator.ioHandler.out(Timer.time(argsFromString(s)).toString());
 		} else if (s.startsWith("latex")) {
-			String args = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
-			Printer.latex(args);
+			Printer.latex(argsFromString(s));
 		} else if (s.startsWith("dot")) {
-			String args = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
-			Printer.dot(args);
+			Printer.dot(argsFromString(s));
 		} else if (s.startsWith("execute")) {
-			String arg = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
-			execute(new File(arg));
+			execute(new File(argsFromString(s)));
+		} else if (s.startsWith("delete") || s.startsWith("del")) {
+			for(String name : Parser.getArguments(argsFromString(s)))
+				Variables.remove(name);
 		} else if (s.startsWith("print")) {
-			MathObject mo = Variables.get(s.substring(s.indexOf("(") + 1, s.lastIndexOf(")")));
+			MathObject mo = Variables.get(argsFromString(s));
 			if (mo == null)
 				Calculator.ioHandler.err("There exists no variable with that name.");
 			else
 				Calculator.ioHandler.out(Printer.toText(mo));
 		} else if (s.startsWith("setting")){
-			Setting.processCommand(s.substring(s.indexOf("(") + 1, s.lastIndexOf(")")));
+			Setting.processCommand(argsFromString(s));
 		} else {
 			MathObject result = new Parser(s).evaluate();
 			Variables.ans(result);
 			Calculator.ioHandler.out(result.toString());
 		}
+	}
+	
+	private static String argsFromString(String s) {
+		return s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
 	}
 
 	private static void assign(String name, String op, String expr)

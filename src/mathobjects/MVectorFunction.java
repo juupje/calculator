@@ -78,12 +78,17 @@ public class MVectorFunction extends MVector {
 			values[i] = ((MFunction) v[i]).evaluateAt();
 		return new MVector(values);
 	}
+	
+	public String[] getParameters() {
+		return vars;
+	}
+	
+	public boolean isDefined() {
+		return defined;
+	}
 
 	@Override
 	public String toString() {
 		return super.toString();
-	}
-
-	
+	}	
 }
- 
