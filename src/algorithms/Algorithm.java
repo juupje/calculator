@@ -1,5 +1,7 @@
 package algorithms;
 
+import helpers.Shape;
+import helpers.exceptions.ShapeException;
 import mathobjects.MathObject;
 
 /**
@@ -25,6 +27,8 @@ public abstract class Algorithm {
 	public abstract MathObject execute(); // Intended for internal use, arguments have to be passed via constructor.
 
 	public abstract MathObject execute(MathObject... args);
+	
+	public abstract Shape shape(Shape... shapes) ;
 
 	protected void prepare(MathObject[] args) {
 		prepared = true;

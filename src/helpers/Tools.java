@@ -9,6 +9,13 @@ public class Tools {
 		return result.substring(0, result.length()-s.length());
 	}
 	
+	public static String join(String s, int[] list) {
+		String result = "";
+		for(int i : list)
+			result += i + s;
+		return result.substring(0, result.length()-s.length());
+	}
+	
 	public static String join(String s, String... list) {
 		String result = "";
 		for(String str : list)

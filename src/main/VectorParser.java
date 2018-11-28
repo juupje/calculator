@@ -36,12 +36,17 @@ public class VectorParser extends Parser {
 		return !exprContainsInVector(c) && expr.contains("" + (char) c);
 	}
 	
+	@SuppressWarnings("serial")
 	public MathObject parse() throws UnexpectedCharacterException {
 		nextChar();
 		if(exprContainsNotInVector(';')) { //trying to create a matrix.
 			ArrayList<String> rows = toElements(expr, ';');
+			if(rows.size()==2 && rows.get(1).equals("")) {
+				return new MMatrix(new ArrayList<MVector>() {{ add((MVector) new VectorParser("[" + rows.get(0) + "]").parse());}});
+			}
 			return new MMatrix(rows.stream().map(s -> {
-				try { return (MVector) new VectorParser("[" + s + "]").parse();
+				try {
+					return (MVector) new VectorParser("[" + s + "]").parse();
 				} catch (UnexpectedCharacterException e) {
 					e.printStackTrace();
 					return null;

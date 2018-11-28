@@ -1,3 +1,5 @@
-A=[-3,2,-6;5,7,-5;1,4,-2]
-b=[6,6,8]
-rref(A,b)
+a:=b^2+c^2+d^2
+f:=a^2+c^2
+dot(dependencies)
+a:=q^2
+dot(dependencies)

@@ -16,7 +16,11 @@ import main.Parser;
 
 public enum Setting {
 
-	NOTATION(Integer.class), PRECISION(Integer.class), DEF_INT_STEPS(Integer.class), DEF_TIMER_RUNS(Integer.class);
+	NOTATION(Integer.class),
+	PRECISION(Integer.class),
+	DEF_INT_STEPS(Integer.class),
+	DEF_TIMER_RUNS(Integer.class),
+	SHOW_STACKTRACE(Boolean.class);
 
 	// Constants
 	public static final short NORMAL = 1;

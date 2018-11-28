@@ -9,7 +9,9 @@ import java.io.IOException;
 import helpers.Printer;
 import helpers.Setting;
 import helpers.Timer;
+import helpers.exceptions.CircularDefinitionException;
 import helpers.exceptions.InvalidFunctionException;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import mathobjects.MExpression;
@@ -21,7 +23,7 @@ public class Interpreter {
 	static int position = -1, ch;
 
 	public static void Interpret(String s)
-			throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
+			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
 		if (s == null || s.length() == 0)
 			return;
 		int index = s.indexOf("=");
@@ -38,7 +40,9 @@ public class Interpreter {
 		} else if (s.startsWith("dot")) {
 			Printer.dot(argsFromString(s));
 		} else if (s.startsWith("execute")) {
-			execute(new File(argsFromString(s)));
+			execute(new File(argsFromString(s))); 
+		} else if (s.startsWith("shape")) {
+			Calculator.ioHandler.out(Variables.get(argsFromString(s)).shape());
 		} else if (s.startsWith("delete") || s.startsWith("del")) {
 			for(String name : Parser.getArguments(argsFromString(s)))
 				Variables.remove(name);
@@ -62,7 +66,7 @@ public class Interpreter {
 	}
 
 	private static void assign(String name, String op, String expr)
-			throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
+			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
 		Operator operator = null;
 		MathObject result = null;
 		switch (op) {
@@ -97,14 +101,27 @@ public class Interpreter {
 			result = operator.evaluate(Variables.get(name), new Parser(expr).evaluate());
 		
 		if(result != null) {
-			Variables.set(name, result);
+			if(result instanceof MExpression) {
+				MathObject old = Variables.get(name);
+				Variables.set(name, result);
+				if(Calculator.dependencyGraph.isCyclic()) {
+					Variables.set(name, old);
+					throw new CircularDefinitionException(result);
+				}
+				try {
+					result.shape();
+				} catch(ShapeException | IllegalArgumentException e) {
+					Variables.set(name, old);
+					e.printStackTrace();
+				}
+			} else
+				Variables.set(name, result);
 			Variables.ans(result);
 			Calculator.ioHandler.out(result.toString());
 		}
-			
 	}
 
-	public static void execute(File f) throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
+	public static void execute(File f) throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
 		try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
 			String line = null;
 			while ((line = reader.readLine()) != null) {

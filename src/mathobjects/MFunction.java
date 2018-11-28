@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helpers.Printer;
 import helpers.exceptions.InvalidFunctionException;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Parser;
@@ -203,12 +204,13 @@ public class MFunction extends MExpression {
 	 * @throws InvalidFunctionException     as thrown by
 	 *                                      {@link Parser#getArgumentsAsMathObject(String)}
 	 * @throws TreeException                as thrown by {@link #evaluateAt()}
+	 * @ 
 	 * @throws IllegalArgumentException     if the amount of parameters in
 	 *                                      <tt>s</tt> does not equal the amount of
 	 *                                      function parameters.
 	 */
 	public MathObject evaluateAt(String s)
-			throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
+			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, ShapeException {
 		MathObject[] paramVals = Parser.getArgumentsAsMathObject(s);
 		if (paramVals.length != vars.length)
 			throw new IllegalArgumentException(

@@ -1,6 +1,8 @@
 package helpers;
 
+import helpers.exceptions.CircularDefinitionException;
 import helpers.exceptions.InvalidFunctionException;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Calculator;
@@ -28,7 +30,7 @@ public class Timer {
 				Interpreter.Interpret(args[0]);
 			}
 			time = System.nanoTime() - startTime;
-		} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
+		} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
 			e.printStackTrace();
 		} finally {
 			Calculator.ioHandler.enable();

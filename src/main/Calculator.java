@@ -2,15 +2,21 @@ package main;
 
 import java.io.File;
 
+import com.sun.scenario.Settings;
+
+import graph.Graph;
 import helpers.IOHandler;
 import helpers.Setting;
+import helpers.exceptions.CircularDefinitionException;
 import helpers.exceptions.InvalidFunctionException;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 
 public class Calculator {
 	
 	public static IOHandler ioHandler;
+	public static Graph<Variable> dependencyGraph;
 	
 	public Calculator() {
 		ioHandler.startConsoleInput();
@@ -21,14 +27,18 @@ public class Calculator {
 	}
 	
 	public static void main(String[] args) {
+		dependencyGraph = new Graph<Variable>();
 		setHandler(new IOHandler());
 		Setting.loadPrefs();
 		if(args != null && args.length > 0) {
 			if(args[0].equals("run"))
 				try {
 					Interpreter.execute(new File(args[1]));
-				} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
-					e.printStackTrace();
+				} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
+					if(Setting.getBool(Setting.SHOW_STACKTRACE))
+						e.printStackTrace();
+					else
+						ioHandler.err(e.getMessage());
 				}
 		}
 		new Calculator();

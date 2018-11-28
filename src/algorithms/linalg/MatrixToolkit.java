@@ -19,9 +19,9 @@ public class MatrixToolkit {
 	}
 	
 	public MatrixToolkit(MMatrix m) {
-		matrix = new double[m.dim().rows()][m.dim().cols()];
-		for(int i = 0; i < m.dim().rows(); i++) {
-			for(int j = 0; j < m.dim().cols(); j++) {
+		matrix = new double[m.shape().rows()][m.shape().cols()];
+		for(int i = 0; i < m.shape().rows(); i++) {
+			for(int j = 0; j < m.shape().cols(); j++) {
 				if(m.get(i, j) instanceof MScalar)
 					matrix[i][j] = ((MScalar) m.get(i, j)).getValue();
 				else if(m.get(i, j) instanceof MExpression)

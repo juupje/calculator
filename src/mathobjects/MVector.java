@@ -1,18 +1,30 @@
 package mathobjects;
 
 import algorithms.Norm;
+import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import main.Operator;
 
-public class MVector implements MathObject {
+public class MVector implements MathObject{
 	MathObject[] v;
 	int size;
+	boolean transposed = false;
+	Shape shape;
+	
+	public MVector(Shape s) {
+		if(s.dim()==1)
+			for(int i = 0; i < s.size(); i++)
+				if(s.get(i)!=1) {
+					size = s.get(i);
+					v = new MathObject[size];
+					for(int j = 0; j < size; j++)
+						v[j] = new MScalar();
+				}
+		shape = s;
+	}
 	
 	public MVector(int size) {
-		this.size = size;
-		v = new MathObject[size];
-		for(int i = 0; i < size; i++)
-			v[i] = new MScalar();
+		this(new Shape(size));
 	}
 	
 	public MVector(double... list) {
@@ -20,17 +32,30 @@ public class MVector implements MathObject {
 		v = new MathObject[size];
 		for(int i = 0; i < size; i++)
 			v[i] = new MScalar(list[i]);
+		shape = new Shape(size);
 	}
 	
 	public MVector(MathObject[] list) {
 		v = list;
 		size = list.length;
+		shape = new Shape(size);
 	}
 
 	public MVector(int size, MathObject c) {
 		v = new MathObject[size];
 		for(int i = 0; i < size; i++)
 			v[i] = c.copy();
+		shape = new Shape(size);
+	}
+	
+	public MVector transpose() {
+		transposed = !transposed;
+		shape = shape.transpose();
+		return this;
+	}
+	
+	public boolean isTransposed() {
+		return transposed;
 	}
 	
 	/**
@@ -102,6 +127,19 @@ public class MVector implements MathObject {
 	public MVector divide(double d) {
 		return divide(new MScalar(d));
 	}
+	
+	public MathObject multiply(MVector other) {
+		if(!transposed && other.isTransposed()) {//column times row vector
+			MMatrix m = MMatrix.empty(size, other.size);
+			for(int i = 0; i < m.shape().rows(); i++) {
+				for(int j = 0; j < m.shape.cols(); j++)
+					m.set(i, j, Operator.MULTIPLY.evaluate(get(i), other.get(j)));
+			}
+			return m;
+		} else
+			return dot(other); //row times column vector
+	}
+	
 	/**
 	 * Builds the dot product of {@code this} and the given {@code MVector} and returns it.
 	 * @param other the vector that needs to be dot-multiplied with {@code this}.
@@ -208,6 +246,11 @@ public class MVector implements MathObject {
 		return new MVector(v2);
 	}
 	
+	@Override
+	public Shape shape() {
+		return shape;
+	}
+	
 	/**
 	 * Returns a new <tt>MMatrix</tt> consisting of the evaluated elements in <tt>this</tt>.
 	 * @
@@ -235,7 +278,11 @@ public class MVector implements MathObject {
 		return s.substring(0, s.length() - 2) + ")";
 	}
 	
-	//###### static methods #####
+	//###### static methods #####	
+	public static MVector empty(int size) {
+		return new MVector(new MathObject[size]);
+	}
+	
 	/**
 	 * @param size length of the vector to be made.
 	 * @return a new {@code MVector} of length {@code size} consisting of {@code MConst}s with value 0.

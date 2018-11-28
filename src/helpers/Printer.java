@@ -12,6 +12,8 @@ import java.text.DecimalFormat;
 import com.sun.scenario.Settings;
 
 import algorithms.Functions.Function;
+import graph.Graph;
+import main.Calculator;
 import main.Operator;
 import main.Variables;
 import mathobjects.MConst;
@@ -90,6 +92,22 @@ public class Printer {
 			writer.println("labelloc=\"t\"\nlabel=\"" + name + "\"\n}");
 			writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void printDot(Graph<?> g, String name) {
+		try {
+			writer = new PrintWriter(name + ".dot", "UTF-8");
+			writer.println("digraph dependencies {");
+			for(Graph<?>.Node n : g.getNodes()) {
+				writer.println(n.hashCode() + "[label=\"" + n.toString() + "\"];");
+				for(Graph<?>.Edge e : n.getEdges())
+					writer.println(n.hashCode() + "->" + e.getB().hashCode());
+			}
+			writer.println("}");
+			writer.close();
+		} catch(FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}
@@ -190,9 +208,10 @@ public class Printer {
 	 */
 	public static String toLatex(MVector v) {
 		String latex = "\\begin{pmatrix}";
+		String s = v.isTransposed() ? "&" : "\\\\";
 		for(MathObject mo : v.elements())
-			latex += toLatex(mo) + "\\\\";
-		return latex + "\\end{pmatrix}";
+			latex += toLatex(mo) + s;
+		return latex.substring(0, latex.length()-s.length()) + "\\end{pmatrix}";
 	}
 	
 	/**
@@ -357,15 +376,21 @@ public class Printer {
 		String[] params = args.split(",");
 		MathObject mo;
 		String name;
+		if(params.length == 2)
+			name = params[1];
+		else
+			name = findAvailableName("output_dot", "dot");
+
+		if(params[0].equals("dependencies")) {
+			printDot(Calculator.dependencyGraph, name);
+			return;
+		}
+		
 		if(Variables.exists(params[0]))
 			mo = Variables.get(params[0]);
 		else
 			mo = new MExpression(params[0]);
 		
-		if(params.length == 2)
-			name = params[1];
-		else
-			name = findAvailableName("output_dot", "dot");
 		if(mo instanceof MExpression)
 			printDot((MExpression) mo, name);
 		else

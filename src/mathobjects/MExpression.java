@@ -1,10 +1,15 @@
 package mathobjects;
 
+import java.util.HashSet;
+
 import helpers.Printer;
+import helpers.Shape;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Operator;
 import main.Parser;
+import main.Variable;
 import tree.Node;
 import tree.Tree;
 
@@ -63,6 +68,24 @@ public class MExpression implements MathObject {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	@Override
+	public Shape shape()  {
+		return tree.getShape(tree.getRoot());
+	}
+	
+	public HashSet<Variable> getDependencies() {
+		HashSet<Variable> dependencies = new HashSet<>();
+		tree.DFS(tree.getRoot(), n -> {
+			if(n.data instanceof Variable)
+				dependencies.add((Variable) n.data);
+			else if(n.data instanceof MVector)
+				for(MathObject mo : ((MVector) n.data).elements())
+					if(mo instanceof MExpression)
+						dependencies.addAll(((MExpression) mo).getDependencies());
+		});
+		return dependencies;
 	}
 	
 	@Override

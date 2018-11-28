@@ -11,6 +11,7 @@ import algorithms.Algorithms;
 import algorithms.Functions;
 import algorithms.Functions.Function;
 import helpers.exceptions.InvalidFunctionException;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import mathobjects.MConst;
@@ -99,8 +100,9 @@ public class Parser {
 	 * @throws InvalidFunctionException
 	 *             if the expression contains an unknown function.
 	 * @throws TreeException 
+	 * @ 
 	 */
-	public MathObject evaluate() throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
+	public MathObject evaluate() throws UnexpectedCharacterException, InvalidFunctionException, TreeException, ShapeException {
 		nextChar();
 		MathObject val = processExpression();
 		if (pos < expr.length())
@@ -228,6 +230,10 @@ public class Parser {
 			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p;
+		} else if(consume('\'')) {
+			tree.insert(p, new Node<Operator>(Operator.TRANSPOSE), Node.LEFT);
+			p = p.parent;
+			return p;
 		} else if (!Character.isDigit(ch)) { // Does the same as consume('*')
 			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), Node.LEFT);
 			n = p;
@@ -243,7 +249,7 @@ public class Parser {
 
 	// ################ Evaluate expression to numeric value ################
 	// expression = term. or expression '+' term, or expression '-' term
-	private MathObject processExpression() throws InvalidFunctionException, UnexpectedCharacterException, TreeException {
+	private MathObject processExpression() throws InvalidFunctionException, UnexpectedCharacterException, TreeException, ShapeException {
 		MathObject d = processTerm();
 		while (true) {
 			if (consume('+'))
@@ -256,7 +262,7 @@ public class Parser {
 	}
 
 	// term = factor, or term '*' factor, or term '/' factor.
-	private MathObject processTerm() throws InvalidFunctionException, UnexpectedCharacterException, TreeException {
+	private MathObject processTerm() throws InvalidFunctionException, UnexpectedCharacterException, TreeException, ShapeException {
 		MathObject d = processFactor();
 		while (true) {
 			if (consume('*'))
@@ -273,7 +279,7 @@ public class Parser {
 	// factor = '+' factor (positive) or '-' factor (negative), or '('
 	// expression ')', or number (double), or factor^factor, or function(factor)
 	// (e.g. sine, cosine, etc.)
-	private MathObject processFactor() throws InvalidFunctionException, UnexpectedCharacterException, TreeException {
+	private MathObject processFactor() throws InvalidFunctionException, UnexpectedCharacterException, TreeException, ShapeException {
 		if (consume('+'))
 			return processFactor();
 		if (consume('-'))
@@ -342,6 +348,8 @@ public class Parser {
 			d = Operator.POWER.evaluate(d, processFactor());
 		if (consume('%'))
 			d = Operator.MOD.evaluate(d, processFactor());
+		if(consume('\''))
+			d = Operator.TRANSPOSE.evaluate(d);
 		return d;
 	}
 	
@@ -357,7 +365,7 @@ public class Parser {
 		return expr.substring(position, pos-1); //-1 because of nextChar() the line above
 	}
 	
-	public static MathObject[] getArgumentsAsMathObject(String s) throws UnexpectedCharacterException, InvalidFunctionException, TreeException {
+	public static MathObject[] getArgumentsAsMathObject(String s) throws UnexpectedCharacterException, InvalidFunctionException, TreeException, ShapeException {
 		String[] args = getArguments(s);
 		MathObject[] moArgs = new MathObject[args.length];
 		for(int i = 0; i < args.length; i++)
@@ -381,7 +389,7 @@ public class Parser {
 			else if(c==')' || c==']' || c=='}')
 				brCount--;
 		}
-		arguments.add(s.substring(lastPos));
+		arguments.add(s.substring(lastPos).trim());
 		String[] args = new String[arguments.size()];
 		return arguments.toArray(args);
 	}

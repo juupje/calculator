@@ -1,6 +1,7 @@
 package main;
 import java.util.HashMap;
 
+import mathobjects.MExpression;
 import mathobjects.MathObject;
 public class Variables {
 	private static HashMap<String, MathObject> vars = new HashMap<String, MathObject>();
@@ -10,6 +11,9 @@ public class Variables {
 	}
 	
 	public static void set(String key, MathObject value) {
+		if(value instanceof MExpression) {
+			Calculator.dependencyGraph.setConnections(new Variable(key), ((MExpression) value).getDependencies());
+		}
 		vars.put(key, value);
 	}
 	
@@ -22,7 +26,7 @@ public class Variables {
 	}
 	
 	public static void ans(MathObject mo) {
-		set("ans", mo);
+		vars.put("ans", mo);
 	}
 	
 	public static MathObject ans() {

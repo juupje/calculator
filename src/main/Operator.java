@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+
+import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
@@ -24,9 +27,10 @@ public enum Operator {
 		 * @param a the {@code MathObject} to which b[0] should be added.
 		 * @param b a list of {@code MathObject}, expected to have length 1.
 		 * @return a+b[0]
+		 * @ 
 		 */
 		@Override
-		public MathObject evaluate(MathObject a, MathObject... b) {
+		public MathObject evaluate(MathObject a, MathObject... b)  {
 			if (b.length != 1)
 				throw new IllegalArgumentException("You can only add exactly two MathObjects, got " + (1 + b.length));
 			if (a == null)
@@ -66,11 +70,20 @@ public enum Operator {
 			throw new InvalidOperationException(
 					"ADD operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.add(a, b[0]);
+			if(b.length==0)
+				return a;
+			throw new InvalidOperationException("Can only add two mathobjects, got " + (b.length+1));
+		}
 	},
 
 	SUBTRACT {
 		@Override
-		public MathObject evaluate(MathObject a, MathObject... b) {
+		public MathObject evaluate(MathObject a, MathObject... b)  {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only substract exactly two MathObjects, got " + (1 + b.length));
@@ -99,22 +112,31 @@ public enum Operator {
 			throw new InvalidOperationException(
 					"SUBTRACT operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.subtract(a, b[0]);
+			if(b.length==0)
+				return a;
+			throw new InvalidOperationException("Can only subtract two mathobjects, got " + (b.length+1));
+		}
 	},
 
 	MULTIPLY {
 		@Override
-		public MathObject evaluate(MathObject a, MathObject... b) {
+		public MathObject evaluate(MathObject a, MathObject... b)  {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only multiply exactly two MathObjects, got " + (1 + b.length));
 			if (a instanceof MVector) {
 				if (b[0] instanceof MVector)
-					return ((MVector) a).dot((MVector) b[0]); // copy is not needed, because MVector.dot() doesn't
-																// change the MVector.
+					return ((MVector) a).multiply((MVector) b[0]); // copy is not needed, because MVector.multiply(MVector) doesn't
+																// change either of the MVectors.
 				if (b[0] instanceof MScalar)
 					return ((MVector) a.copy()).multiply((MScalar) b[0]);
 				if (b[0] instanceof MMatrix)
-					return ((MMatrix) b[0].copy()).multiply((MVector) a);
+					return ((MMatrix) b[0].copy()).multiplyRight((MVector) a);
 			} else if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).multiply((MScalar) b[0]);
@@ -126,12 +148,19 @@ public enum Operator {
 				if (b[0] instanceof MScalar)
 					return ((MMatrix) a.copy()).multiply((MScalar) b[0]);
 				if (b[0] instanceof MVector)
-					return ((MMatrix) a).multiply((MVector) b[0]);
+					return ((MMatrix) a).multiplyLeft((MVector) b[0]);
 				if (b[0] instanceof MMatrix)
-					return ((MMatrix) a).multiply((MMatrix) b[0]);
+					return ((MMatrix) a).multiplyLeft((MMatrix) b[0]);
 			}
 			throw new InvalidOperationException(
 					"MULTIPLY operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.multiply(a, b[0]);
+			throw new InvalidOperationException("Can only multiply two mathobjects, got " + (b.length+1));
 		}
 	},
 
@@ -154,6 +183,13 @@ public enum Operator {
 			throw new InvalidOperationException(
 					"DIVIDE operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.divide(a, b[0]);
+			throw new InvalidOperationException("Can only divide two mathobjects, got " + (b.length+1));
+		}
 	},
 
 	POWER {
@@ -162,10 +198,7 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException("You can only raise one MathObject to the power of one other, got "
 						+ (1 + b.length) + " arguments, expected 2");
-			if (a instanceof MVector) {
-				if (b[0] instanceof MScalar)
-					return ((MVector) a.copy()).power((MScalar) b[0]);
-			} else if (a instanceof MScalar) {
+			if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).power((MScalar) b[0]);
 			} else if (a instanceof MMatrix) {
@@ -176,6 +209,13 @@ public enum Operator {
 			}
 			throw new InvalidOperationException(
 					"POWER operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.power(a, b[0]);
+			throw new InvalidOperationException("Can only raise one mathobject to the power of one other, got " + (b.length+1));
 		}
 	},
 
@@ -193,6 +233,13 @@ public enum Operator {
 			throw new InvalidOperationException(
 					"MODULO operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.mod(a, b[0]);
+			throw new InvalidOperationException("Modulo operation requires one object and one operant, got " + b.length + " operants.");
+		}
 	},
 
 	// ###### single argument operators #######
@@ -203,6 +250,13 @@ public enum Operator {
 				throw new IllegalArgumentException("You can only invert exactly one MathObject, got " + (1 + b.length));
 			return a.copy().invert();
 		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==01)
+				return Shape.invert(a);
+			throw new InvalidOperationException("Can only invert one mathobject to  got " + (b.length+1));
+		}
 	},
 
 	NEGATE {
@@ -212,8 +266,35 @@ public enum Operator {
 				throw new IllegalArgumentException("You can only negate exactly one MathObject, got " + (1 + b.length));
 			return a.copy().negate();
 		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1)
+				return Shape.negate(a);
+			throw new InvalidOperationException("Can only raise one mathobject to the power of one other, got " + (b.length+1));
+		}
 	},
 
+	TRANSPOSE {
+		@Override
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length!=0)
+				throw new InvalidOperationException("Can transpose only one mathobject, got " + (b.length+1));
+			if(a instanceof MMatrix)
+				return ((MMatrix) a.copy()).transpose();
+			else if(a instanceof MVector)
+				return ((MVector) a.copy()).transpose();
+			throw new InvalidOperationException("Can't transpose object " + a.getClass().getSimpleName());
+		}
+
+		@Override
+		public Shape shape(Shape a, Shape... b) {
+			if(b.length==0)
+			return Shape.transpose(a);
+		throw new InvalidOperationException("Can only transpose one mathobject, got " + (b.length+1));
+		}
+	},
+	
 	ELEMENT {
 		@Override
 		public MathObject evaluate(MathObject a, MathObject... b) {
@@ -246,7 +327,44 @@ public enum Operator {
 			throw new IllegalArgumentException(
 					"Only matrices and vectors have indexed components, got " + a.getClass());
 		}
+		
+		@Override
+		/**
+		 * If it works, it works. Don't touch it.
+		 */
+		public Shape shape(Shape a, Shape... b) {
+			if(b.length==0)
+				throw new IllegalArgumentException("No index argument found.");
+			if(a.equals(null))
+				throw new InvalidOperationException("Object of shape " + a + " has no indexed components.");
+			if(b.length > a.dim())
+				throw new IllegalArgumentException("Got " + b.length +"D index for a " + a.dim() + "D shape.");
+			ArrayList<Integer> nullIndices = new ArrayList<>();
+			if(b.length > 1) {
+				for(int i = 0; i < b.length; i++) {
+					if(b[i] == null)
+						nullIndices.add(i);
+					else if(!b[i].equals(null))
+						throw new IllegalArgumentException("If multiple indices are given, they all must be either null or a scalar value.");
+				}
+				int[] shape = new int[nullIndices.size()];
+				for(int i = 0; i < shape.length; i++)
+					shape[i] = a.get(nullIndices.get(i));
+				return new Shape(shape);
+			} else { //b==1
+				if(b[0].dim() > 1)
+					throw new IllegalArgumentException("Only a vector or scalar shaped object can point to an index. Got shape: " + b[0]);
+				int indexCount = b[0].dim()==0 ? 1 : b[0].get(0); //if b is a scalar, there is only one index. If b is a vector of shape (n), there are n indices.
+				if(indexCount>a.dim())
+					throw new IllegalArgumentException("Got " + b.length +"D index for a " + a.dim() + "D shape.");
+				int[] shape = new int[a.dim()-indexCount];
+				for(int i = indexCount; i < a.dim(); i++)
+					shape[i] = a.get(i);
+				return new Shape(shape);
+			}
+		}
 	};
 
-	public abstract MathObject evaluate(MathObject a, MathObject... b);
+	public abstract MathObject evaluate(MathObject a, MathObject... b) ;
+	public abstract Shape shape(Shape a, Shape... b) ;
 }

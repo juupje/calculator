@@ -47,7 +47,10 @@ public class IOHandler {
 			try {
 				Interpreter.Interpret(line);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(Setting.getBool(Setting.SHOW_STACKTRACE))
+					e.printStackTrace();
+				else
+					err(e.getMessage());
 			}
 		}
 		close();

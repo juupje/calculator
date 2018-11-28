@@ -1,6 +1,7 @@
 package mathobjects;
 
 import helpers.Printer;
+import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 
 public class MScalar implements MathObject {
@@ -188,6 +189,11 @@ public class MScalar implements MathObject {
 	public MathObject invert() {
 		value = 1/value;
 		return this;
+	}
+	
+	@Override
+	public Shape shape() {
+		return Shape.SCALAR;
 	}
 
 	/**

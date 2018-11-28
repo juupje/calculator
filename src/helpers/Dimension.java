@@ -1,14 +1,14 @@
 package helpers;
 
+import main.Operator;
+
 /**
  * @author Joep Geuskens 
- * This class is basically a container for the amount of
- *         rows and columns in the MMatrix.
+ * This class is basically a container for the amount 
  */
 public class Dimension {
-	private int rows = 0;
-	public int cols = 0;
-
+	public int rows = 0, cols = 0;
+	
 	public Dimension(int rows, int cols) {
 		this.rows = rows;
 		this.cols = cols;
@@ -21,6 +21,11 @@ public class Dimension {
 	public int cols() {
 		return cols;
 	}
+	
+	public Dimension copy() {
+		return new Dimension(rows, cols);
+	}
+	
 
 	@Override
 	public boolean equals(Object other) {

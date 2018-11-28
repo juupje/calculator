@@ -1,6 +1,8 @@
 package algorithms;
 
+import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
+import helpers.exceptions.ShapeException;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -13,11 +15,23 @@ public class Functions {
 			public MathObject evaluate(MathObject m) {
 				return toDegree(m);
 			}
+			@Override
+			public Shape shape(Shape s)  {
+				if(s.dim()<2)
+					return s;
+				throw new ShapeException("Function TODEG is not defined for arguments of shape " + s);
+			}
 		},
 		TORAD {
 			@Override
 			public MathObject evaluate(MathObject m) {
 				return toRadians(m);
+			}
+			@Override
+			public Shape shape(Shape s)  {
+				if(s.dim()<2)
+					return s;
+				throw new ShapeException("Function TORAD is not defined for arguments of shape " + s);
 			}
 		},
 		SIN {
@@ -85,6 +99,12 @@ public class Functions {
 			public MScalar evaluate(MathObject m) {
 				return abs(m);
 			}
+			@Override
+			public Shape shape(Shape s)  {
+				if(s.dim()<3)
+					return new Shape();
+				throw new ShapeException("Function TODEG is not defined for arguments of shape " + s);
+			}
 		},
 		LN {
 			@Override
@@ -100,6 +120,11 @@ public class Functions {
 		};
 
 		public abstract MathObject evaluate(MathObject m);
+		public Shape shape(Shape s)  {
+			if(s.dim()==0)
+				return s;
+			throw new ShapeException("Function " + name() + " not defined for shape " + s);
+		}
 	}
 
 	//############### TRIGONOMETRIC FUNCTIONS ###############

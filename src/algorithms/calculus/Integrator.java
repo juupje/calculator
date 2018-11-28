@@ -2,6 +2,8 @@ package algorithms.calculus;
 
 import algorithms.Algorithm;
 import helpers.Setting;
+import helpers.Shape;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import mathobjects.MFunction;
 import mathobjects.MScalar;
@@ -132,5 +134,15 @@ public class Integrator extends Algorithm{
 				steps = Setting.getInt(Setting.DEF_INT_STEPS);
 		} else
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args) + " not applicable for Integration algorithm see help for the correct use.");			
+	}
+	
+	@Override
+	public Shape shape(Shape... shapes)  {
+		if(shapes[0].dim()==0 && shapes[1].equals(shapes[2]) && shapes[1].dim()<=1 && ((shapes.length==4 && shapes[3].dim()==0) || shapes.length==3))
+			return new Shape();
+		String msg = "";
+		for(int i = 0; i < shapes.length; i++)
+			msg += (i!=0 ? ", " : "") +shapes[i].toString();
+		throw new ShapeException("Integration algorithm is not defined for arguments with shapes: " + msg);
 	}
 }

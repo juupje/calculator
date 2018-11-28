@@ -39,7 +39,7 @@ public class JordanElimination extends GaussianElimination {
 			if (args[0] instanceof MMatrix) {
 				if (args[1] instanceof MMatrix) {
 					mtk = new MatrixToolkit(((MMatrix) args[0]).augment((MMatrix) args[1]));
-					mtk.setAugmCols(((MMatrix) args[1]).dim().cols());
+					mtk.setAugmCols(((MMatrix) args[1]).shape().cols());
 				} else if (args[1] instanceof MVector) {
 					mtk = new MatrixToolkit(((MMatrix) args[0]).augment((MVector) args[1]));
 					mtk.setAugmCols(1);

@@ -1,5 +1,8 @@
 package mathobjects;
 
+import helpers.Shape;
+import helpers.exceptions.ShapeException;
+
 public interface MathObject {
 	/**
 	 * Changes the current <tt>MathObject</tt> (called <tt>a</tt>) to <tt>b</tt>, such that <tt>a+b</tt>=0.
@@ -24,6 +27,9 @@ public interface MathObject {
 	 * @return A copy of the current <tt>MathObject</tt> with the corresponding numeric value(s).
 	 */
 	public abstract MathObject evaluate();
+	
+	public abstract Shape shape() ;
+	
 	@Override
 	public abstract String toString();
 }

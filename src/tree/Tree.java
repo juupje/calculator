@@ -3,6 +3,9 @@ package tree;
 import java.util.function.Consumer;
 
 import algorithms.Functions.Function;
+import helpers.Dimension;
+import helpers.Shape;
+import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import main.Operator;
 import main.Variable;
@@ -82,11 +85,22 @@ public class Tree {
 		c.accept(n);
 	}
 	
-	public abstract class DFSTask implements Consumer<Node<?>>{
-		Object[] obj;
-		public DFSTask(Object... obj) {
-			this.obj = obj;
-		}
+	/**
+	 * Recursively calculates the shape of the result of {@link #evaluateTree()}.
+	 * Note that unknown variables will be assumed to have a scalar shape.
+	 * @param n the node on which the DFS will be started/continued.
+	 * @return the {@link Shape} of the object returned by {@link #evaluateNode(n)}.
+	 * @
+	 */
+	public Shape getShape(Node<?> n)  {
+		if(n.data instanceof Operator)
+			return ((Operator) n.data).shape(getShape(n.left()), getShape(n.right()));
+		else if(n.data instanceof MathObject)
+			return ((MathObject) n.data).shape();
+		else if(n.data instanceof Variable)
+			if(((Variable) n.data).get()!=null)
+				return ((Variable) n.data).get().shape();
+		return Shape.SCALAR; //scalar shape
 	}
 	
 	public Node<?> copy(Node<?> n, java.util.function.Function<Node<?>, Node<?>> func) {
@@ -105,5 +119,11 @@ public class Tree {
 	public Tree copy(java.util.function.Function<Node<?>, Node<?>> func) {
 		return new Tree(copy(root, func));
 	}
-
+	
+	public abstract class DFSTask implements Consumer<Node<?>>{
+		Object[] obj;
+		public DFSTask(Object... obj) {
+			this.obj = obj;
+		}
+	}
 }
