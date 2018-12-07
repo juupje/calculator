@@ -108,8 +108,8 @@ public class MReal extends MScalar {
 		if(!other.isComplex())
 			value = Math.pow(value, ((MReal) other).getValue());
 		else {
-			double a = ((MComplex) other).getA();
-			double b = ((MComplex) other).getB();
+			double a = ((MComplex) other).real();
+			double b = ((MComplex) other).imag();
 			return MComplex.fromPolar(Math.pow(value, a), b*Math.log(value));
 		}
 		return this;
@@ -218,7 +218,7 @@ public class MReal extends MScalar {
 			return ((Number) other).doubleValue() == value;
 		if(other instanceof MComplex) {
 			MComplex z = (MComplex) other;
-			return (z.polar ? z.arg()==0 && z.getR()==value : z.getB()==0 && z.getA()==value);
+			return (z.polar ? z.arg()==0 && z.getR()==value : z.imag()==0 && z.real()==value);
 		}
 		return false;
 	}

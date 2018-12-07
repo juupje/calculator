@@ -144,7 +144,7 @@ public class Functions {
 			return new MReal(Math.sin(((MReal) m).getValue()));
 		else if(m instanceof MComplex) {
 			MComplex z = (MComplex) m;
-			return new MComplex(Math.sin(z.getA())*Math.cosh(z.getB()), -1*Math.cos(z.getA())*Math.sinh(z.getB()));
+			return new MComplex(Math.sin(z.real())*Math.cosh(z.imag()), -1*Math.cos(z.real())*Math.sinh(z.imag()));
 		} else
 			throw new InvalidOperationException("Sine is not defined for " + m.getClass());
 	}
@@ -162,7 +162,7 @@ public class Functions {
 			return new MReal(Math.cos(((MReal) m).getValue())); 
 		else if(m instanceof MComplex) {
 			MComplex z = (MComplex) m;
-			return new MComplex(Math.cos(z.getA())*Math.cosh(z.getB()), Math.sin(z.getA())*Math.sinh(z.getB()));
+			return new MComplex(Math.cos(z.real())*Math.cosh(z.imag()), Math.sin(z.real())*Math.sinh(z.imag()));
 		} else
 			throw new InvalidOperationException("Cosine is not defined for " + m.getClass());
 	}
@@ -180,8 +180,8 @@ public class Functions {
 			return new MReal(Math.tan(((MReal) m).getValue()));
 		else if(m instanceof MComplex) {
 			MComplex z = (MComplex) m;
-			double d = Math.cos(2*z.getA())+Math.cosh(2*z.getB());
-			return new MComplex(Math.sin(2*z.getA())/d, Math.sinh(2*z.getB())/d);
+			double d = Math.cos(2*z.real())+Math.cosh(2*z.imag());
+			return new MComplex(Math.sin(2*z.real())/d, Math.sinh(2*z.imag())/d);
 		} else
 			throw new InvalidOperationException("Tangent is not defined for " + m.getClass());
 	}
@@ -275,8 +275,8 @@ public class Functions {
 		if (m instanceof MReal)
 			return new MReal(Math.atan(((MReal) m).getValue()));
 		else if(m instanceof MComplex) {
-			double a = ((MComplex) m).getA();
-			double b = ((MComplex) m).getB();
+			double a = ((MComplex) m).real();
+			double b = ((MComplex) m).imag();
 			double c = a*a+(b+1)*(b+1);
 			return ((MComplex) ln(new MComplex((-a*a-b*b+1)/c, 2*a/c)).multiply(MConst.i.evaluate().multiply(-0.5)));
 		} else

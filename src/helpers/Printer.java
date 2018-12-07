@@ -495,8 +495,8 @@ public class Printer {
 			if(Setting.getBool(Setting.COMPLEX_IN_POLAR))
 				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
 			else {
-				double b = ((MComplex) scalar).getB();
-				return numToString(((MComplex) scalar).getA()) + (b>=0 ? "+" : "") + numToString(b) + "í";
+				double b = ((MComplex) scalar).imag();
+				return numToString(((MComplex) scalar).real()) + (b>=0 ? "+" : "") + numToString(b) + "í";
 			}
 		}
 		return numToString(((MReal) scalar).getValue());
