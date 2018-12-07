@@ -2,6 +2,7 @@ package algorithms.linalg;
 
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
+import mathobjects.MReal;
 import mathobjects.MScalar;
 
 public class MatrixToolkit {
@@ -22,10 +23,10 @@ public class MatrixToolkit {
 		matrix = new double[m.shape().rows()][m.shape().cols()];
 		for(int i = 0; i < m.shape().rows(); i++) {
 			for(int j = 0; j < m.shape().cols(); j++) {
-				if(m.get(i, j) instanceof MScalar)
-					matrix[i][j] = ((MScalar) m.get(i, j)).getValue();
+				if(m.get(i, j) instanceof MReal)
+					matrix[i][j] = ((MReal) m.get(i, j)).getValue();
 				else if(m.get(i, j) instanceof MExpression)
-					matrix[i][j] = ((MScalar) m.evaluate()).getValue();
+					matrix[i][j] = ((MReal) m.evaluate()).getValue();
 				else
 					throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + m.getClass());
 			}

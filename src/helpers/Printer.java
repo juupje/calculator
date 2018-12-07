@@ -16,10 +16,12 @@ import graph.Graph;
 import main.Calculator;
 import main.Operator;
 import main.Variables;
+import mathobjects.MComplex;
 import mathobjects.MConst;
 import mathobjects.MExpression;
 import mathobjects.MFunction;
 import mathobjects.MMatrix;
+import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -241,8 +243,10 @@ public class Printer {
 			return toLatex((MMatrix) mo);
 		else if(mo instanceof MExpression)
 			return toLatex((MExpression) mo);
-		else if(mo instanceof MScalar)
+		else if(mo instanceof MReal)
 			return mo.toString();
+		else if(mo instanceof MComplex)
+			return mo.toString().replace("(", "{").replace(")", "}");
 		else 
 			throw new IllegalArgumentException("Can't export " + mo.getClass() + " to LaTex");
 	}
@@ -487,7 +491,15 @@ public class Printer {
 	 * @return the created String.
 	 */
 	public static String numToString(MScalar scalar) {
-		return numToString(scalar.getValue());
+		if(scalar.isComplex()) {
+			if(Setting.getBool(Setting.COMPLEX_IN_POLAR))
+				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
+			else {
+				double b = ((MComplex) scalar).getB();
+				return numToString(((MComplex) scalar).getA()) + (b>=0 ? "+" : "") + numToString(b) + "í";
+			}
+		}
+		return numToString(((MReal) scalar).getValue());
 	}
 	
 	/**

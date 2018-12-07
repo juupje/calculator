@@ -1,7 +1,6 @@
 package algorithms;
 
 import helpers.Shape;
-import helpers.exceptions.ShapeException;
 import mathobjects.MathObject;
 
 /**

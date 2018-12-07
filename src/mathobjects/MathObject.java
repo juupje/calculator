@@ -1,7 +1,6 @@
 package mathobjects;
 
 import helpers.Shape;
-import helpers.exceptions.ShapeException;
 
 public interface MathObject {
 	/**

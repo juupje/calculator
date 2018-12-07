@@ -1,5 +1,5 @@
-a:=b^2+c^2+d^2
-f:=a^2+c^2
-dot(dependencies)
-a:=q^2
-dot(dependencies)
+z=2+4í
+a=sin(z)
+asin(a)
+b=asin(z)
+sin(b)

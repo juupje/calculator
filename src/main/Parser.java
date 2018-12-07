@@ -14,9 +14,11 @@ import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
+import mathobjects.MComplex;
 import mathobjects.MConst;
 import mathobjects.MFunction;
 import mathobjects.MMatrix;
+import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -146,6 +148,7 @@ public class Parser {
 		return (MVector) new VectorParser("[" + expr.substring(position, pos-1) + "]").parse();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Node<?> getFactor() throws UnexpectedCharacterException {
 		Node<?> n = null;
 		int position = pos;
@@ -168,11 +171,13 @@ public class Parser {
 					tree.root = p = new Node<Operator>(Operator.MULTIPLY);
 				else
 					p = new Node<Operator>(Operator.MULTIPLY);
-				p.left(new Node<MScalar>(new MScalar(-1.0)));
+				p.left(n = new Node<MScalar>(new MReal(-1.0)));
 				p.right(getFactor());
 				return p.right();
 			} else
-				n = new Node<MScalar>(new MScalar(Double.valueOf(s1)));
+				n = new Node<MScalar>(new MReal(Double.valueOf(s1)));
+			if(consume('í'))
+				((Node<MScalar>) n).setData(new MComplex(0,((MReal) n.getData()).getValue()));
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
 				nextChar();
@@ -190,7 +195,10 @@ public class Parser {
 				if (!Variables.exists(str))
 					Calculator.ioHandler.err("The variable " + str + " is undefined. Statement was parsed regardless.");
 			}
-		}
+		} else if(ch=='í')
+			n = new Node<MConst>(MConst.i);
+		else
+			throw new UnexpectedCharacterException(expr, pos);
 		return n;
 	}
 
@@ -299,10 +307,15 @@ public class Parser {
 		} else if ((ch >= '0' && ch <= '9') || ch == '.') {// number
 			while ((ch >= '0' && ch <= '9') || ch == '.')
 				nextChar();
-			d = new MScalar(Double.parseDouble(expr.substring(p, pos)));
-			if (consume('E')) {
-				d = Operator.MULTIPLY.evaluate(d, Operator.POWER.evaluate(new MScalar(10), processFactor()));
-			} 
+			d = new MReal(Double.parseDouble(expr.substring(p, pos)));
+			if (consume('E'))
+				d = Operator.MULTIPLY.evaluate(d, Operator.POWER.evaluate(new MReal(10), processFactor()));
+			if(consume('í')) {
+				if(((MScalar) d).isComplex())
+					((MScalar) d).multiply(MConst.i.evaluate());
+				else
+					d = new MComplex(0, ((MReal) d).getValue());
+			}
 			// Letter, which is part of a variable or function
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_') {
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' || ch >= '0' && ch <= '9')
@@ -339,6 +352,8 @@ public class Parser {
 				else
 					throw new UnexpectedCharacterException(expr, pos);
 			}
+		} else if(consume('í')) {
+			d = MConst.i.evaluate();
 		} else {
 			throw new UnexpectedCharacterException(expr, pos);
 		}

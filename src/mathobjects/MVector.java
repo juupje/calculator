@@ -18,7 +18,7 @@ public class MVector implements MathObject{
 					size = s.get(i);
 					v = new MathObject[size];
 					for(int j = 0; j < size; j++)
-						v[j] = new MScalar();
+						v[j] = new MReal();
 				}
 		shape = s;
 	}
@@ -31,7 +31,7 @@ public class MVector implements MathObject{
 		size = list.length;
 		v = new MathObject[size];
 		for(int i = 0; i < size; i++)
-			v[i] = new MScalar(list[i]);
+			v[i] = new MReal(list[i]);
 		shape = new Shape(size);
 	}
 	
@@ -104,7 +104,7 @@ public class MVector implements MathObject{
 	 * @see #multiply(MScalar)
 	 */
 	public MVector multiply(double d) {
-		return multiply(new MScalar(d));
+		return multiply(new MReal(d));
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public class MVector implements MathObject{
 	 * @see #divide(MScalar)
 	 */
 	public MVector divide(double d) {
-		return divide(new MScalar(d));
+		return divide(new MReal(d));
 	}
 	
 	public MathObject multiply(MVector other) {
@@ -161,19 +161,15 @@ public class MVector implements MathObject{
 	 * Raises this <tt>MVector</tt> to the <tt>n</tt>-th power, where n is a positive integer. Note that this method applies the mathematical definition of raising a vector to a power,
 	 * meaning that this is not an element-wise operation.
 	 * Let <tt>v</tt> be a vector, than the follow holds:
-	 * <ul><li>if <tt>n</tt> is even: <tt>v^n=|v|^n</tt></li><li>if <tt>n</tt> is uneven: <tt>v^n=v|v|^(n-1)</tt></li><ul>
+	 * if <tt>n</tt> is an integer: <tt>v^n=|v|^n</tt>
 	 * @param n the <tt>MScalar</tt> containing <tt>n</tt>.
 	 * @return <tt>this</tt>
 	 * @throws InvalidOperationException if <tt>n</tt> is not an positive integer value.
 	 */
-	public MathObject power(MScalar n) {
+	public MReal power(MReal n) {
 		if(Math.ceil(n.value) != Math.floor(n.value) || n.value<=0)
 			throw new InvalidOperationException("Vectors can only be raised to positive integer powers.");
-		int exp = (int) n.value;
-		if(exp % 2 == 0) //even power
-			return Norm.eucl(this).power(exp);
-		else //uneven power
-			return multiply(Norm.eucl(this).power((int) Math.floor(exp/2)).value);
+		return Norm.eucl(this).power((int) n.getValue());
 	}
 	
 	/**
@@ -199,7 +195,7 @@ public class MVector implements MathObject{
 	}
 	
 	public void set(int index, double d) {
-		v[index] = new MScalar(d);
+		v[index] = new MReal(d);
 	}
 	
 	/**
@@ -296,7 +292,7 @@ public class MVector implements MathObject{
 	 * @return a new {@code MVector} of length {@code size} consisting of {@code MConst}s with value 1.
 	 */
 	public static MathObject ones(int size) {
-		return new MVector(size, new MScalar(1));
+		return new MVector(size, new MReal(1));
 	}
 	
 	/**

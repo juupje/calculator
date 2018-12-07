@@ -1,7 +1,6 @@
 package algorithms.linalg;
 
-import helpers.Dimension;
-
+import helpers.Shape;
 import mathobjects.MMatrix;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -49,6 +48,6 @@ public class JordanElimination extends GaussianElimination {
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args)
 					+ " not applicable for Gaussian Elimination, see help for correct use.");
 		else
-			dim = new Dimension(mtk.rows, mtk.cols);
+			shape = new Shape(mtk.rows, mtk.cols);
 	}
 }

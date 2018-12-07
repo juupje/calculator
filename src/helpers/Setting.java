@@ -16,10 +16,16 @@ import main.Parser;
 
 public enum Setting {
 
-	NOTATION(Integer.class),
+	//Calculation stuff
 	PRECISION(Integer.class),
-	DEF_INT_STEPS(Integer.class),
+
+	//Algoritm stuff
 	DEF_TIMER_RUNS(Integer.class),
+	DEF_INT_STEPS(Integer.class),
+
+	//Display stuff
+	NOTATION(Integer.class),
+	COMPLEX_IN_POLAR(Boolean.class),
 	SHOW_STACKTRACE(Boolean.class);
 
 	// Constants
@@ -131,7 +137,6 @@ public enum Setting {
 	}
 
 	public static void resetVariables() {
-		// Read settings from default JSON file
 		try {
 			File file = new File(Calculator.class.getResource("/files/defaultsettings.json").toURI());
 			FileInputStream in = new FileInputStream(file);

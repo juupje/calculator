@@ -3,9 +3,7 @@ package tree;
 import java.util.function.Consumer;
 
 import algorithms.Functions.Function;
-import helpers.Dimension;
 import helpers.Shape;
-import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import main.Operator;
 import main.Variable;

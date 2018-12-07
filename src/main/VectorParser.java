@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import helpers.exceptions.UnexpectedCharacterException;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
+import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -57,7 +58,7 @@ public class VectorParser extends Parser {
 			MathObject[] v = new MathObject[elements.size()];
 			for(int i = 0; i < elements.size(); i++) {
 				try {
-					v[i] = new MScalar(Double.parseDouble(elements.get(i)));
+					v[i] = new MReal(Double.parseDouble(elements.get(i)));
 				} catch(NumberFormatException e) {
 					MExpression me =  new MExpression(elements.get(i));
 					if(!me.getTree().getRoot().isInternal() && me.getTree().getRoot().getData() instanceof MathObject)

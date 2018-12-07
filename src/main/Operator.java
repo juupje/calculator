@@ -6,6 +6,7 @@ import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
+import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -202,8 +203,8 @@ public enum Operator {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).power((MScalar) b[0]);
 			} else if (a instanceof MMatrix) {
-				if (b[0] instanceof MScalar)
-					if (((MScalar) b[0]).getValue() == -1)
+				if (b[0] instanceof MReal)
+					if (((MReal) b[0]).getValue() == -1)
 						return ((MMatrix) a.copy()).invert();
 				// return ((MMatrix) a.copy()).power((MScalar) b[0]);
 			}
@@ -227,8 +228,8 @@ public enum Operator {
 						"You can only convert one MathObject to the modulo of one other, got " + (1 + b.length)
 								+ " arguments, expected 2");
 			if (a instanceof MScalar) {
-				if (b[0] instanceof MScalar)
-					return ((MScalar) a.copy()).mod((MScalar) b[0]);
+				if (b[0] instanceof MReal)
+					return ((MReal) a.copy()).mod((MReal) b[0]);
 			}
 			throw new InvalidOperationException(
 					"MODULO operator is not defined for " + a.getClass() + " and " + b[0].getClass());
@@ -301,23 +302,23 @@ public enum Operator {
 			if (a instanceof MVector) {
 				if (b.length != 1)
 					throw new IllegalArgumentException("A vector only has 1 index, got " + (b.length));
-				if (b[0] instanceof MScalar)
-					return ((MVector) a).get((int) ((MScalar) b[0]).getValue());
+				if (b[0] instanceof MReal)
+					return ((MVector) a).get((int) ((MReal) b[0]).getValue());
 				else
 					throw new IllegalArgumentException(
 							"Vector index needs to be an (integer) scalar value, got " + b[0].toString());
 			} else if (a instanceof MMatrix) {
 				if (b.length == 1) {
-					if (b[0] instanceof MScalar)
-						return ((MMatrix) a).getRow((int) ((MScalar) b[0]).getValue());
+					if (b[0] instanceof MReal)
+						return ((MMatrix) a).getRow((int) ((MReal) b[0]).getValue());
 					else
 						throw new IllegalArgumentException(
 								"Matrix index needs to be an (integer) scalar value, got " + b[0].toString());
 				} else if (b.length == 2) {
-					if (b[0] == null && b[1] instanceof MScalar)
-						return ((MMatrix) a).getColumn((int) ((MScalar) b[1]).getValue());
-					else if (b[0] instanceof MScalar && b[1] instanceof MScalar)
-						return ((MMatrix) a).get((int) ((MScalar) b[0]).getValue(), (int) ((MScalar) b[1]).getValue());
+					if (b[0] == null && b[1] instanceof MReal)
+						return ((MMatrix) a).getColumn((int) ((MReal) b[1]).getValue());
+					else if (b[0] instanceof MReal && b[1] instanceof MReal)
+						return ((MMatrix) a).get((int) ((MReal) b[0]).getValue(), (int) ((MReal) b[1]).getValue());
 					else
 						throw new IllegalArgumentException(
 								"Matrix indices need to be one or two (integer) scalar value(s) (first one may be null/empty), got "

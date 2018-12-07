@@ -57,7 +57,7 @@ public class Interpreter {
 		} else {
 			MathObject result = new Parser(s).evaluate();
 			Variables.ans(result);
-			Calculator.ioHandler.out(result.toString());
+			Calculator.ioHandler.out(Printer.toText(result));
 		}
 	}
 	

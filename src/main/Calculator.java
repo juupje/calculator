@@ -2,8 +2,6 @@ package main;
 
 import java.io.File;
 
-import com.sun.scenario.Settings;
-
 import graph.Graph;
 import helpers.IOHandler;
 import helpers.Setting;

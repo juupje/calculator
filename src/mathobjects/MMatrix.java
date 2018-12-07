@@ -3,7 +3,6 @@ package mathobjects;
 import java.util.List;
 
 import algorithms.linalg.JordanElimination;
-import helpers.Dimension;
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
@@ -23,7 +22,7 @@ public class MMatrix implements MathObject {
 		this.m = new MathObject[m.length][m[0].length];
 		for (int i = 0; i < m.length; i++)
 			for (int j = 0; j < m[i].length; j++)
-				this.m[i][j] = new MScalar(m[i][j]);
+				this.m[i][j] = new MReal(m[i][j]);
 		shape = new Shape(m.length, m[0].length);
 	}
 
@@ -211,7 +210,7 @@ public class MMatrix implements MathObject {
 	 * @see #multiply(MScalar)
 	 */
 	public MMatrix multiply(double d) {
-		return multiply(new MScalar(d));
+		return multiply(new MReal(d));
 	}
 
 	/**
@@ -336,7 +335,7 @@ public class MMatrix implements MathObject {
 	 * @see #divide(MScalar)
 	 */
 	public MMatrix divide(double d) {
-		return divide(new MScalar(d));
+		return divide(new MReal(d));
 	}
 
 	/**
@@ -480,7 +479,7 @@ public class MMatrix implements MathObject {
 		MMatrix matrix = new MMatrix(new Shape(size, size));
 		for (int i = 0; i < size; i++)
 			for (int j = 0; j < size; j++)
-				matrix.set(i, j, new MScalar(i == j ? 1 : 0));
+				matrix.set(i, j, new MReal(i == j ? 1 : 0));
 		return matrix;
 	}
 

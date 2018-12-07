@@ -1,8 +1,9 @@
 package mathobjects;
 
 public enum MConst {
-	PI(new MScalar(Math.PI)),
-	E(new MScalar(Math.E));
+	PI(new MReal(Math.PI)),
+	E(new MReal(Math.E)),
+	i(new MComplex(0,1));
 	
 	MScalar value;
 	MConst(MScalar value) {

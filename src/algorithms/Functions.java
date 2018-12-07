@@ -3,6 +3,9 @@ package algorithms;
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
+import mathobjects.MComplex;
+import mathobjects.MConst;
+import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
@@ -130,40 +133,56 @@ public class Functions {
 	//############### TRIGONOMETRIC FUNCTIONS ###############
 	/**
 	 * Calculates the sine of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * For complex numbers the formula {@code sin(a+bi)=sin(a)cosh(b)+i*cos(a)sinh(b)} is used.
 	 * @param m a <tt>MScalar</tt> of which the sine should be calculated (in radians).
 	 * @return a <tt>MScalar</tt> containing the sine of <tt>m</tt>
+	 * (real arguments give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
 	public static MScalar sin(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.sin(((MScalar) m).getValue()));
-		else
+		if (m instanceof MReal)
+			return new MReal(Math.sin(((MReal) m).getValue()));
+		else if(m instanceof MComplex) {
+			MComplex z = (MComplex) m;
+			return new MComplex(Math.sin(z.getA())*Math.cosh(z.getB()), -1*Math.cos(z.getA())*Math.sinh(z.getB()));
+		} else
 			throw new InvalidOperationException("Sine is not defined for " + m.getClass());
 	}
 
 	/**
 	 * Calculates the cosine of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * For complex numbers the formula {@code cos(a+bi)=cos(a)cosh(b)-i*sin(a)sinh(b)} is used.
 	 * @param m a <tt>MScalar</tt> of which the cosine should be calculated (in radians).
 	 * @return a <tt>MScalar</tt> containing the cosine of <tt>m</tt>
+	 * (real arguments give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
 	public static MScalar cos(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.cos(((MScalar) m).getValue()));
-		else
+		if (m instanceof MReal)
+			return new MReal(Math.cos(((MReal) m).getValue())); 
+		else if(m instanceof MComplex) {
+			MComplex z = (MComplex) m;
+			return new MComplex(Math.cos(z.getA())*Math.cosh(z.getB()), Math.sin(z.getA())*Math.sinh(z.getB()));
+		} else
 			throw new InvalidOperationException("Cosine is not defined for " + m.getClass());
 	}
 
 	/**
 	 * Calculates the tangent of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * For complex numbers the formula {@code tan(a+bi)=(sin(2a)+i*sinh(2b))/(cos(2a)+cosh(2b))} is used.
 	 * @param m a <tt>MScalar</tt> of which the tangent should be calculated (in radians).
 	 * @return a <tt>MScalar</tt> containing the tangent of <tt>m</tt>
+	 * (real arguments give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
 	public static MScalar tan(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.tan(((MScalar) m).getValue()));
-		else
+		if (m instanceof MReal)
+			return new MReal(Math.tan(((MReal) m).getValue()));
+		else if(m instanceof MComplex) {
+			MComplex z = (MComplex) m;
+			double d = Math.cos(2*z.getA())+Math.cosh(2*z.getB());
+			return new MComplex(Math.sin(2*z.getA())/d, Math.sinh(2*z.getB())/d);
+		} else
 			throw new InvalidOperationException("Tangent is not defined for " + m.getClass());
 	}
 	
@@ -199,40 +218,68 @@ public class Functions {
 	
 	/**
 	 * Calculates the arc sine of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * <ul><li>If the argument is real, it has to be in the interval [-1,1].</li>
+	 * <li>If the argument is complex, the formula {@code asin(z)=-i*ln(iz+sqrt(1-z^2))} is used, using {@link #ln(MathObject)}.</li></ul>
 	 * @param m a <tt>MScalar</tt> of which the arc sine should be calculated (in radians).
 	 * @return a <tt>MScalar</tt> containing the arc sine of <tt>m</tt>.
+	 * (real arguments give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
 	public static MScalar asin(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.asin(((MScalar) m).getValue()));
-		else
+		if (m instanceof MReal) {
+			double val = ((MReal) m).getValue();
+			if(val>1 || val<-1)
+				throw new IllegalArgumentException("Domain error: arcsin is defined on [-1,1], got " +val);
+			return new MReal(Math.asin(((MReal) m).getValue()));
+		}else if(m instanceof MComplex) {
+			MComplex z = (MComplex) m;
+			MComplex w = z.copy().power(2).negate().add(1);
+			MScalar v = w.power(0.5).add(z.copy().multiply(0,1));
+			return ((MComplex) ln(v)).multiply(0,-1);
+		}else
 			throw new InvalidOperationException("Arc sine is not defined for " + m.getClass());
 	}
 
 	/**
 	 * Calculates the arc cosine of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * <ul><li>If the argument is real, it has to be in the interval [-1,1].</li>
+	 * <li>If the argument is complex, the formula {@code acos(z)=-i*ln(z+i*sqrt(1-z^2))} is used, using {@link #ln(MathObject)}.</li></ul>
 	 * @param m a <tt>MScalar</tt> of which the arc cosine should be calculated.
 	 * @return a <tt>MScalar</tt> containing the arc cosine of <tt>m</tt> (in radians).
+	 * (real arguments give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
 	public static MScalar acos(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.acos(((MScalar) m).getValue()));
-		else
+		if (m instanceof MReal) {
+			double val = ((MReal) m).getValue();
+			if(val>1 || val<-1)
+				throw new IllegalArgumentException("Domain error: arccos is defined on [-1,1], got " +val);
+			return new MReal(Math.acos(((MReal) m).getValue()));
+		} else if(m instanceof MComplex) {
+			MComplex z = (MComplex) m;
+			MComplex w = z.copy().multiply(z).negate().add(1);
+			return ((MComplex) ln(w.power(0.5).multiply(0,1).add(z))).multiply(0,-1);
+		} else
 			throw new InvalidOperationException("Arc cosine is not defined for " + m.getClass());
 	}
 
 	/**
 	 * Calculates the arc tangent of the given <tt>MathObject</tt>. This works only if <tt>m</tt> is a <tt>MScalar</tt>.
+	 * If the argument is complex, the principle value will be returned using {@code atan(z)=1/(2i)ln((i-z)/(i+z))} using {@link #ln(MathObject)}.
 	 * @param m a <tt>MScalar</tt> of which the arc tangent should be calculated.
 	 * @return a <tt>MScalar</tt> containing the arc tangent of <tt>m</tt> (in radians).
+	 * (real arguments give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
 	public static MScalar atan(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.atan(((MScalar) m).getValue()));
-		else
+		if (m instanceof MReal)
+			return new MReal(Math.atan(((MReal) m).getValue()));
+		else if(m instanceof MComplex) {
+			double a = ((MComplex) m).getA();
+			double b = ((MComplex) m).getB();
+			double c = a*a+(b+1)*(b+1);
+			return ((MComplex) ln(new MComplex((-a*a-b*b+1)/c, 2*a/c)).multiply(MConst.i.evaluate().multiply(-0.5)));
+		} else
 			throw new InvalidOperationException("Arc tangent is not defined for " + m.getClass());
 	}
 	
@@ -244,8 +291,8 @@ public class Functions {
 	 * @throws InvalidOperationException if the given <tt>MathObject</tt> cannot be converted to degrees.
 	 */
 	public static MathObject toDegree(MathObject m) {
-		if(m instanceof MScalar)
-			return new MScalar(Math.toDegrees(((MScalar) m).getValue()));
+		if(m instanceof MReal)
+			return new MReal(Math.toDegrees(((MReal) m).getValue()));
 		else if(m instanceof MVector) {
 			MVector v = (MVector) m.copy();
 			for(MathObject el: v.elements())
@@ -262,8 +309,8 @@ public class Functions {
 	 * @throws InvalidOperationException if the given <tt>MathObject</tt> cannot be converted to radians.
 	 */
 	public static MathObject toRadians(MathObject m) {
-		if(m instanceof MScalar)
-			return new MScalar(Math.toRadians(((MScalar) m).getValue()));
+		if(m instanceof MReal)
+			return new MReal(Math.toRadians(((MReal) m).getValue()));
 		else if(m instanceof MVector) {
 			MVector v = (MVector) m.copy();
 			for(MathObject el: v.elements())
@@ -275,55 +322,65 @@ public class Functions {
 
 	//############### SCALAR FUNCTIONS ###############
 	/**
-	 * Calculates the absolute value (distance to the origin) of the given <tt>MathObject</tt>, for vectors this equals the Euclidean norm..
+	 * Calculates the absolute value (distance to the origin) of the given <tt>MathObject</tt>, for vectors and complex values this equals the Euclidean norm.
 	 * @param m <tt>MathObject</tt> of which the absolute value should be calculated.
-	 * @return a <tt>MScalar</tt> containing the absolute value.
+	 * @return a <tt>MReal</tt> containing the absolute value.
 	 * @throws InvalidOperationException if the absolute value is not defined for the type of <tt>m</tt>.
 	 */
-	public static MScalar abs(MathObject m) {
+	public static MReal abs(MathObject m) {
 		if (m instanceof MScalar)
-			return new MScalar(Math.abs(((MScalar) m).getValue()));
+			return new MReal(((MScalar)m).abs());
 		else if (m instanceof MVector)
 			return Norm.eucl((MVector) m);
 		throw new InvalidOperationException("The absolute value is not defined for " + m.getClass());
 	}
 	
 	/**
-	 * returns the natural logarithm of the given <tt>MathObject</tt>. This works only if m is a <tt>MScalar</tt>
+	 * returns the natural logarithm of the given <tt>MathObject</tt>. This works only if m is a <tt>MScalar</tt>.
+	 * If the argument is complex the principle value is returned: {@code log(z)=ln(r)+i*phi}, where {@code -pi<=phi<=pi}.
 	 * @param m the argument
 	 * @return a <tt>MScalar</tt> containing the natural logarithm of <tt>m</tt>
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#log(double)
 	 */
 	public static MScalar ln(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.log(((MScalar) m).getValue()));
+		if (m instanceof MReal)
+			return new MReal(Math.log(((MReal) m).getValue()));
+		else if(m instanceof MComplex) {
+			return new MComplex(Math.log(((MComplex) m).getR()), ((MComplex) m).arg());
+		}
 		throw new InvalidOperationException("The logarithm is not defined for " + m.getClass());
 	}
 	
 	/**
-	 * returns the logarithm with base 10 of the given <tt>MathObject</tt>. This works only if m is a <tt>MScalar</tt>
+	 * returns the logarithm with base 10 of the given <tt>MathObject</tt>. This works only if m is a <tt>MScalar</tt>.
+	 * If the argument is complex {@code ln(m)/ln(10)} is returned using {@link #ln(MathObject)}.
 	 * @param m the argument
 	 * @return a <tt>MScalar</tt> containing the 10-logarithm of <tt>m</tt>
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#log10(double)
 	 */
 	public static MScalar log(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.log10(((MScalar) m).getValue()));
+		if (m instanceof MReal)
+			return new MReal(Math.log10(((MReal) m).getValue()));
+		else if(m instanceof MComplex)
+			return ((MComplex) ln(m)).divide(Math.log(10));
 		throw new InvalidOperationException("The logarithm is not defined for " + m.getClass());
 	}
 	
 	/**
-	 * returns the square root of the given <tt>MathObject</tt>. This works only if m is a <tt>MScalar</tt>
+	 * returns the square root of the given <tt>MathObject</tt>. This works only if m is a <tt>MScalar</tt>.
+	 * If the argument is complex {@code m^0.5} is returned using {@link MComplex#power(double)}.
 	 * @param m the argument
 	 * @return a <tt>MScalar</tt> containing the square root of <tt>m</tt>
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#sqrt(double)
 	 */
 	public static MScalar sqrt(MathObject m) {
-		if (m instanceof MScalar)
-			return new MScalar(Math.sqrt(((MScalar) m).getValue()));
+		if (m instanceof MReal)
+			return new MReal(Math.sqrt(((MReal) m).getValue()));
+		if(m instanceof MComplex)
+			return ((MComplex) m.copy()).power(0.5);
 		throw new InvalidOperationException("The square root is not defined for " + m.getClass());
 	}
 	
@@ -333,11 +390,11 @@ public class Functions {
 	 * @param n the base of the root
 	 * @return a <tt>MScalar</tt> containing the n-th root of <tt>m</tt>
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
-	 * @see Math#sqrt(double)
+	 * @see MScalar#power(double)
 	 */
 	public static MScalar root(MathObject m, int n) {
 		if (m instanceof MScalar)
-			return new MScalar(Math.pow(((MScalar) m).getValue(), 1d/n));
+			return ((MScalar) m.copy()).power(1d/n);
 		throw new InvalidOperationException("The root is not defined for " + m.getClass());
 	}
 

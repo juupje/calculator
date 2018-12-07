@@ -1,7 +1,6 @@
 package algorithms.linalg;
 
 import algorithms.Algorithm;
-import helpers.Dimension;
 import helpers.Shape;
 import helpers.Tools;
 import helpers.exceptions.ShapeException;
@@ -11,7 +10,7 @@ import mathobjects.MathObject;
 
 public class GaussianElimination extends Algorithm {
 
-	Dimension dim;
+	Shape shape;
 	MatrixToolkit mtk;
 	
 	public GaussianElimination() {}
@@ -19,7 +18,7 @@ public class GaussianElimination extends Algorithm {
 	public GaussianElimination(MMatrix m, MMatrix b) {
 		mtk = new MatrixToolkit(m.augment(b));
 		mtk.setAugmCols(b.shape().cols());
-		dim = new Dimension(mtk.rows, mtk.cols);
+		shape = new Shape(mtk.rows, mtk.cols);
 		prepared = true;
 	}
 	
@@ -32,9 +31,9 @@ public class GaussianElimination extends Algorithm {
 	
 	protected void gauss() {
 		mtk.reorder(mtk.rows);
-		for(int i = 0; i < dim.rows(); i++) {
+		for(int i = 0; i < shape.rows(); i++) {
 			mtk.multiplyRow(i, 1.0/mtk.matrix[i][i]);
-			for(int row = i+1; row < dim.rows(); row++) {
+			for(int row = i+1; row < shape.rows(); row++) {
 				if(mtk.matrix[row][i] != 0) {
 					mtk.addToRow(row, i, -mtk.matrix[row][i]);
 					mtk.matrix[row][i] = 0;
@@ -63,7 +62,7 @@ public class GaussianElimination extends Algorithm {
 			mtk = new MatrixToolkit((MMatrix) args[0]); //no need to copy as the toolkit only works with the double values.
 		else
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args) + " not applicable for Gaussian Elimination, see help for correct use.");
-		dim = new Dimension(mtk.rows, mtk.cols);
+		shape = new Shape(mtk.rows, mtk.cols);
 	}
 	
 	@Override

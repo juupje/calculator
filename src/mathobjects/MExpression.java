@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import helpers.Printer;
 import helpers.Shape;
-import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Operator;

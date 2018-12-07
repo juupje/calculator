@@ -97,6 +97,10 @@ public class Node<T> {
 		return data;
 	}
 	
+	public void setData(T data) {
+		this.data = data;
+	}
+	
 	@Override
 	public String toString() {
 		if(data instanceof Variable)
