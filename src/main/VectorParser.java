@@ -7,7 +7,6 @@ import helpers.exceptions.UnexpectedCharacterException;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
-import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
 

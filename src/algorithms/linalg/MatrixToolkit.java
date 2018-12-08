@@ -3,7 +3,6 @@ package algorithms.linalg;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
-import mathobjects.MScalar;
 
 public class MatrixToolkit {
 	double[][] matrix;

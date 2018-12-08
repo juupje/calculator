@@ -7,7 +7,6 @@ import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import mathobjects.MFunction;
 import mathobjects.MReal;
-import mathobjects.MReal;
 import mathobjects.MVector;
 import mathobjects.MathObject;
 
@@ -31,7 +30,7 @@ public class Integrator extends Algorithm{
 	}
 	
 	public Integrator(MFunction f, MReal[] a, MReal[] b) {
-		this(f, a, b, Setting.getInt(Setting.DEF_INT_STEPS));
+		this(f, a, b, Setting.getInt(Setting.INT_DEF_STEPS));
 	}
 	
 	public Integrator(MFunction f, MReal a, MReal b, int steps) {
@@ -39,7 +38,7 @@ public class Integrator extends Algorithm{
 	}
 	
 	public Integrator(MFunction f, MReal a, MReal b) {
-		this(f, a, b, Setting.getInt(Setting.DEF_INT_STEPS));
+		this(f, a, b, Setting.getInt(Setting.INT_DEF_STEPS));
 	}
 	
 	public MReal execute() {
@@ -132,7 +131,7 @@ public class Integrator extends Algorithm{
 					throw new IllegalArgumentException("Argument 4 has to be an integer valued scalar, got " + args[3].toString());
 			} else
 				//If there is no 4th argument, set steps to the default (10,000).
-				steps = Setting.getInt(Setting.DEF_INT_STEPS);
+				steps = Setting.getInt(Setting.INT_DEF_STEPS);
 		} else
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args) + " not applicable for Integration algorithm see help for the correct use.");			
 	}

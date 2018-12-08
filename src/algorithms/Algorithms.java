@@ -1,6 +1,7 @@
 package algorithms;
 
 import mathobjects.MathObject;
+import algorithms.algebra.ABCFormula;
 import algorithms.calculus.Integrator;
 import algorithms.linalg.GaussianElimination;
 import algorithms.linalg.JordanElimination;
@@ -8,7 +9,8 @@ import algorithms.linalg.JordanElimination;
 public enum Algorithms {
 	INTEGRATE(new Integrator()),
 	REF(new GaussianElimination()),
-	RREF(new JordanElimination());
+	RREF(new JordanElimination()),
+	ABC(new ABCFormula());
 	
 	Algorithm a;
 	Algorithms(Algorithm a) {

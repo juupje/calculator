@@ -2,7 +2,6 @@ package mathobjects;
 
 import helpers.Printer;
 import helpers.Shape;
-import helpers.exceptions.InvalidOperationException;
 
 public abstract class MScalar implements MathObject {
 	

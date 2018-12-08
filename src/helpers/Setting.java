@@ -20,8 +20,9 @@ public enum Setting {
 	PRECISION(Integer.class),
 
 	//Algoritm stuff
-	DEF_TIMER_RUNS(Integer.class),
-	DEF_INT_STEPS(Integer.class),
+	TIMER_DEF_RUNS(Integer.class),
+	INT_DEF_STEPS(Integer.class),
+	ABC_SHOW_TEXT(Boolean.class),
 
 	//Display stuff
 	NOTATION(Integer.class),
