@@ -18,6 +18,7 @@ public enum Setting {
 
 	//Calculation stuff
 	PRECISION(Integer.class),
+	COMPLEX_ENABLED(Boolean.class),
 
 	//Algoritm stuff
 	TIMER_DEF_RUNS(Integer.class),
@@ -156,6 +157,11 @@ public enum Setting {
 	public static void setArgument(String[] args) {
 		for (String s : args)
 			arguments.add(s);
+	}
+	
+	public static String[] getArguments() {
+		String[] args = new String[arguments.size()];
+		return arguments.toArray(args);
 	}
 
 	public static boolean existsArgument(String name) {

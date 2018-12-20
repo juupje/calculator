@@ -1,7 +1,10 @@
 {
     "notation": 1,
     "precision": 3,
-    "int_def_steps": 10000,
+    "int_def_steps": 16,
     "timer_def_runs": 100,
-	"abc_show_text": false
+	"abc_show_text": true,
+	"complex_in_polar": false,
+	"complex_in_polar": false,
+	"show_stacktrace": false
 }

@@ -16,6 +16,8 @@ public class GaussianElimination extends Algorithm {
 	public GaussianElimination() {}
 	
 	public GaussianElimination(MMatrix m, MMatrix b) {
+		if(m.shape().rows() != b.shape().rows())
+			throw new ShapeException("Augmented matrix needs to have the same amount of rows as the matrix, got " + m.shape() + " and " + b.shape());
 		mtk = new MatrixToolkit(m.augment(b));
 		mtk.setAugmCols(b.shape().cols());
 		shape = new Shape(mtk.rows, mtk.cols);

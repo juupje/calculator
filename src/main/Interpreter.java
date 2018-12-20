@@ -7,8 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import helpers.Printer;
-import helpers.Setting;
-import helpers.Timer;
 import helpers.exceptions.CircularDefinitionException;
 import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
@@ -31,29 +29,11 @@ public class Interpreter {
 			boolean containsOp = "+-*/:".contains("" + s.charAt(index - 1));
 			assign(s.substring(0, index - (containsOp ? 1 : 0)), containsOp ? s.substring(index - 1, index) : "",
 					s.substring(index + 1));
-		} else if (s.startsWith("type")) {
-			Calculator.ioHandler.out(Variables.get(argsFromString(s)).getClass());
-		} else if(s.startsWith("time")) {
-			Calculator.ioHandler.out(Timer.time(argsFromString(s)).toString());
-		} else if (s.startsWith("latex")) {
-			Printer.latex(argsFromString(s));
-		} else if (s.startsWith("dot")) {
-			Printer.dot(argsFromString(s));
-		} else if (s.startsWith("execute")) {
-			execute(new File(argsFromString(s))); 
-		} else if (s.startsWith("shape")) {
-			Calculator.ioHandler.out(Variables.get(argsFromString(s)).shape());
-		} else if (s.startsWith("delete") || s.startsWith("del")) {
-			for(String name : Parser.getArguments(argsFromString(s)))
-				Variables.remove(name);
-		} else if (s.startsWith("print")) {
-			MathObject mo = Variables.get(argsFromString(s));
-			if (mo == null)
-				Calculator.ioHandler.err("There exists no variable with that name.");
-			else
-				Calculator.ioHandler.out(Printer.toText(mo));
-		} else if (s.startsWith("setting")){
-			Setting.processCommand(argsFromString(s));
+			return;
+		}
+		Command c = Command.findCommand(s);
+		if(c!=null) {
+			c.process(argsFromString(s));
 		} else {
 			MathObject result = new Parser(s).evaluate();
 			Variables.ans(result);
@@ -71,9 +51,10 @@ public class Interpreter {
 		MathObject result = null;
 		switch (op) {
 		case ":":
-			if (name.contains("("))
+			if (name.contains("(")) {
 				result = MFunction.create(name, expr, true);
-			else
+				name = name.substring(0, name.indexOf("("));
+			} else
 				result = new MExpression(expr);
 			break;
 		case "+":

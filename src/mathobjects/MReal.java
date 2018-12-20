@@ -82,7 +82,7 @@ public class MReal extends MScalar {
 	 * @return {@code this}
 	 */
 	public MScalar divide(MScalar other) {
-		if(!other.isComplex())
+		if(other.isComplex())
 			return new MComplex(this).divide(other);
 		else
 			value /= ((MReal) other).getValue();

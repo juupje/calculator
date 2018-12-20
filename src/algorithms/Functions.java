@@ -1,6 +1,7 @@
 package algorithms;
 
 import helpers.Shape;
+import helpers.Tools;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
 import mathobjects.MComplex;
@@ -102,12 +103,6 @@ public class Functions {
 			public MScalar evaluate(MathObject m) {
 				return abs(m);
 			}
-			@Override
-			public Shape shape(Shape s)  {
-				if(s.dim()<3)
-					return new Shape();
-				throw new ShapeException("Function TODEG is not defined for arguments of shape " + s);
-			}
 		},
 		LN {
 			@Override
@@ -119,6 +114,12 @@ public class Functions {
 			@Override
 			public MScalar evaluate(MathObject m) {
 				return log(m);
+			}
+		},
+		FACT {
+			@Override
+			public MReal evaluate(MathObject m) {
+				return fact(m);
 			}
 		};
 
@@ -396,6 +397,20 @@ public class Functions {
 		if (m instanceof MScalar)
 			return ((MScalar) m.copy()).power(1d/n);
 		throw new InvalidOperationException("The root is not defined for " + m.getClass());
+	}
+	
+	/**
+	 * Calculates n! (n factorial) using {@link Tools#fact(int)}.
+	 * @param m a MathObject
+	 * @return n! (where n is the value of m).
+	 * @throws IllegalArgumentException if n is not a positive integer value.
+	 */
+	public static MReal fact(MathObject m) {
+		if(m instanceof MReal && ((MReal) m).isInteger()) {
+			int n = (int) ((MReal) m).getValue();
+			return new MReal(Tools.fact(n));
+		}
+		throw new IllegalArgumentException("Factorial is only defined for integer values, got " + m.toString());
 	}
 
 	public static boolean isFunction(String s) {

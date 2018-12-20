@@ -56,7 +56,7 @@ public class MFunction extends MExpression {
 	 *         tree as described above.
 	 */
 	@Override
-	public MathObject evaluate() {
+	public MFunction evaluate() {
 		return new MFunction(vars, tree.copy((n) -> {
 			if (n.data instanceof Variable) {
 				for (String v : vars)

@@ -1,5 +1,2 @@
-z=2+4í
-a=sin(z)
-asin(a)
-b=asin(z)
-sin(b)
+f(x):=x^3
+integrate(f, 1, 10, 2)

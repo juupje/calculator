@@ -1,0 +1,220 @@
+{
+    "functions": {
+    	"sin": {
+			"syntax": "sin(s)",
+			"description": "Calculates the sine of the argument.",
+			"arguments": "Any real or complex number in radians.",
+			"result": "A complex or real number which equals the sine of the argument. For real arguments the result will be in [-1,1]."
+		},
+		"cos": {
+			"syntax": "cos(s)",
+			"description": "Calculates the cosine of the argument.",
+			"arguments": "Any real or complex number in radians.",
+			"result": "A complex or real number which equals the cosine of the argument. For real arguments the result will be in [-1,1]."
+		},
+		"tan": {
+			"syntax": "tan(s)",
+			"description": "Calculates the tangent of the argument.",
+			"arguments": "Any real or complex number in radians.",
+			"result": "A complex or real number which equals the tangent of the argument."
+		},
+		"sind": {
+			"syntax": "sind(s)",
+			"description": "Calculates the sine of the argument.",
+			"arguments": "Any real number in degrees.",
+			"result": "A real number from [-1,1] which equals the sine of the argument."
+		},
+		"cosd": {
+			"syntax": "cosd(s)",
+			"description": "Calculates the cosine of the argument.",
+			"arguments": "Any real number in degrees.",
+			"result": "A real number from [-1,1] which equals the cosine of the argument."
+		},
+		"tand": {
+			"syntax": "tand(s)",
+			"description": "Calculates the tangent of the argument.",
+			"arguments": "Any real number in degrees.",
+			"result": "A real number which equals the tangent of the argument."
+		},
+		"asin": {
+			"syntax": "asin(s)",
+			"description": "Calculates the inverse sine (arcsine) of the argument. That is, the number whose sine equals the argument.",
+			"arguments": "Any complex number or a real number from [-1,1].",
+			"result": "A complex or real number whose sine equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
+		},
+		"acos": {
+			"syntax": "cosd(s)",
+			"description": "Calculates the inverse cosine (arccosine) of the argument. That is, the number whose cosine equals the argument.",
+			"arguments": "Any complex number or a real number from [-1,1].",
+			"result": "A complex or real number whose cosine equals the argument. For real arguments the result will be in [0, pi]."
+		},
+		"atan": {
+			"syntax": "tand(s)",
+			"description": "Calculates the inverse tangent (arctangent) of the argument. That is, the number whose tangent equals the argument.",
+			"arguments": "Any real or complex number.",
+			"result": "A complex or real number whose tangent equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
+		},
+		"toRad": {
+			"syntax": "toRad(s)",
+			"description": "Converts the argument from degrees to radians. This is done using rad=deg*pi/180",
+			"arguments": "Any real number.",
+			"result": "A real number which corresponds to the same angle in radians as the argument in degrees."
+		},
+		"toDeg": {
+			"syntax": "toDeg(s)",
+			"description": "Converts the argument from radians to degrees. This is done using deg=rad*180/pi",
+			"arguments": "Any real number.",
+			"result": "A real number which corresponds to the same angle in degrees as the argument in radians."
+		},
+		"sqrt": {
+			"syntax": "sqrt(s)",
+			"description": "Calculates the square root of the argument. If the setting COMPLEX_ENABLED is set to true, the argument can be negative too, in which case the result will be complex.",
+			"arguments": "A positive (zero included) number, or a negative or complex number (see above).",
+			"result": "A real non-negative number whose square equals the argument, or a complex number (see above)."
+		}
+	},
+	"algorithms": {
+		"integral": {
+			"syntax": "integral(f, a, b) or integral(f, a, b, s)",
+			"description": "Numerically approximates the definite integral of the function f from a to b with (optional) s steps (nodes) using Gaussian-Legendre Quadrature.",
+			"arguments": "f: a function depending on n variables. a: a vector containing n lower bound values.If n=1, this can be a (real) scalar. b: a vector containing n upper bound values. If n=1 this can be a (real) scalar only if a is one as well. s (optional): the amount of steps in the numerical approximation, the default is set in the INT_DEF_STEPS setting. The order of the lower- and upper bound values should correspond to the order of the variables of f.",
+			"result": "An approximation of the definite integral of f between a and b. The approximation is exact for polynomes with degree <2N-1, where N is the amount of steps."
+		},
+		"ref": {
+			"syntax": "ref(M) or ref(M, b)",
+			"description": "Calculates the row echilon form of the matrix m (optionally augmented with b) using Gaussian Elimination.",
+			"arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Gaussian Elimination.",
+			"result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Gaussian Elimination on M augmented with b."
+		},
+		"rref": {
+			"syntax": "ref(M) or ref(M, b)",
+			"description": "Calculates the reduced row echilon form of the matrix m (optionally augmented with b) using Jordan-Gauss Elimination.",
+			"arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Jordan-Gauss Elimination.",
+			"result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Jordan-Gauss Elimination on M augmented with b."
+		},
+		"abc": {
+			"syntax": "abc(a, b, c)",
+			"description": "Uses the ABC-Formula to calculate the root of a quadratic equation of the form y=ax^2+bx+c. If the setting COMPLEX_ENABLED is set to true, the a complex result may be returned.",
+			"arguments": "a, b and c: real numbers",
+			"result": "A vector with 2 elements containing both roots, if one or both of the roots is complex and the setting COMPLEX_ENABLED is set to false, one or both of the elements may be null. If only one element is null, it will be the second one."
+		}
+	},
+	"commands": {
+		"del": {
+			"syntax": "del(a,b,...) or delete(a,b,...)",
+			"description": "Deletes the given variables. This can be used to free memory if you are working with large objects which are no longer needed.",
+			"arguments": "a, b, ...: arbitrary amount of variable names.",
+			"result": "-"
+		},
+		"dot": {
+			"syntax": "dot(a) or dot(a, name)",
+			"description": "Exports the given variable as a tree graph in a dot format (see Graphviz for more info) to a file with the given name or 'output_dot*.dot' where * is the first available integer. If the argument equals 'dependencies' the dependencies graph is exported (developer feature).",
+			"arguments": "a: an expression, function or 'dependencies'. name (optional): the name of the file to which the variable is exported (without extension).",
+			"result": "A .dot file containing the dot code representing the tree graph of the argument"
+		},
+		"execute": {
+			"syntax": "execute(file)",
+			"description": "Executes the statements in the given file.",
+			"arguments": "file: the name of the file to be executed (including the .cal extension and the path if the file is not in the same directory as the program).",
+			"result": "The statements in the file and their results printed to the console."
+		},
+		"help": {
+			"syntax": "help(command)",
+			"description": "Displays the entry in the help document for the given command.",
+			"arguments": "command: the name of the command which's help page should be displayed.",
+			"result": "The help page of the given command printed to the console."
+		},
+		"latex": {
+			"syntax": "latex(a) or latex(a, name)",
+			"description": "Exports the given variable in its LaTeX format to a file with the given name or 'output_latex*.tex' if no name is given, where * is the first available integer.",
+			"arguments": "a: the name of the variable to be exported as LaTeX. name (optional): the name of the file to which the LaTeX code should be written (without the .tex extension).",
+			"result": "A .tex file containing the LaTeX code representing the argument."
+		},
+		"list": {
+			"syntax": "list(type) or list()",
+			"description": "Prints a list of available help pages for commands, functions, algorithms or settings. If no argument is given, all pages are listed.",
+			"arguments": "type (optional): the category which should be listed. Can be 'algorithms', 'commands', 'functions' or 'settings'.",
+			"result": "A list of available commands/functions/algorithms/settings."
+		},
+		"print": {
+			"syntax": "print(a)",
+			"description": "Prints the given variable to the console.",
+			"arguments": "a: the name of the variable to be printed to the console.",
+			"result": "The variable in text printed to the console."
+		},
+		"setting": {
+			"syntax": "setting(key) or setting(key, value)",
+			"description": "Prints the setting if only the key is given, or sets the setting to a new value if both key and value are given. If the key equals 'reset' the settings will be reset to their default values. See help(<setting>) or list(setting) for more info.",
+			"arguments": "key: the name of the setting or 'reset'. value (optional): the new value of the setting (note that each setting requires a specific value type (e.g. integer, string, boolean etc.)",
+			"result": "The current value of the setting printed to the console if only the key is given."
+		},
+		"shape": {
+			"syntax": "shape(a)",
+			"description": "Prints the shape of the given variable.",
+			"arguments": "a: the name of the variable.",
+			"result": "The shape of the given variable."
+		},
+		"time": {
+			"syntax": "time(expression) or time(expression, runs)",
+			"description": "Measures the time needed to execute the given expression. To increase precision, the expression is run multiple times. How often the expression is run can be given in the second argument or else is set to the TIMER_DEF_RUNS setting.",
+			"arguments": "expression: the expression whose execution time should be measured. runs (optional): how often the expression should be run.",
+			"result": "The total time required for all runs and the average time per run."
+		},
+		"type": {
+			"syntax": "type(a)",
+			"description": "Prints the type (=java class name) of the given variable.",
+			"arguments": "a: the name of the variable whose type should be printed.",
+			"result": "The type of the given variable."
+		},
+	},
+	"settings": {
+		"abc_show_text": {
+			"name": "abc_show_text",
+			"type": "boolean",
+			"description": "whether or not the ABC-Formula algorithm should display more information as text. See help(abc) for more info.",
+			"default": true
+		},
+		"complex_enabled": {
+			"name": "complex_enabled",
+			"type": "boolean",
+			"description": "whether or not complex numbers can be returned by functions.",
+			"default": false
+		},
+		"complex_in_polar": {
+			"name": "compex_in_polar",
+			"type": "boolean",
+			"description": "whether or not complex number should be expressed in their polar form. If false, complex numbers will be given in cartesian form.",
+			"default": false
+		},
+		"int_def_steps": {
+			"name": "int_def_steps",
+			"type": "integer",
+			"description": "The default amount of steps (nodes) used by the Gaussian Quadrature algorithm. See help(integral).",
+			"default": 16
+		},
+		"notation": {
+			"name": "notation",
+			"type": "integer",
+			"description": "The type of notation which is used to display numbers. normal=1, engineering=2, scientific=3.",
+			"default": 1
+		},
+		"precision": {
+			"name": "precision",
+			"type": "integer",
+			"description": "The amount of decimal places to be displayed in the console.",
+			"default": 3
+		},
+		"show_stacktrace": {
+			"name": "show_stacktrace",
+			"type": "boolean",
+			"description": "whether or not the stacktrace of error messages should be shown. The stacktrace can be used by the developer to pinpoint the code generating the error.",
+			"default": false
+		},
+		"timer_def_runs": {
+			"name": "timer_def_runs",
+			"type": "integer",
+			"description": "The default amount of runs of the time command. See help(time) for more info.",
+			"default": 100
+		}
+	}
+}

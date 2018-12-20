@@ -24,9 +24,9 @@ public class Calculator {
 		ioHandler = hl;
 	}
 	
-	public static void main(String[] args) {
+	public static void start(String[] args) {
 		dependencyGraph = new Graph<Variable>();
-		setHandler(new IOHandler());
+		Setting.setArgument(args);
 		Setting.loadPrefs();
 		if(args != null && args.length > 0) {
 			if(args[0].equals("run"))
@@ -39,6 +39,11 @@ public class Calculator {
 						ioHandler.err(e.getMessage());
 				}
 		}
+	}
+	
+	public static void main(String[] args) {
+		setHandler(new IOHandler());
+		start(args);
 		new Calculator();
 	}
 }

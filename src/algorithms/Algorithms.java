@@ -7,7 +7,7 @@ import algorithms.linalg.GaussianElimination;
 import algorithms.linalg.JordanElimination;
 
 public enum Algorithms {
-	INTEGRATE(new Integrator()),
+	INTEGRAL(new Integrator()),
 	REF(new GaussianElimination()),
 	RREF(new JordanElimination()),
 	ABC(new ABCFormula());
