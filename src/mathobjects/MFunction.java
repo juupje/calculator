@@ -250,6 +250,46 @@ public class MFunction extends MExpression {
 	public String[] getParameters() {
 		return vars;
 	}
+	
+	public MFunction add(MScalar other) {
+		super.add(other);
+		return this;
+	}
+	
+	public MFunction add(MExpression other) {
+		super.add(other);
+		return this;
+	}
+	
+	public MFunction subtract(MScalar other) {
+		super.subtract(other);
+		return this;
+	}
+	
+	public MFunction subtract(MExpression other) {
+		super.subtract(other);
+		return this;
+	}
+	
+	public MFunction multiply(MScalar other) {
+		super.multiply(other);
+		return this;
+	}
+	
+	public MFunction multiply(MExpression other) {
+		super.multiply(other);
+		return this;
+	}
+	
+	public MFunction divide(MScalar other) {
+		super.divide(other);
+		return this;
+	}
+	
+	public MFunction divide(MExpression other) {
+		super.divide(other);
+		return this;
+	}
 
 	/**
 	 * Calls {@link Printer#toText(MExpression)} and returns the result

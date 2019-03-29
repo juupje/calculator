@@ -127,7 +127,11 @@ public class Functions {
 		public Shape shape(Shape s)  {
 			if(s.dim()==0)
 				return s;
-			throw new ShapeException("Function " + name() + " not defined for shape " + s);
+			throw new ShapeException("Function " + name().toLowerCase() + " not defined for shape " + s);
+		}
+		
+		public String toString() {
+			return name().toLowerCase();
 		}
 	}
 
@@ -424,5 +428,10 @@ public class Functions {
 
 	public static Function getFunction(String name) {
 		return Function.valueOf(name.toUpperCase());
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString().toLowerCase();
 	}
 }

@@ -252,7 +252,7 @@ public class MVector implements MathObject{
 	 * @
 	 */
 	@Override
-	public MathObject evaluate() {
+	public MVector evaluate() {
 		MVector v = new MVector(size);
 		for(int i = 0; i < v.size; i++)
 			v.set(i, get(i).evaluate());

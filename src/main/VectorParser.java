@@ -12,6 +12,7 @@ import mathobjects.MathObject;
 
 public class VectorParser extends Parser {
 	ArrayList<MathObject> v;
+	
 	public VectorParser(String s) {
 		super(s);
 		expr = expr.substring(1, expr.length()-1);

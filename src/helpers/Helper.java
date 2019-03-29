@@ -52,6 +52,7 @@ public class Helper {
 						type = "setting";
 					} catch(JSONException e4) {
 						Calculator.ioHandler.err("No known help page for " + command + ", type list for a list of commands/functions/algorithms");
+						return;
 					}
 				}
 			}

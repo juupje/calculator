@@ -6,6 +6,12 @@ import mathobjects.MathObject;
 public class Variables {
 	private static HashMap<String, MathObject> vars = new HashMap<String, MathObject>();
 	
+	/**
+	 * Returns the variable with the given name from the map, or {@code null} if no mapping with such name exists.
+	 * @param key the name of the variable to be returned.
+	 * @return the variable associated with the given name.
+	 * @see HashMap#get(Object)
+	 */
 	public static MathObject get(String key) {
 		return vars.get(key);
 	}

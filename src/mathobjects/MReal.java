@@ -3,6 +3,8 @@ package mathobjects;
 import helpers.exceptions.InvalidOperationException;
 
 public class MReal extends MScalar {
+	private static final MReal NaN = new MReal(Double.NaN);
+	
 	double value = 0;
 	public MReal() {}
 	public MReal(double d) {
@@ -222,5 +224,8 @@ public class MReal extends MScalar {
 		}
 		return false;
 	}
-
+	
+	public static final MReal NaN() {
+		return NaN.copy();
+	}
 }

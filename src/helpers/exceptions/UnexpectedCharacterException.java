@@ -1,6 +1,6 @@
 package helpers.exceptions;
 
-public class UnexpectedCharacterException extends Exception {
+public class UnexpectedCharacterException extends RuntimeException {
 	private static final long serialVersionUID = 7536284287269689946L;
 
 	public UnexpectedCharacterException(String msg) {

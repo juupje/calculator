@@ -38,6 +38,13 @@ public class IOHandler {
 			System.out.print(str);
 	}
 	
+	public void printException(Exception e) {
+		if(Setting.getBool(Setting.SHOW_STACKTRACE))
+			e.printStackTrace();
+		else
+			err(e.getMessage());
+	}
+	
 	public void startConsoleInput() {
 		reading = true;
 		while(reading) {

@@ -3,11 +3,15 @@ package algorithms;
 import mathobjects.MathObject;
 import algorithms.algebra.ABCFormula;
 import algorithms.calculus.Integrator;
+import algorithms.calculus.Deriver;
+import algorithms.calculus.Gradient;
 import algorithms.linalg.GaussianElimination;
 import algorithms.linalg.JordanElimination;
 
 public enum Algorithms {
 	INTEGRAL(new Integrator()),
+	DERIVATIVE(new Deriver()),
+	GRAD(new Gradient()),
 	REF(new GaussianElimination()),
 	RREF(new JordanElimination()),
 	ABC(new ABCFormula());
@@ -18,6 +22,10 @@ public enum Algorithms {
 	}
 	
 	public MathObject execute(MathObject... args) {
+		return a.execute(args);
+	}
+	
+	public MathObject execute(String... args) {
 		return a.execute(args);
 	}
 	

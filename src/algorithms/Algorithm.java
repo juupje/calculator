@@ -1,6 +1,13 @@
 package algorithms;
 
 import helpers.Shape;
+import helpers.exceptions.InvalidFunctionException;
+import helpers.exceptions.ShapeException;
+import helpers.exceptions.TreeException;
+import helpers.exceptions.UnexpectedCharacterException;
+import main.Calculator;
+import main.Parser;
+import mathobjects.MReal;
 import mathobjects.MathObject;
 
 /**
@@ -25,11 +32,24 @@ public abstract class Algorithm {
 	
 	public abstract MathObject execute(); // Intended for internal use, arguments have to be passed via constructor.
 
-	public abstract MathObject execute(MathObject... args);
+	protected abstract MathObject execute(MathObject... args);
+	
+	public MathObject execute(String... args) {
+		try {
+			return execute(Parser.toMathObjects(args));
+		} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
+			Calculator.ioHandler.printException(e);
+			return MReal.NaN();
+		}
+	}
 	
 	public abstract Shape shape(Shape... shapes) ;
 
 	protected void prepare(MathObject[] args) {
+		prepared = true;
+	}
+	
+	protected void prepare(String[] args) {
 		prepared = true;
 	}
 

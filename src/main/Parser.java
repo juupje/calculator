@@ -341,8 +341,8 @@ public class Parser {
 				d = MConst.get(letters).evaluate();
 			else if(Algorithms.isAlgorithm(letters)) {
 				if(!consume('('))
-					throw new UnexpectedCharacterException("Expected '(' after a function instead of '" + (char) ch + "'.");
-				d = Algorithms.getAlgorithm(letters).execute(getArgumentsAsMathObject(findEndOfBrackets()));
+					throw new UnexpectedCharacterException("Expected '(' after a algorithm name instead of '" + (char) ch + "'.");
+				d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
 				d = processFactor(); // Gets the factor inside the function
 				if(Functions.isFunction(letters))
@@ -381,10 +381,13 @@ public class Parser {
 	}
 	
 	public static MathObject[] getArgumentsAsMathObject(String s) throws UnexpectedCharacterException, InvalidFunctionException, TreeException, ShapeException {
-		String[] args = getArguments(s);
-		MathObject[] moArgs = new MathObject[args.length];
-		for(int i = 0; i < args.length; i++)
-			moArgs[i] = new Parser(args[i]).evaluate();
+		return toMathObjects(getArguments(s));
+	}
+	
+	public static MathObject[] toMathObjects(String... s) throws ShapeException, UnexpectedCharacterException, InvalidFunctionException, TreeException {
+		MathObject[] moArgs = new MathObject[s.length];
+		for(int i = 0; i < s.length; i++)
+			moArgs[i] = new Parser(s[i]).evaluate();
 		return moArgs;
 	}
 	

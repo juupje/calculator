@@ -5,11 +5,11 @@ import main.Operator;
 import main.Variable;
 import mathobjects.MConst;
 import mathobjects.MScalar;
+import mathobjects.MathObject;
 
 public class Node<T> {
 	
 	public static final byte LEFT = 0, RIGHT = 1;
-	
 	
 	public Node<?> left = null, right = null, parent = null;
 	public T data;
@@ -99,6 +99,19 @@ public class Node<T> {
 	
 	public void setData(T data) {
 		this.data = data;
+	}
+	
+	public Node<?> copy() {
+		Node<?> n;
+		if(data instanceof MathObject)
+			n = new Node<MathObject>(((MathObject) data).copy());
+		else
+			n = new Node<T>(data);
+		if(left != null)
+			n.left(left.copy());
+		if(right != null)
+			n.right(right.copy());
+		return n;
 	}
 	
 	@Override

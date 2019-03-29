@@ -1,2 +1,2 @@
-f(x):=x^3
-integrate(f, 1, 10, 2)
+f(x):=x^3*sin(x)/ln(x)
+derivative(f)

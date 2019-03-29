@@ -6,6 +6,7 @@ import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import main.Parser;
+import tree.Node;
 import tree.Tree;
 
 public class MVectorFunction extends MVector {
@@ -34,11 +35,14 @@ public class MVectorFunction extends MVector {
 		paramMap = new HashMap<String, MathObject>(MFunction.INIT_PARAM_CAP);
 		v = new MFunction[vector.size()];
 		for(int i = 0; i < vector.size(); i++) {
+			MFunction func = null;
 			if(vector.get(i) instanceof MExpression) {
-				MFunction func = new MFunction(vars, ((MExpression) vector.get(i)).getTree(), defined);
-				func.setParamMap(paramMap);
-				v[i] = defined ? func : func.evaluate();
+				func = new MFunction(vars, ((MExpression) vector.get(i)).getTree(), defined);
+			} else { //vector[i] is a constant
+				func = new MFunction(vars, new Tree(new Node<MathObject>(vector.get(i))), defined);
 			}
+			func.setParamMap(paramMap);
+			v[i] = defined ? func : func.evaluate();
 		}
 	}
 
