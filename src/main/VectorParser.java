@@ -49,7 +49,7 @@ public class VectorParser extends Parser {
 				try {
 					return (MVector) new VectorParser("[" + s + "]").parse();
 				} catch (UnexpectedCharacterException e) {
-					e.printStackTrace();
+					Calculator.errorHandler.handle(e);
 					return null;
 				}
 			}).collect(Collectors.toList()));

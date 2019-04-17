@@ -46,7 +46,7 @@ public class Printer {
 	 * </pre>
 	 */
 	private static final String latexPreamble = "\\documentclass[preview]{standalone}\n\\usepackage{amsmath}\n"
-			+ "\\author{Calculator - By Joep Geuskens}\n\\newcommand{\\func}[1]{\\mathrm{#1}}\n{\\begin{document}";
+			+ "\\author{Calculator - By Joep Geuskens}\n\\newcommand{\\func}[1]{\\mathrm{#1}}\n\\begin{document}";
 	private static final String latexEnd = "\\end{document}";
 
 	/**
@@ -93,7 +93,7 @@ public class Printer {
 			writer.println("labelloc=\"t\"\nlabel=\"" + name + "\"\n}");
 			writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class Printer {
 			writer.println("}");
 			writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 	}
 
@@ -177,23 +177,25 @@ public class Printer {
 		} else if (n.data instanceof Function) {
 			switch ((Function) n.data) {
 			case SQRT:
-				s += "\\sqrt{" + nodeToText(n.left()) + "}";
+				s += "\\sqrt{" + printNodeLatex(n.left()) + "}";
 				break;
 			case ABS:
-				s += "\\left|" + nodeToText(n.left()) + "\\right|";
+				s += "\\left|" + printNodeLatex(n.left()) + "\\right|";
 				break;
 			case SIN:
 			case COS:
 			case TAN:
-				s += "\\" + n.data + "\\left(" + nodeToText(n.left()) + "\\right)";
+			case LN:
+			case LOG:
+				s += "\\" + n.data + "\\left(" + printNodeLatex(n.left()) + "\\right)";
 				break;
 			case ASIN:
 			case ACOS:
 			case ATAN:
-				s += "\\arc" + n.data.toString().substring(1) + "\\left(" + nodeToText(n.left()) + "\\right)";
+				s += "\\arc" + n.data.toString().substring(1) + "\\left(" + printNodeLatex(n.left()) + "\\right)";
 				break;
 			default:
-				s += "\\func{" + n.data + "}\\left(" + nodeToText(n.left()) + "\\right)";
+				s += "\\operatorname{" + n.data + "}{\\left(" + printNodeLatex(n.left()) + "\\right)}";
 			}
 		} else if (n.data instanceof MathObject)
 			s += toLatex((MathObject) n.data);
@@ -499,7 +501,7 @@ public class Printer {
 			}
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 	}
 
@@ -519,7 +521,7 @@ public class Printer {
 			else
 				Files.write(f.toPath(), str.getBytes());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 	}
 
@@ -534,8 +536,12 @@ public class Printer {
 			if (Setting.getBool(Setting.COMPLEX_IN_POLAR))
 				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
 			else {
-				double b = ((MComplex) scalar).imag();
-				return numToString(((MComplex) scalar).real()) + (b >= 0 ? "+" : "") + numToString(b) + "í";
+				String stra = numToString(((MComplex) scalar).real());
+				String strb = numToString(((MComplex) scalar).imag());
+				if(stra.equals("0") && strb.equals("0"))
+					return "0";
+				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
+						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "í" : "");
 			}
 		}
 		return numToString(((MReal) scalar).getValue());
@@ -565,6 +571,8 @@ public class Printer {
 			format += "E0";
 			s = new DecimalFormat(format).format(num);
 		}
+		if(s.equals("-0"))
+			return "0";
 		return s;
 	}
 

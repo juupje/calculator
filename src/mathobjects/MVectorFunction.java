@@ -16,9 +16,9 @@ public class MVectorFunction extends MVector {
 	HashMap<String, MathObject> paramMap;
 	
 	public MVectorFunction(String[] vars, boolean defined, Tree... trees) {
+		super(trees.length);
 		this.defined = defined;
 		this.vars = vars;
-		this.size = trees.length;
 		paramMap = new HashMap<String, MathObject>(MFunction.INIT_PARAM_CAP);
 		v = new MFunction[trees.length];
 		for(int i = 0; i < trees.length; i++) {
@@ -29,9 +29,9 @@ public class MVectorFunction extends MVector {
 	}
 	
 	public MVectorFunction(String[] vars, MVector vector, boolean defined) {
+		super(vector.size());
 		this.defined = defined;
 		this.vars = vars;
-		this.size = vector.size();
 		paramMap = new HashMap<String, MathObject>(MFunction.INIT_PARAM_CAP);
 		v = new MFunction[vector.size()];
 		for(int i = 0; i < vector.size(); i++) {

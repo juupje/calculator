@@ -344,13 +344,13 @@ public class Parser {
 					throw new UnexpectedCharacterException("Expected '(' after a algorithm name instead of '" + (char) ch + "'.");
 				d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
-				d = processFactor(); // Gets the factor inside the function
-				if(Functions.isFunction(letters))
+				if(Functions.isFunction(letters)) {
+					d = processFactor(); // Gets the factor inside the function
 					d = Functions.getFunction(letters).evaluate(d);
-				else if(letters.equals("inv"))
-					d.invert();
+				} else if(letters.equals("inv"))
+					d = processFactor().invert();
 				else
-					throw new UnexpectedCharacterException(expr, pos);
+					throw new UnexpectedCharacterException(expr, p, pos);
 			}
 		} else if(consume('í')) {
 			d = MConst.i.evaluate();

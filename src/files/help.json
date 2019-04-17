@@ -165,7 +165,7 @@
 			"description": "Prints the type (=java class name) of the given variable.",
 			"arguments": "a: the name of the variable whose type should be printed.",
 			"result": "The type of the given variable."
-		},
+		}
 	},
 	"settings": {
 		"abc_show_text": {

@@ -8,13 +8,18 @@ public class UnexpectedCharacterException extends RuntimeException {
 	}
 	
 	public UnexpectedCharacterException(String expr, int pos) {
-		super(composeMessage(expr, pos));
+		super(composeMessage(expr, pos, pos+1));
 	}
-	private static String composeMessage(String expr, int pos) {
-		String msg = "Encountered an unexpected character:\n" + expr+"\n";
-		for(int i = 0; i < pos; i++)
+	
+	public UnexpectedCharacterException(String expr, int begin, int end) {
+		super(composeMessage(expr, begin, end));
+	}
+	private static String composeMessage(String expr, int begin, int end) {
+		String msg = "Encountered an unexpected character" + (begin==end ? "" : " sequence") + ":\n" + expr+"\n";
+		for(int i = 0; i < begin-1; i++)
 			msg += " ";
-		msg += "^";
+		for(int i = begin; i < end; i++)
+			msg += "^";
 		return msg;
 	}
 }

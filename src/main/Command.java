@@ -41,10 +41,7 @@ public enum Command {
 				Interpreter.execute(new File(args));
 			} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException
 					| CircularDefinitionException e) {
-				if (Setting.getBool(Setting.SHOW_STACKTRACE))
-					e.printStackTrace();
-				else
-					Calculator.ioHandler.err(e.getMessage());
+				Calculator.errorHandler.handle(e);
 			}
 		}
 	},

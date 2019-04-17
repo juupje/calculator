@@ -35,7 +35,7 @@ public class MVector implements MathObject{
 		shape = new Shape(size);
 	}
 	
-	public MVector(MathObject[] list) {
+	public MVector(MathObject... list) {
 		v = list;
 		size = list.length;
 		shape = new Shape(size);

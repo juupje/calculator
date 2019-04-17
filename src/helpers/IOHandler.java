@@ -2,6 +2,7 @@ package helpers;
 
 import java.util.Scanner;
 
+import main.Calculator;
 import main.Interpreter;
 
 public class IOHandler {
@@ -38,13 +39,6 @@ public class IOHandler {
 			System.out.print(str);
 	}
 	
-	public void printException(Exception e) {
-		if(Setting.getBool(Setting.SHOW_STACKTRACE))
-			e.printStackTrace();
-		else
-			err(e.getMessage());
-	}
-	
 	public void startConsoleInput() {
 		reading = true;
 		while(reading) {
@@ -54,10 +48,7 @@ public class IOHandler {
 			try {
 				Interpreter.Interpret(line);
 			} catch (Exception e) {
-				if(Setting.getBool(Setting.SHOW_STACKTRACE))
-					e.printStackTrace();
-				else
-					err(e.getMessage());
+				Calculator.errorHandler.handle(e);
 			}
 		}
 		close();

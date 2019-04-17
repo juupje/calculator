@@ -1,5 +1,6 @@
 package algorithms.linalg;
 
+import helpers.exceptions.ShapeException;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
@@ -70,6 +71,29 @@ public class MatrixToolkit {
 	}
 	
 	/**
+	 * Multiplies the matrix (from the right) with the given matrix using a matrix product.
+	 * In Einstein notation: M_ij=A_ik*B_kj
+	 * Note that this method does not take the augmented columns into account.
+	 * @param M
+	 */
+	public void multiply(double[][] M) {
+		if(cols != M.length)
+			throw new ShapeException("Can't multiply matrices of size ("
+					+ rows + "x" + cols + ") and (" + M.length + "x" + M[0].length + ")");
+		double[][] result = new double[rows][M[0].length];
+		for(int i = 0; i < result.length; i++) {
+			for(int j = 0; j < result[0].length; j++) {
+				result[i][j] = 0;
+				for(int k = 0; k < cols; k++)
+					result[i][j] += matrix[i][k]*M[k][j];
+			}
+		}
+		rows = result.length;
+		cols = result[0].length;
+		matrix = result;
+	}
+	
+	/**
 	 * Recursively reorders the rows of this matrix.
 	 * This means that the rows with the most leading zeros will end up on the bottom,
 	 * and the rows with no leading zeros will end up at the top.
@@ -88,7 +112,51 @@ public class MatrixToolkit {
 				prevZeros = curZeros;
 		}
 		reorder(maxRow-1);
-	}
-
+	}	
 	
+	public double[][] getPivotMatrix() {
+		double[][] P = new double[rows][cols];
+		for(int i = 0; i < P.length; i++)
+			for(int j = 0; j < P[i].length; j++)
+				P[i][j] = i==j ? 1 : 0;
+		for(int col = 0; col < rows; col++) {
+			double colmax = matrix[col][col]; //max element in this column
+			int max_row = col;
+			for(int i = col; i < rows; i++) {
+				if(matrix[i][col]>colmax) {
+					colmax = matrix[i][col];
+					max_row = i;
+				}
+			}
+			if(max_row != col) {
+				double[] tmp = P[col];
+				P[col] = P[max_row];
+				P[max_row] = tmp;
+			}
+		}
+		return P;
+	}
+	
+	/**
+	 * Multiplies the matrix (from the right) with the given matrix using a matrix product.
+	 * In Einstein notation: M_ij=A_ik*B_kj
+	 * Note that this method does not take the augmented columns into account.
+	 * @param A
+	 * @param B
+	 * @return A*B
+	 */
+	public static double[][] multiply(double[][] A, double[][] B) {
+		if(A[0].length != B.length)
+			throw new ShapeException("Can't multiply matrices of size ("
+					+ A.length + "x" + A[0].length + ") and (" + B.length + "x" + B[0].length + ")");
+		double[][] result = new double[A.length][B[0].length];
+		for(int i = 0; i < result.length; i++) {
+			for(int j = 0; j < result[0].length; j++) {
+				result[i][j] = 0;
+				for(int k = 0; k < B.length; k++)
+					result[i][j] += A[i][k]*B[k][j];
+			}
+		}
+		return result;
+	}
 }

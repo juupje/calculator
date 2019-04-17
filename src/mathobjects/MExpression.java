@@ -6,6 +6,7 @@ import helpers.Printer;
 import helpers.Shape;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
+import main.Calculator;
 import main.Operator;
 import main.Parser;
 import main.Variable;
@@ -25,7 +26,7 @@ public class MExpression implements MathObject {
 		try {
 			tree = new Parser(str).getTree();
 		} catch (UnexpectedCharacterException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 	}
 	
@@ -97,7 +98,7 @@ public class MExpression implements MathObject {
 		try {
 			return tree.evaluateTree();
 		} catch (TreeException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 			return null;
 		}
 	}

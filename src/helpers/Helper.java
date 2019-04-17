@@ -1,9 +1,6 @@
 package helpers;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,18 +12,9 @@ public class Helper {
 
 	private static void init() {
 		try {
-			File file = new File(Calculator.class.getResource("/files/help.json").toURI());
-			FileInputStream in = new FileInputStream(file);
-			byte[] data = new byte[(int) file.length()];
-			in.read(data);
-			in.close();
-			String s = new String(data, "UTF-8");
-			json = new JSONObject(s);
-		} catch (IOException | URISyntaxException e) {
-			if (Setting.getBool(Setting.SHOW_STACKTRACE))
-				e.printStackTrace();
-			else
-				Calculator.ioHandler.err(e.getMessage());
+			json = JSONReader.parse("/files/help.json");
+		} catch (IOException e) {
+			Calculator.errorHandler.handle(e);
 		}
 	}
 

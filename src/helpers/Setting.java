@@ -1,12 +1,8 @@
 package helpers;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.json.JSONObject;
@@ -70,11 +66,6 @@ public enum Setting {
 				pref.put(setting.toString(), (String) value);
 			else if (setting.getType().equals(Boolean.class))
 				pref.putBoolean(setting.toString(), (Boolean) value);
-			try {
-				pref.flush();
-			} catch (BackingStoreException e) {
-				e.printStackTrace();
-			}
 		} else
 			throw new IllegalArgumentException("Setting " + setting.toString().toLowerCase() + " expects value of type "
 					+ setting.getType() + ", got " + value.getClass());
@@ -140,17 +131,11 @@ public enum Setting {
 
 	public static void resetVariables() {
 		try {
-			File file = new File(Calculator.class.getResource("/files/defaultsettings.json").toURI());
-			FileInputStream in = new FileInputStream(file);
-			byte[] data = new byte[(int) file.length()];
-			in.read(data);
-			in.close();
-			String s = new String(data, "UTF-8");
-			JSONObject json = new JSONObject(s);
+			JSONObject json = JSONReader.parse("/files/defaultsettings.json");
 			for (Setting setting : values())
 				set(setting, json.get(setting.toString().toLowerCase()));
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			Calculator.errorHandler.handle(e);
 		}
 	}
 

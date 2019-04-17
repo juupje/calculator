@@ -7,6 +7,7 @@ import algorithms.calculus.Deriver;
 import algorithms.calculus.Gradient;
 import algorithms.linalg.GaussianElimination;
 import algorithms.linalg.JordanElimination;
+import algorithms.linalg.LUDecomposition;
 
 public enum Algorithms {
 	INTEGRAL(new Integrator()),
@@ -14,6 +15,7 @@ public enum Algorithms {
 	GRAD(new Gradient()),
 	REF(new GaussianElimination()),
 	RREF(new JordanElimination()),
+	LU(new LUDecomposition()),
 	ABC(new ABCFormula());
 	
 	Algorithm a;

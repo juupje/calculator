@@ -5,11 +5,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import main.Calculator;
 
 public class CSVHandler {
 	
@@ -17,32 +21,27 @@ public class CSVHandler {
 	public static final short TYPE_INT = 1;
 	public static final short TYPE_LONG = 3;
 	public static final short TYPE_STRING = 4;
+	public static final String fsep = File.separator;
 	
-	public static CSVData<?> read(String path, short type) throws URISyntaxException {
-		return read(new File(CSVHandler.class.getResource(path).toURI()), type);
-	}
-	
-	public static CSVData<?> read(String path) throws URISyntaxException {
+	public static CSVData<?> read(String path) throws URISyntaxException, IOException {
 		return read(path, TYPE_DOUBLE);
 	}
 	
-	public static CSVData<?> read(File file) {
-		return read(file, TYPE_DOUBLE);
+	public static CSVData<?> read(File file) throws IOException {
+		return read(file.getAbsolutePath(), TYPE_DOUBLE);
 	}
 	
-	public static String[] readLine(String path, int n) throws URISyntaxException {
-		return readLine(new File(CSVHandler.class.getResource(path).toURI()), n);
-	}
-	
-	public static String[] readLine(File f, int n) {
-		try(BufferedReader br = new BufferedReader(new FileReader(f))) {
+	public static String[] readLine(String path, int n) {
+		try(InputStream in = Calculator.class.getResourceAsStream(path);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			for(int i = 0; i < n; i++)
 				br.readLine();
 			return br.readLine().split(",");
 		} catch(NullPointerException e) {
+			Calculator.errorHandler.handle(e);
 			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 		return null;
 	}
@@ -80,16 +79,12 @@ public class CSVHandler {
 			fileOut.write(inputStr.getBytes());
 			fileOut.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 		
 	}
 	
-	public static double[] readDoubleLine(String path, int n) throws URISyntaxException {
-		return readDoubleLine(new File(CSVHandler.class.getResource(path).toURI()), n);
-	}
-	
-	public static double[] readDoubleLine(File f, int n) {
+	public static double[] readDoubleLine(String f, int n) {
 		String[] s = readLine(f, n);
 		if(s==null || s[0].equals("")) return null;
 		double[] d = new double[s.length];
@@ -98,13 +93,17 @@ public class CSVHandler {
 		return d;
 	}
 	
-	public static CSVData<?> read(File file, short type) {
-		List<String> lines = null;
-		try {
-			lines = Files.readAllLines(file.toPath());
-		} catch (IOException e) {
-			e.printStackTrace();
+	public static CSVData<?> read(String path, short type) throws IOException {
+		InputStream in = Calculator.class.getResourceAsStream(path.replace("/", fsep));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		String line;
+		List<String> lines = new ArrayList<String>();
+		if(in != null) {
+			while((line = reader.readLine()) != null) {
+				lines.add(line);
+			}
 		}
+		in.close();
 		int rows = lines.size();
 		int cols = lines.get(0).split(",").length;
 		switch(type) {

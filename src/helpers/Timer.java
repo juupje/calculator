@@ -31,7 +31,7 @@ public class Timer {
 			}
 			time = System.nanoTime() - startTime;
 		} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		} finally {
 			Calculator.ioHandler.enable();
 		}
@@ -54,8 +54,7 @@ public class Timer {
 		@Override
 		public String toString() {
 			return "Timer results for command: " + command + System.lineSeparator() + "  loops: " + repeats
-					+ System.lineSeparator() + "  total time: " + time + System.lineSeparator() + "  avg time: " + avg;
+					+ System.lineSeparator() + "  total time: " + time + "s" + System.lineSeparator() + "  avg time: " + avg + "s";
 		}
-
 	}
 }

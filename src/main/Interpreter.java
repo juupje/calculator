@@ -2,7 +2,6 @@ package main;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -93,7 +92,7 @@ public class Interpreter {
 					result.shape();
 				} catch(ShapeException | IllegalArgumentException e) {
 					Variables.set(name, old);
-					e.printStackTrace();
+					Calculator.errorHandler.handle(e);
 				}
 			} else
 				Variables.set(name, result);
@@ -111,10 +110,8 @@ public class Interpreter {
 					System.exit(0);
 				Interpret(line);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 	}
 }

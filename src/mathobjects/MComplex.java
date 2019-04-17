@@ -258,7 +258,8 @@ public class MComplex extends MScalar {
 		if(polar) {
 			if(other.isComplex()) {
 				r *= ((MComplex) other).getR();
-				phi = Tools.reduce(phi + ((MComplex) other).arg(), -Math.PI, Math.PI);
+				phi += ((MComplex) other).arg();
+				fixPhi();
 			} else
 				r*= ((MReal) other).getValue();
 			cartesian = false;
@@ -325,7 +326,8 @@ public class MComplex extends MScalar {
 		if(polar) {
 			if(other.isComplex()) {
 				r /= ((MComplex) other).getR();
-				phi = Tools.reduce(phi - ((MComplex) other).arg(), -Math.PI, Math.PI);
+				phi -= ((MComplex) other).arg();
+				fixPhi();
 			} else
 				r /= ((MReal) other).getValue();
 			cartesian = false;
@@ -355,7 +357,13 @@ public class MComplex extends MScalar {
 	@Override
 	public MScalar divide(double d) {
 		if(polar) {
-			r /= d;
+			if(d>0)
+				r /= d;
+			else {
+				r /= -d;
+				phi +=Math.PI;
+				fixPhi();
+			}
 			cartesian = cartesian && d==1;
 		} else {
 			a /= d;
@@ -395,7 +403,8 @@ public class MComplex extends MScalar {
 	public MComplex power(double d) {
 		if(!polar)
 			updatePolar();
-		phi = Tools.reduce(phi * d, -Math.PI, Math.PI);
+		phi *= d;
+		fixPhi();
 		r = Math.pow(r, d);
 		polar = true;
 		cartesian = cartesian && d==1;
@@ -425,14 +434,15 @@ public class MComplex extends MScalar {
 	
 	/**
 	 * Negates this number.
-	 * <ul><li>In the polar form, pi will be added to phi (after which phi will be reduced to the interval [-pi, pi].</li>
+	 * <ul><li>In the polar form, pi will be added to phi (after which phi will be reduced to the interval [0, 2*pi].</li>
 	 * <li>In the Cartesian form, both components will be negated.</li></ul>
 	 * @return {@code this}
 	 */
 	@Override
 	public MComplex negate() {
 		if(polar) {
-			phi += Tools.reduce(phi+Math.PI, -Math.PI, Math.PI);
+			phi += Math.PI;
+			fixPhi();
 			cartesian = false;
 		} else {
 			a *= -1;
@@ -471,6 +481,13 @@ public class MComplex extends MScalar {
 	@Override
 	public MComplex evaluate() {
 		return copy();
+	}
+	
+	private void fixPhi() {
+		if(r==0)
+			phi = 0;
+		else
+			phi = Tools.reduce(phi, 0, 2*Math.PI);
 	}
 	
 	@Override

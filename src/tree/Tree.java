@@ -111,17 +111,15 @@ public class Tree {
 	}
 	
 	public Tree copy() {
-		return copy(n -> new Node<Object>(n.data));
+		return copy(new java.util.function.Function<Node<?>, Node<?>>() {
+			@Override
+			public Node<?> apply(Node<?> n) {
+				return new Node<Object>(n.data);
+			}
+		});
 	}
 	
 	public Tree copy(java.util.function.Function<Node<?>, Node<?>> func) {
 		return new Tree(copy(root, func));
-	}
-	
-	public abstract class DFSTask implements Consumer<Node<?>>{
-		Object[] obj;
-		public DFSTask(Object... obj) {
-			this.obj = obj;
-		}
 	}
 }

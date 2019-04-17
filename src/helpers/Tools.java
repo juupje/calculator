@@ -52,6 +52,13 @@ public class Tools {
 		return a - b*Math.floor(a/b);
 	}
 	
+	/**
+	 * Reduces a number to fit in the interval [a,b) (including a, excluding b)
+	 * @param num the number to be reduced
+	 * @param a the lower bound of the interval (included)
+	 * @param b the upper bound of the interval (excluded)
+	 * @return the equivalent of num inside the interval [a,b)
+	 */
 	public static double reduce(double num, double a, double b) {
 		if(a>b) {
 			double temp = a;
@@ -59,8 +66,10 @@ public class Tools {
 			b = temp;
 		} else if(a==b)
 			return a;
-		if(num>a && num<b)
+		if(num>=a && num<b)
 			return num;
+		if(num==b)
+			return a;
 		double interval = b-a;
 		return num-Math.floor(num/interval)*interval+a;
 	}

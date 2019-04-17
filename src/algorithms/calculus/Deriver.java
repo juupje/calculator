@@ -77,7 +77,7 @@ public class Deriver extends Algorithm {
 			try {
 				return func.evaluateAt((value instanceof MVector ? ((MVector) value).elements() : new MathObject[] {value}));
 			} catch (TreeException e) {
-				Calculator.ioHandler.printException(e);
+				Calculator.errorHandler.handle(e);
 			}
 		return func;
 	}

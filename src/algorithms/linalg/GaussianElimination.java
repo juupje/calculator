@@ -24,6 +24,12 @@ public class GaussianElimination extends Algorithm {
 		prepared = true;
 	}
 	
+	public GaussianElimination(MMatrix m) {
+		mtk = new MatrixToolkit(m);
+		shape = m.shape();
+		prepared = true;
+	}
+	
 	@Override
 	public MMatrix execute() {
 		if(!prepared) return null;

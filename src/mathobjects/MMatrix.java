@@ -1,8 +1,10 @@
 package mathobjects;
 
+import java.util.Arrays;
 import java.util.List;
 
 import algorithms.linalg.JordanElimination;
+import algorithms.linalg.LUDecomposition;
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
@@ -136,6 +138,14 @@ public class MMatrix implements MathObject {
 	 */
 	public MathObject[][] elements() {
 		return m;
+	}
+	
+	/**
+	 * Returns {@code true} if the matrix is square (that is, if {@code shape.cols()==shape.rows();}), or {@code false} otherwise. 
+	 * @return {@code shape.cols()==shape.rows();}
+	 */
+	public boolean isSquare() {
+		return shape.cols() == shape.rows();
 	}
 
 	public MMatrix getSubMatrix(int lefttoprow, int lefttopcol, int rightbottomrow, int rightbottomcol) {
@@ -396,6 +406,17 @@ public class MMatrix implements MathObject {
 		return this;
 	}
 
+	public MScalar det() {
+		if(!isSquare())
+			throw new ShapeException("Determinant is only defined for square matrices. Shape: " + shape);
+		//Decompose the matrix into LU decomposition and use Det(A)=Det(PLU)=Det(P)Det(L)Det(U)=Det(L)Det(U)
+		MMatrix[] lup = Arrays.copyOf(new LUDecomposition(this).execute().elements(), 2, MMatrix[].class);
+		MReal det = new MReal(1);
+		for(int i = 0; i < lup[0].shape.rows(); i++) {
+			det.multiply(((MScalar)lup[0].get(i, i))).multiply(((MScalar) lup[1].get(i, i)));
+		}
+		return det;	
+	}
 	// TODO method to raise matrix to a integer power. First the algorithm for
 	// Jordan-Normal Form is needed.
 

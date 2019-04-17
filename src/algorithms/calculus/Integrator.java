@@ -1,13 +1,12 @@
 package algorithms.calculus;
 
-import java.net.URISyntaxException;
-
 import algorithms.Algorithm;
 import helpers.CSVHandler;
 import helpers.Setting;
 import helpers.Shape;
 import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
+import main.Calculator;
 import mathobjects.MFunction;
 import mathobjects.MReal;
 import mathobjects.MVector;
@@ -75,12 +74,8 @@ public class Integrator extends Algorithm {
 
 	private void loadGaussQuadData(int n) {
 		if (abscissae == null || weights == null || abscissae.length != n || weights.length != n) {
-			try {
-				abscissae = CSVHandler.readDoubleLine("/files/gaussquad_abscissae.dat", n - 2);
-				weights = CSVHandler.readDoubleLine("/files/gaussquad_weights.dat", n - 2);
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
+			abscissae = CSVHandler.readDoubleLine("/files/gaussquad_abscissae.dat", n - 2);
+			weights = CSVHandler.readDoubleLine("/files/gaussquad_weights.dat", n - 2);
 		}
 		if(abscissae == null || weights == null)
 			throw new RuntimeException("Could not read abscissae and/or weights from data files.");
@@ -102,7 +97,7 @@ public class Integrator extends Algorithm {
 				}
 			}
 		} catch (TreeException e) {
-			e.printStackTrace();
+			Calculator.errorHandler.handle(e);
 		}
 		return sum * c;
 	}

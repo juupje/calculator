@@ -6,6 +6,7 @@ import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
 import mathobjects.MComplex;
 import mathobjects.MConst;
+import mathobjects.MMatrix;
 import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
@@ -120,6 +121,12 @@ public class Functions {
 			@Override
 			public MReal evaluate(MathObject m) {
 				return fact(m);
+			}
+		},
+		DET {
+			@Override
+			public MScalar evaluate(MathObject m) {
+				return det(m);
 			}
 		};
 
@@ -415,6 +422,13 @@ public class Functions {
 			return new MReal(Tools.fact(n));
 		}
 		throw new IllegalArgumentException("Factorial is only defined for integer values, got " + m.toString());
+	}
+	
+	public static MScalar det(MathObject m) {
+		if(m instanceof MMatrix && ((MMatrix) m).isSquare()) {
+			return ((MMatrix)m).det();
+		}
+		throw new IllegalArgumentException("The determinant is only defined for (square) matrices, got " + m.getClass().getCanonicalName());
 	}
 
 	public static boolean isFunction(String s) {

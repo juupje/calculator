@@ -38,7 +38,7 @@ public abstract class Algorithm {
 		try {
 			return execute(Parser.toMathObjects(args));
 		} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
-			Calculator.ioHandler.printException(e);
+			Calculator.errorHandler.handle(e);
 			return MReal.NaN();
 		}
 	}
