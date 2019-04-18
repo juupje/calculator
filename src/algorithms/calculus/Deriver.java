@@ -121,7 +121,7 @@ public class Deriver extends Algorithm {
 				break;
 			case DIVIDE:
 				boolean varInTop = dependsOn(n.left(), var);
-				boolean varInBottom = dependsOn(n.left(), var);
+				boolean varInBottom = dependsOn(n.right(), var);
 				if(varInTop && !varInBottom) { //f(x)/a=f'(x)/a
 					node = applyOperator(derive(n.left(), var), op, n.right().copy());
 				} else if(!varInTop && varInBottom) {//a/f(x)=-a/(f(x))^2*f'(x)

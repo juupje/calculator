@@ -195,7 +195,7 @@ public class Parser {
 				if (!Variables.exists(str))
 					Calculator.ioHandler.err("The variable " + str + " is undefined. Statement was parsed regardless.");
 			}
-		} else if(ch=='í')
+		} else if(consume('í'))
 			n = new Node<MConst>(MConst.i);
 		else
 			throw new UnexpectedCharacterException(expr, pos);

@@ -140,9 +140,9 @@ public class Printer {
 				break;
 			case MULTIPLY:
 				String s2 = printNodeLatex(n.right());
-				boolean brackets = s2.contains("-") || s2.contains("+");
+				boolean brackets = n.right().data.equals(Operator.ADD) || n.right().data.equals(Operator.SUBTRACT);//s2.contains("-") || s2.contains("+");
 				if (brackets)
-					s2 = "(" + s2 + ")";
+					s2 = "\\left(" + s2 + "\\right)";
 				if (n.left().isNumeric() && !Character.isDigit(s2.charAt(0))) // there needn't be a multiplication dot
 																				// between a number and a variable.
 					s += printNodeLatex(n.left()) + s2;
@@ -297,8 +297,8 @@ public class Printer {
 			case MULTIPLY:
 				String s2 = nodeToText(n.right());
 				String s1 = nodeToText(n.left());
-				boolean brackets1 = s1.contains("-") || s1.contains("+");
-				boolean brackets2 = s2.contains("-") || s2.contains("+");
+				boolean brackets1 = n.right().data.equals(Operator.ADD) || n.right().data.equals(Operator.SUBTRACT);//s1.contains("-") || s1.contains("+");
+				boolean brackets2 = n.left().data.equals(Operator.ADD) || n.left().data.equals(Operator.SUBTRACT);//s2.contains("-") || s2.contains("+");
 				if (brackets2)
 					s2 = "(" + s2 + ")";
 				if(brackets1)

@@ -1,6 +1,5 @@
 package mathobjects;
 
-import java.util.Arrays;
 import java.util.List;
 
 import algorithms.linalg.JordanElimination;
@@ -410,10 +409,10 @@ public class MMatrix implements MathObject {
 		if(!isSquare())
 			throw new ShapeException("Determinant is only defined for square matrices. Shape: " + shape);
 		//Decompose the matrix into LU decomposition and use Det(A)=Det(PLU)=Det(P)Det(L)Det(U)=Det(L)Det(U)
-		MMatrix[] lup = Arrays.copyOf(new LUDecomposition(this).execute().elements(), 2, MMatrix[].class);
+		MVector lup = new LUDecomposition(this).execute();
 		MReal det = new MReal(1);
-		for(int i = 0; i < lup[0].shape.rows(); i++) {
-			det.multiply(((MScalar)lup[0].get(i, i))).multiply(((MScalar) lup[1].get(i, i)));
+		for(int i = 0; i < ((MMatrix) lup.get(0)).shape.rows(); i++) {
+			det.multiply(((MScalar) ((MMatrix) lup.get(0)).get(i, i))).multiply(((MScalar) ((MMatrix) lup.get(1)).get(i, i)));
 		}
 		return det;	
 	}
