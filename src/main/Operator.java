@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
@@ -292,6 +293,32 @@ public enum Operator {
 		public Shape shape(Shape a, Shape... b) {
 			if(b.length==0)
 			return Shape.transpose(a);
+		throw new InvalidOperationException("Can only transpose one mathobject, got " + (b.length+1));
+		}
+	},
+	
+	CONJUGATE {
+		@Override
+		public MathObject evaluate(MathObject a, MathObject... b) {
+			if(b.length!=0)
+				throw new InvalidOperationException("Can conjugate only one mathobject, got " + (b.length+1));
+			if(a instanceof MMatrix || a instanceof MVector) {
+				Function<MathObject, MathObject> f = new Function<MathObject, MathObject>() {
+					@Override
+					public MathObject apply(MathObject mo) {
+						return Operator.CONJUGATE.evaluate(mo);
+					}
+				};
+				return a instanceof MMatrix ? ((MMatrix) a).forEach(f) : ((MVector) a).forEach(f);
+			} else if(a instanceof MScalar)
+				return ((MScalar) a).copy().conjugate();
+			throw new InvalidOperationException("Can't transpose object " + a.getClass().getSimpleName());
+		}
+
+		@Override
+		public Shape shape(Shape a, Shape... b) {
+			if(b.length==0)
+			return a;
 		throw new InvalidOperationException("Can only transpose one mathobject, got " + (b.length+1));
 		}
 	},

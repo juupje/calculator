@@ -1,6 +1,7 @@
 package mathobjects;
 
 import java.util.List;
+import java.util.function.Function;
 
 import algorithms.linalg.JordanElimination;
 import algorithms.linalg.LUDecomposition;
@@ -419,6 +420,14 @@ public class MMatrix implements MathObject {
 	// TODO method to raise matrix to a integer power. First the algorithm for
 	// Jordan-Normal Form is needed.
 
+	public MMatrix forEach(Function<MathObject, MathObject> f) {
+		MathObject[][] m2 = new MathObject[m.length][m[0].length];
+		for(int i = 0; i < m2.length; i++)
+			for(int j = 0; j < m2[0].length; j++)
+				m2[i][j] = f.apply(m[i][j]);
+		return new MMatrix(m2);
+	}
+	
 	/**
 	 * Negates the <tt>MMatrix</tt>. <br/>
 	 * Every element in the matrix will be negated using

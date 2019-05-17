@@ -1,5 +1,7 @@
 package mathobjects;
 
+import java.util.function.Function;
+
 import algorithms.Norm;
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
@@ -198,6 +200,13 @@ public class MVector implements MathObject{
 		v[index] = new MReal(d);
 	}
 	
+	public MVector forEach(Function<MathObject, MathObject> f) {
+		MathObject[] v2 = new MathObject[v.length];
+		for(int i = 0; i < v2.length; i++)
+				v2[i] = f.apply(v[i]);
+		return new MVector(v2);
+	}
+	
 	/**
 	 * @return the length of the vector. This equals the mathematical dimension.
 	 */
@@ -271,7 +280,7 @@ public class MVector implements MathObject{
 		String s = "(";
 		for(MathObject element : v)
 			s += element.toString() + ", ";
-		return s.substring(0, s.length() - 2) + ")";
+		return s.substring(0, s.length() - 2) + ")" + (transposed ? "'" : "");
 	}
 	
 	//###### static methods #####	

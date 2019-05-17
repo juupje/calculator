@@ -193,10 +193,21 @@ public class MReal extends MScalar {
 		return this;
 	}
 	
+	/**
+	 * Turns this number into its complex conjugate.
+	 * This operation does nothing to real numbers.
+	 * @return {@code this}
+	 */
+	@Override
+	public MReal conjugate() {
+		return this;
+	}
+
 	@Override
 	public double abs() {
 		return value < 0 ? -1*value : value;
 	}
+	
 	
 	/**
 	 * @return a new {@code MScalar} with the same value as this one.

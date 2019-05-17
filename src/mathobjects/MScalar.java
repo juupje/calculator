@@ -79,6 +79,8 @@ public abstract class MScalar implements MathObject {
 	
 	public abstract MScalar copy();
 	
+	public abstract MScalar conjugate();
+
 	public abstract double abs();
 	
 	public abstract boolean isComplex();

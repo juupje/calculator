@@ -355,7 +355,7 @@ public class MComplex extends MScalar {
 	 * @return {@code this}
 	 */
 	@Override
-	public MScalar divide(double d) {
+	public MComplex divide(double d) {
 		if(polar) {
 			if(d>0)
 				r /= d;
@@ -450,6 +450,15 @@ public class MComplex extends MScalar {
 		}
 		return this;
 	}
+
+	/*
+	 * Turns this number into its inverse: 1/z=z'/|z|^2 where z' is the complex conjugate.
+	 * @return {@code conjugate().divide(abs()*abs());}
+	 */
+	@Override
+	public MComplex invert() {
+		return conjugate().divide(abs()*abs());
+	}
 	
 	/**
 	 * Turns this number into its complex conjugate.
@@ -457,8 +466,7 @@ public class MComplex extends MScalar {
 	 * <li>In the Cartesian form, the imaginary component will be negated.</li></ul>
 	 * @return {@code this}
 	 */
-	@Override
-	public MComplex invert() {
+	public MComplex conjugate() {
 		phi *= -1;
 		b  *= -1;
 		return this;
