@@ -234,7 +234,7 @@ public class Printer {
 		String s = v.isTransposed() ? "&" : "\\\\";
 		for (MathObject mo : v.elements())
 			latex += toLatex(mo) + s;
-		return latex.substring(0, latex.length() - s.length()) + "\\end{pmatrix}";
+		return latex.substring(0, latex.length() - s.length()) + "\\end{pmatrix}" + (v.isTransposed() ? "^\\intercal " : "");
 	}
 
 	/**

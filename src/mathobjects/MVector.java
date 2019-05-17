@@ -29,6 +29,18 @@ public class MVector implements MathObject{
 		this(new Shape(size));
 	}
 	
+	public MVector(int size, boolean transposed) {
+		this(size);
+		if(transposed)
+			transpose();
+	}
+	
+	public MVector(boolean transposed, double... list){
+		this(list);
+		if(transposed)
+			transpose();
+	}
+	
 	public MVector(double... list) {
 		size = list.length;
 		v = new MathObject[size];
@@ -37,11 +49,18 @@ public class MVector implements MathObject{
 		shape = new Shape(size);
 	}
 	
+	public MVector(boolean transposed, MathObject... list) {
+		this(list);
+		if(transposed)
+			transpose();
+	}
+	
 	public MVector(MathObject... list) {
 		v = list;
 		size = list.length;
 		shape = new Shape(size);
 	}
+	
 
 	public MVector(int size, MathObject c) {
 		v = new MathObject[size];
@@ -248,7 +267,7 @@ public class MVector implements MathObject{
 		MathObject v2[] = new MathObject[size];
 		for(int i = 0; i < size; i++)
 			v2[i] = v[i].copy();
-		return new MVector(v2);
+		return new MVector(transposed, v2);
 	}
 	
 	@Override
