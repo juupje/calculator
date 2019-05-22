@@ -74,6 +74,7 @@ public class Parser {
 		tree.root = p = getFactor();
 		while (ch > 0 && p != null)
 			p = getTerm();
+		tree.updateRoot();
 		return tree;
 	}
 

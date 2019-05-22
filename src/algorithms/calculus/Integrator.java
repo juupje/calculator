@@ -116,6 +116,8 @@ public class Integrator extends Algorithm {
 		// integration).
 		// This also copies the values (preventing them from being changed during the
 		// algorithm) and replaces Variables with their values.
+		if(args.length < 3)
+			throw new IllegalArgumentException("Expected at least 3 arguments, type help(integral) for more info.");
 		args[1] = args[1].evaluate();
 		args[2] = args[2].evaluate();
 		// Check if all arguments are of the correct type.

@@ -45,10 +45,11 @@ public class Node<T> {
 			if(n.left() != null)
 				throw new RuntimeException("Trying to insert a node which already has a left child.");
 			n.left(this);
-		} else
+		} else {
 			if(n.right() != null)
 				throw new RuntimeException("Trying to insert a node which already has a right child.");
 			n.right(this);
+		}
 	}
 	
 	public void replaceWithChildren(Node<?> n) {

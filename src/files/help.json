@@ -74,6 +74,12 @@
 		}
 	},
 	"algorithms": {
+		"derivative": {
+			"syntax": "derivative(f), derivative(f, x) or derivative(f, x, a)",
+			"description": "Analytically calculates the derivative of the function  with respect to the variable x (if provided) at location a (if provided).",
+			"arguments": "f: a function depending on one or more variables. x: the name of the variable to which f should be derived (not need if the function only has one variable). For multivariate functions x can also be a vector for a directional derivative. a: (optional) the value to be used as the input for the derivative.",
+			"result": "If a is given (df/dx)(a) (or (x*grad(f))(a) ) will be returned, otherwise (df/dx) is returned."
+		},
 		"integral": {
 			"syntax": "integral(f, a, b) or integral(f, a, b, s)",
 			"description": "Numerically approximates the definite integral of the function f from a to b with (optional) s steps (nodes) using Gaussian-Legendre Quadrature.",

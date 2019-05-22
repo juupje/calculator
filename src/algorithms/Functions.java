@@ -1,5 +1,6 @@
 package algorithms;
 
+import helpers.Setting;
 import helpers.Shape;
 import helpers.Tools;
 import helpers.exceptions.InvalidOperationException;
@@ -389,8 +390,11 @@ public class Functions {
 	 * @see Math#sqrt(double)
 	 */
 	public static MScalar sqrt(MathObject m) {
-		if (m instanceof MReal)
+		if (m instanceof MReal) {
+			if(((MReal) m).getValue() < 0 && (Setting.getBool(Setting.COMPLEX_ENABLED)))
+				return new MComplex(0, Math.sqrt(((MReal) m).getValue()*-1));
 			return new MReal(Math.sqrt(((MReal) m).getValue()));
+		}
 		if(m instanceof MComplex)
 			return ((MComplex) m.copy()).power(0.5);
 		throw new InvalidOperationException("The square root is not defined for " + m.getClass());

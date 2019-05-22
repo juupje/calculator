@@ -234,7 +234,7 @@ public class Printer {
 		String s = v.isTransposed() ? "&" : "\\\\";
 		for (MathObject mo : v.elements())
 			latex += toLatex(mo) + s;
-		return latex.substring(0, latex.length() - s.length()) + "\\end{pmatrix}" + (v.isTransposed() ? "^\\intercal " : "");
+		return latex.substring(0, latex.length() - s.length()) + "\\end{pmatrix}";
 	}
 
 	/**
@@ -295,8 +295,8 @@ public class Printer {
 				s += nodeToText(n.left()) + (op == Operator.ADD ? "+" : "-") + nodeToText(n.right());
 				break;
 			case MULTIPLY:
-				String s2 = nodeToText(n.right());
-				String s1 = nodeToText(n.left());
+				String s1 = nodeToText(n.right());
+				String s2 = nodeToText(n.left());
 				boolean brackets1 = n.right().data.equals(Operator.ADD) || n.right().data.equals(Operator.SUBTRACT);//s1.contains("-") || s1.contains("+");
 				boolean brackets2 = n.left().data.equals(Operator.ADD) || n.left().data.equals(Operator.SUBTRACT);//s2.contains("-") || s2.contains("+");
 				if (brackets2)

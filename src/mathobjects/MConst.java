@@ -19,6 +19,6 @@ public enum MConst {
 	}
 	
 	public MScalar evaluate() {
-		return value;
+		return value.copy();
 	}
 }
