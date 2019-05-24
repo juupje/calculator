@@ -77,6 +77,11 @@ public abstract class MScalar implements MathObject {
 	 */
 	public abstract MScalar power(double d);
 	
+	@Override
+	public abstract MScalar invert();
+	@Override
+	public abstract MScalar negate();
+	
 	public abstract MScalar copy();
 	
 	public abstract MScalar conjugate();
@@ -84,6 +89,8 @@ public abstract class MScalar implements MathObject {
 	public abstract double abs();
 	
 	public abstract boolean isComplex();
+	
+	public abstract boolean isNaN();
 	
 	/**
 	 * @return {@code Printer.numToString(this);}

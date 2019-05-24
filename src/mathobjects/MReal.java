@@ -226,14 +226,19 @@ public class MReal extends MScalar {
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof MReal)
-			return ((MReal) other).getValue() == value;
+			return ((MReal) other).getValue() == value || (isNaN() && ((MReal) other).isNaN());
 		if (other instanceof Number)
-			return ((Number) other).doubleValue() == value;
+			return ((Number) other).doubleValue() == value || (Double.isNaN(((Number) other).doubleValue()) && isNaN());
 		if(other instanceof MComplex) {
 			MComplex z = (MComplex) other;
-			return (z.polar ? z.arg()==0 && z.getR()==value : z.imag()==0 && z.real()==value);
+			return (z.polar ? z.arg()==0 && z.getR()==value : z.imag()==0 && z.real()==value) || (z.isNaN() && isNaN());
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean isNaN() {
+		return Double.isNaN(value);
 	}
 	
 	public static final MReal NaN() {

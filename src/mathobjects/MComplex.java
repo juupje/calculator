@@ -513,6 +513,11 @@ public class MComplex extends MScalar {
 		return false;
 	}
 	
+	@Override
+	public boolean isNaN() {
+		return polar ? Double.isNaN(r) || Double.isNaN(phi) : Double.isNaN(a) || Double.isNaN(b);
+	}
+	
 	/**
 	 * Constructs a new {@code MComplex} in polar form.
 	 * @param r the radial component of the new complex number.
