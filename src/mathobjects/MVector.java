@@ -271,6 +271,13 @@ public class MVector implements MathObject{
 	}
 	
 	@Override
+	public boolean isNumeric() {
+		for(MathObject element : v)
+			if(!element.isNumeric()) return false;
+		return true;
+	}
+	
+	@Override
 	public Shape shape() {
 		return shape;
 	}

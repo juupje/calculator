@@ -27,7 +27,8 @@ public interface MathObject {
 	 */
 	public abstract MathObject evaluate();
 	
-	public abstract Shape shape() ;
+	public abstract Shape shape();
+	public abstract boolean isNumeric();
 	
 	@Override
 	public abstract String toString();

@@ -104,6 +104,11 @@ public class MExpression implements MathObject {
 	}
 	
 	@Override
+	public boolean isNumeric() {
+		return false;
+	}
+	
+	@Override
 	public Shape shape()  {
 		if(s == null)
 			s = tree.getShape(tree.getRoot());

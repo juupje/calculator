@@ -81,6 +81,11 @@ public abstract class MScalar implements MathObject {
 	public abstract MScalar invert();
 	@Override
 	public abstract MScalar negate();
+	@Override
+	public abstract MScalar evaluate();
+	
+	@Override
+	public boolean isNumeric() {return true;}
 	
 	public abstract MScalar copy();
 	
@@ -91,6 +96,7 @@ public abstract class MScalar implements MathObject {
 	public abstract boolean isComplex();
 	
 	public abstract boolean isNaN();
+	
 	
 	/**
 	 * @return {@code Printer.numToString(this);}

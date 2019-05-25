@@ -4,7 +4,7 @@ import algorithms.Functions.Function;
 import main.Operator;
 import main.Variable;
 import mathobjects.MConst;
-import mathobjects.MScalar;
+import mathobjects.MReal;
 import mathobjects.MathObject;
 
 public class Node<T> {
@@ -19,7 +19,12 @@ public class Node<T> {
 	}
 	
 	public boolean isNumeric() {
-		return data instanceof MConst || data instanceof MScalar;
+		return data instanceof MConst || (data instanceof MathObject && ((MathObject) data).isNumeric());
+	}
+	
+	public MathObject asMathObject() {
+		if(!isNumeric()) return MReal.NaN();
+		return data instanceof MConst ? ((MConst) data).evaluate() : ((MathObject) data).evaluate();
 	}
 	
 	public boolean isInternal() {

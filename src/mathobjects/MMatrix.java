@@ -487,6 +487,14 @@ public class MMatrix implements MathObject {
 				row[i] = row[i].evaluate();
 		return copy;
 	}
+	
+	@Override
+	public boolean isNumeric() {
+		for(MathObject[] row : m)
+			for(MathObject element : row)
+				if(!element.isNumeric()) return false;
+		return true;
+	}
 
 	@Override
 	public Shape shape() {
