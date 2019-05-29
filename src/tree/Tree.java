@@ -83,6 +83,10 @@ public class Tree {
 		c.accept(n);
 	}
 	
+	public void DFS(Consumer<Node<?>> c) {
+		DFS(root, c);
+	}
+	
 	/**
 	 * Recursively calculates the shape of the result of {@link #evaluateTree()}.
 	 * Note that unknown variables will be assumed to have a scalar shape.

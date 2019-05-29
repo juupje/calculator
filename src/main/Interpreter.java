@@ -46,6 +46,8 @@ public class Interpreter {
 
 	private static void assign(String name, String op, String expr)
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
+		if(!checkNameValidity(name))
+			throw new UnexpectedCharacterException(name + " is not a valid name.");
 		Operator operator = null;
 		MathObject result = null;
 		switch (op) {
@@ -99,6 +101,16 @@ public class Interpreter {
 			Variables.ans(result);
 			Calculator.ioHandler.out(result.toString());
 		}
+	}
+	
+	private static boolean checkNameValidity(String name) {
+		if(name.startsWith("_") || Character.isDigit(name.codePointAt(0))) return false;
+		for(int i = 0; i < name.length(); i++) {
+			int c = name.codePointAt(i);
+			if(c<65 && c>90 && c<97 && c>120 && c<945 && c>969 && c<913 && c>937 && c<30 && c<48 && c>57)
+				return false;
+		}
+		return true;
 	}
 
 	public static void execute(File f) throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {

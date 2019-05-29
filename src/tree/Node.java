@@ -57,6 +57,11 @@ public class Node<T> {
 		}
 	}
 	
+	/**
+	 * Replaces this {@code Node} with {@code n}. This conserves children of {@code n},
+	 * which means that the children of this {@code Node} (if any) will be discarded. 
+	 * @param n the {@code Node} with which this one will be replaced.
+	 */
 	public void replaceWithChildren(Node<?> n) {
 		if (parent != null) {
 			if (parent.left() == this)
@@ -68,6 +73,11 @@ public class Node<T> {
 			System.out.println("ATTENTION: node was replaced and it's children discarded, left: " + left + " right: " + right + " node: " + left.parent);
 	}
 	
+	/**
+	 * Replaces this {@code Node} with {@code n}. This conserves children of this {@code Node},
+	 * which means that the children of {@code n} (if any) will be discarded. 
+	 * @param n the {@code Node} with which this one will be replaced.
+	 */
 	public void replace(Node<?> n) {
 		if (parent != null) {
 			if (parent.left() == this)
@@ -77,6 +87,10 @@ public class Node<T> {
 		}
 		n.left(left);
 		n.right(right);
+	}
+	
+	public void shiftUp() {
+		parent.replaceWithChildren(this);
 	}
 	
 	public void left(Node<?> l) {

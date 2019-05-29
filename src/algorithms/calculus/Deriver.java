@@ -177,7 +177,7 @@ public class Deriver extends Algorithm {
 					node = new Node<MReal>(new MReal(0));
 				else if(!varLeft2 && varRight2) { //[a^f(x)]'=ln(a)*f'(x)*a^f(x)
 					Node<?> n2 = applyOperator(derive(n.right(), var), Operator.MULTIPLY, n.copy());
-					if(!n.left().data.equals(MConst.E.evaluate())) {
+					if(!n.left().data.equals(MConst.e.evaluate())) {
 						//Multiply n2 with ln(a)=ln(n.left)
 						Node<Function> fnode = new Node<>(Function.LN);
 						fnode.left(n.left().copy());

@@ -556,20 +556,35 @@ public class Printer {
 	 */
 	public static String numToString(double num) {
 		String s = "";
-		if ((Math.abs(num) >= 0.01 && Math.abs(num) < 1000 && Setting.getInt(Setting.NOTATION) == Setting.ENG)
-				|| num == 0 || Setting.getInt(Setting.NOTATION) == Setting.NORMAL
-				|| (Setting.getInt(Setting.NOTATION) == Setting.SCI && Math.abs(num) < 10 && Math.abs(num) >= 1)) {
-			s = String.format("%." + Setting.getInt(Setting.PRECISION) + "f", num);
-			while (s.endsWith("0"))
-				s = s.substring(0, s.length() - 1);
-			if (s.endsWith("."))
-				s = s.substring(0, s.length() - 1);
-		} else {
+		if(num==0) return "0";
+		switch(Setting.getInt(Setting.NOTATION)) {
+		case Setting.NORMAL:
+			if(Math.abs(num) >= 0.001 && Math.abs(num)<100000) {
+				s = String.format("%." + Setting.getInt(Setting.PRECISION) + "f", num);
+				while (s.endsWith("0"))
+					s = s.substring(0, s.length() - 1);
+				if (s.endsWith("."))
+					s = s.substring(0, s.length() - 1);
+				break;
+			}
+		case Setting.SCI:
 			String format = "0.";
 			for (int i = 0; i < Setting.getInt(Setting.PRECISION); i++)
 				format += "#";
-			format += "E0";
+			if(num<1 || num>=10)
+				format += "E0";
 			s = new DecimalFormat(format).format(num);
+			break;
+		case Setting.ENG:
+			   // If the value is negative, make it positive so the log10 works
+			   double posVal = (num<0) ? -num : num;
+			   double log10 = Math.log10(posVal);
+			   // Determine how many orders of 3 magnitudes the value is
+			   int count = (int) Math.floor(log10/3);
+			   // Scale the value into the range 1<=val<1000
+			   num /= Math.pow(10, count * 3);
+			   s = String.format("%." + Setting.getInt(Setting.PRECISION) + "fe%d", num, count * 3);
+			break;
 		}
 		if(s.equals("-0"))
 			return "0";

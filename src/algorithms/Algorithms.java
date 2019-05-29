@@ -2,6 +2,7 @@ package algorithms;
 
 import mathobjects.MathObject;
 import algorithms.algebra.ABCFormula;
+import algorithms.algebra.Simplifier;
 import algorithms.calculus.Integrator;
 import algorithms.calculus.Deriver;
 import algorithms.calculus.Gradient;
@@ -16,7 +17,8 @@ public enum Algorithms {
 	REF(new GaussianElimination()),
 	RREF(new JordanElimination()),
 	LU(new LUDecomposition()),
-	ABC(new ABCFormula());
+	ABC(new ABCFormula()),
+	SIMPLIFY(new Simplifier());
 	
 	Algorithm a;
 	Algorithms(Algorithm a) {

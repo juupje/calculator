@@ -179,8 +179,8 @@ public class Parser {
 				n = new Node<MScalar>(new MReal(Double.valueOf(s1)));
 			if(consume('í'))
 				((Node<MScalar>) n).setData(new MComplex(0,((MReal) n.getData()).getValue()));
-		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
-			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z' || ch=='_')) {
+			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch=='_' || (ch>='0' && ch<='9'))
 				nextChar();
 			String str = expr.substring(position, pos);
 			if (MConst.isConstant(str))

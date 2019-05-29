@@ -5,8 +5,6 @@ import helpers.Shape;
 
 public abstract class MScalar implements MathObject {
 	
-	
-	
 	/**
 	 * Adds the value of the given {@code MScalar} to the value of this one.
 	 * @param other the {@code MScalar} containing the value to be added.
