@@ -4,6 +4,7 @@ import static main.Operator.ADD;
 import static main.Operator.DIVIDE;
 import static main.Operator.MULTIPLY;
 import static main.Operator.SUBTRACT;
+import static main.Operator.CROSS;
 
 import java.util.ArrayList;
 
@@ -225,6 +226,12 @@ public class Parser {
 			p = p.parent;
 			p.right(getFactor());
 			return p.right();
+		} else if (consume('×') || consume('~')) {
+			tree.insert(p, new Node<Operator>(Operator.CROSS), Node.LEFT);
+			//n = p;
+			p = p.parent;
+			p.right(getFactor());
+			return p.right();
 		} else if (consume('/')) {
 			tree.insert(p, new Node<Operator>(Operator.DIVIDE), Node.LEFT);
 			n = p;
@@ -276,6 +283,8 @@ public class Parser {
 		while (true) {
 			if (consume('*'))
 				d = MULTIPLY.evaluate(d, processFactor());
+			else if (consume('×') || consume('~'))
+				d = CROSS.evaluate(d, processFactor());
 			else if (consume('/'))
 				d = DIVIDE.evaluate(d, processFactor());
 			else if (pos < expr.length() && Character.isLetter(ch))

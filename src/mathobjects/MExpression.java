@@ -10,6 +10,7 @@ import main.Calculator;
 import main.Operator;
 import main.Parser;
 import main.Variable;
+import tree.DFSTask;
 import tree.Node;
 import tree.Tree;
 
@@ -117,13 +118,16 @@ public class MExpression implements MathObject {
 	
 	public HashSet<Variable> getDependencies() {
 		HashSet<Variable> dependencies = new HashSet<>();
-		tree.DFS(tree.getRoot(), n -> {
+		tree.DFS(new DFSTask(false) {
+			@Override
+			public void accept(Node<?> n) {
 			if(n.data instanceof Variable)
 				dependencies.add((Variable) n.data);
 			else if(n.data instanceof MVector)
 				for(MathObject mo : ((MVector) n.data).elements())
 					if(mo instanceof MExpression)
 						dependencies.addAll(((MExpression) mo).getDependencies());
+			}
 		});
 		return dependencies;
 	}

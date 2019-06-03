@@ -161,6 +161,20 @@ public class MVector implements MathObject{
 			return dot(other); //row times column vector
 	}
 	
+	public MathObject cross(MVector other) {
+		if(other.size() != size || (size != 2 && size!=3))
+			throw new InvalidOperationException("The cross product is only definef for vectors of the same size, which can be 2 or 3. Sizes: " + size + ", " + other.size());
+		if(size == 2)
+			return Operator.SUBTRACT.evaluate(Operator.MULTIPLY.evaluate(get(0), other.get(1)), Operator.MULTIPLY.evaluate(get(1), other.get(0)));
+		else //size==3
+			return new MVector(new MathObject[] {
+					Operator.SUBTRACT.evaluate(Operator.MULTIPLY.evaluate(get(1), other.get(2)), Operator.MULTIPLY.evaluate(get(2), other.get(1))),
+					Operator.SUBTRACT.evaluate(Operator.MULTIPLY.evaluate(get(2), other.get(0)), Operator.MULTIPLY.evaluate(get(0), other.get(2))),
+					Operator.SUBTRACT.evaluate(Operator.MULTIPLY.evaluate(get(0), other.get(1)), Operator.MULTIPLY.evaluate(get(1), other.get(0)))
+			});
+			
+	}
+	
 	/**
 	 * Builds the dot product of {@code this} and the given {@code MVector} and returns it.
 	 * @param other the vector that needs to be dot-multiplied with {@code this}.
@@ -239,7 +253,7 @@ public class MVector implements MathObject{
 	 * @see MathObject#negate()
 	 */
 	@Override
-	public MathObject negate() {
+	public MVector negate() {
 		for(MathObject element : v)
 			element.negate();
 		return this;
@@ -247,11 +261,12 @@ public class MVector implements MathObject{
 	
 	/**
 	 * Inverts the vector. This means that every component will inverted separately.
+	 * Note, though this operation is not mathematically defined, this results in a*inv(a)=1.
 	 * @return {@code this}
 	 * @see MathObject#invert()
 	 */
 	@Override
-	public MathObject invert() {
+	public MVector invert() {
 		for(MathObject element : v)
 			element.invert();
 		return this;
@@ -263,7 +278,7 @@ public class MVector implements MathObject{
 	 * @see MathObject#copy()
 	 */
 	@Override
-	public MathObject copy() {
+	public MVector copy() {
 		MathObject v2[] = new MathObject[size];
 		for(int i = 0; i < size; i++)
 			v2[i] = v[i].copy();
@@ -318,7 +333,7 @@ public class MVector implements MathObject{
 	 * @param size length of the vector to be made.
 	 * @return a new {@code MVector} of length {@code size} consisting of {@code MConst}s with value 0.
 	 */
-	public static MathObject zero(int size) {
+	public static MVector zero(int size) {
 		return new MVector(size);
 	}
 	
@@ -326,7 +341,7 @@ public class MVector implements MathObject{
 	 * @param size the length of the vector to be made
 	 * @return a new {@code MVector} of length {@code size} consisting of {@code MConst}s with value 1.
 	 */
-	public static MathObject ones(int size) {
+	public static MVector ones(int size) {
 		return new MVector(size, new MReal(1));
 	}
 	

@@ -35,7 +35,7 @@ public class Interpreter {
 			c.process(argsFromString(s));
 		} else {
 			MathObject result = new Parser(s).evaluate();
-			Variables.ans(result);
+			Variables.ans(result.copy());
 			Calculator.ioHandler.out(Printer.toText(result));
 		}
 	}
@@ -98,7 +98,7 @@ public class Interpreter {
 				}
 			} else
 				Variables.set(name, result);
-			Variables.ans(result);
+			Variables.ans(result.copy());
 			Calculator.ioHandler.out(result.toString());
 		}
 	}

@@ -1,14 +1,9 @@
 package algorithms;
 
 import mathobjects.MathObject;
-import algorithms.algebra.ABCFormula;
-import algorithms.algebra.Simplifier;
-import algorithms.calculus.Integrator;
-import algorithms.calculus.Deriver;
-import algorithms.calculus.Gradient;
-import algorithms.linalg.GaussianElimination;
-import algorithms.linalg.JordanElimination;
-import algorithms.linalg.LUDecomposition;
+import algorithms.algebra.*;
+import algorithms.calculus.*;
+import algorithms.linalg.*;
 
 public enum Algorithms {
 	INTEGRAL(new Integrator()),
@@ -18,7 +13,9 @@ public enum Algorithms {
 	RREF(new JordanElimination()),
 	LU(new LUDecomposition()),
 	ABC(new ABCFormula()),
-	SIMPLIFY(new Simplifier());
+	SIMPLIFY(new Simplifier()),
+	REORDER(new Reorderer()),
+	COM(new Commutator());
 	
 	Algorithm a;
 	Algorithms(Algorithm a) {

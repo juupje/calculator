@@ -5,7 +5,7 @@ public enum MConst {
 	e(new MReal(Math.E)),
 	i(new MComplex(0,1)),
 	_c(new MReal(299792458)), //m/s - speed of light in vacuum
-	_e(new MReal(1.60217662)), //C - electron charge
+	_e(new MReal(1.60217662e-19)), //C - electron charge
 	_mu0(new MReal(1.2566370614359173e-06)), //N/A^2 - magnetic permeability of vacuum
 	_epsilon0(new MReal(8.854187817620389e-12)), //F/m - dielectic permittivity of vacuum
 	_h(new MReal(6.62607004e-34)), //Js - Plank's constant
@@ -18,7 +18,7 @@ public enum MConst {
 	_k(new MReal(1.38064852e-23)), //J/K - Boltzmann constant
 	_sigma(new MReal(5.670367e-8)), //W/(m^2K^4) - Stefan-Boltzmann constant
 	_wien(new MReal(0.0028977729)), //m*K - Wien's displacement constant
-	_rydberg(new MReal(10973731.568508)), //1/m - Rydberg constant
+	_Ry(new MReal(10973731.568508)), //1/m - Rydberg constant
 	_m_e(new MReal(9.10938356e-31)), //kg - electron mass
 	_m_p(new MReal(1.672621898e-27)), //kg - proton mass
 	_m_n(new MReal(1.674927471e-27)), //kg - neutron mass

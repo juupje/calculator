@@ -145,7 +145,7 @@ public class MFunction extends MExpression {
 	}
 
 	public static Tree processTree(Tree tree, boolean defined, String[] vars) {
-		tree.DFS(tree.getRoot(), new DFSTask() {
+		tree.DFS(new DFSTask(false) {
 			@Override
 			public void accept(Node<?> n) {
 				// If the node is a vector containing functions: turn it into a vector-function
@@ -160,22 +160,16 @@ public class MFunction extends MExpression {
 					}
 				}
 
-				// If the node is internal and this function is not defined, replace this node
+				// If the node is not internal and this function is not defined, replace this node
 				// with its evaluated value.
 				if (defined)
 					return;
-				if (n.data instanceof Variable) {
+				if (n.data instanceof Variable) { //this implies that the node is not internal
 					for (String var : vars)
 						if (n.data.equals(var))
 							return;
 					MathObject obj = ((Variable) n.data).get();
-					// if the variable is a function, replace the node with the tree of that
-					// function.
-					// if (obj instanceof MFunction)
-					// n.replace(new Node<MFunction>((MFunction) obj.evaluate()));
-					// else // if the variable is a different type of MathObject, replace the node
-					// with a
-					// new node containing the evaluated MathObject
+
 					n.replace(new Node<MathObject>(obj.evaluate()));
 				} else if (n.data instanceof MathObject)
 					n.replace(new Node<MathObject>(((MathObject) n.data).evaluate()));

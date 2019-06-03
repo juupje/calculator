@@ -163,6 +163,8 @@ public class MComplex extends MScalar {
 	private void updateCartesian() {
 		a = r*Math.cos(phi);
 		b = r*Math.sin(phi);
+		if(Math.abs(a)<1e-15) a = 0;
+		if(Math.abs(b)<1e-15) b = 0;
 		cartesian = true;
 	}
 	
@@ -491,11 +493,13 @@ public class MComplex extends MScalar {
 		return copy();
 	}
 	
-	private void fixPhi() {
+	public void fixPhi() {
 		if(r==0)
 			phi = 0;
 		else
 			phi = Tools.reduce(phi, 0, 2*Math.PI);
+		if(Math.abs(a)<1e-15) a = 0;
+		if(Math.abs(b)<1e-15) b = 0;
 	}
 	
 	@Override

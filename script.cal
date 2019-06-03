@@ -1,6 +1,7 @@
-L1=[0,0,0;0,0,-1;0,1,0]
-L2=[0,0,1;0,0,0;-1,0,0]
-L3=[0,-1,0;1,0,0;0,0,0]
-K1=L1/í
-K2=L2/í
-K3=L3/í
+f(x)=3x^3*2/x
+g=derivative(f)
+dot(g)
+reorder(g)
+dot(ans)
+simplify(g)
+dot(ans)

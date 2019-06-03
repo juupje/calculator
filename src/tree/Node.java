@@ -13,6 +13,7 @@ public class Node<T> {
 	
 	public Node<?> left = null, right = null, parent = null;
 	public T data;
+	public int flags = 0;
 	
 	public Node(T data) {
 		this.data = data;
@@ -62,22 +63,6 @@ public class Node<T> {
 	 * which means that the children of this {@code Node} (if any) will be discarded. 
 	 * @param n the {@code Node} with which this one will be replaced.
 	 */
-	public void replaceWithChildren(Node<?> n) {
-		if (parent != null) {
-			if (parent.left() == this)
-				parent.left(n);
-			else
-				parent.right(n);
-		}
-		if(right != null || left != null)
-			System.out.println("ATTENTION: node was replaced and it's children discarded, left: " + left + " right: " + right + " node: " + left.parent);
-	}
-	
-	/**
-	 * Replaces this {@code Node} with {@code n}. This conserves children of this {@code Node},
-	 * which means that the children of {@code n} (if any) will be discarded. 
-	 * @param n the {@code Node} with which this one will be replaced.
-	 */
 	public void replace(Node<?> n) {
 		if (parent != null) {
 			if (parent.left() == this)
@@ -85,12 +70,35 @@ public class Node<T> {
 			else
 				parent.right(n);
 		}
+		if(right != null || left != null)
+			System.out.println("ATTENTION: node was replaced and it's children discarded, old: " + left.parent + "[" + left + ", " + right + "] " + 
+		" new: " + n + (n != null ? "[" + n.left + ", " + n.right + "]": ""));
+	}
+	
+	/**
+	 * Replaces this {@code Node} with {@code n}. This conserves children of this {@code Node},
+	 * which means that the children of {@code n} (if any) will be discarded. 
+	 * @param n the {@code Node} with which this one will be swapped.
+	 */
+	public void swap(Node<?> n) {
+		if (parent != null) {
+			if (parent.left() == this)
+				parent.left(n);
+			else
+				parent.right(n);
+		}
 		n.left(left);
-		n.right(right);
+		n.right(right); 
+	}
+	
+	public void switchChildren() {
+		Node<?> temp = left;
+		left = right;
+		right = temp;
 	}
 	
 	public void shiftUp() {
-		parent.replaceWithChildren(this);
+		parent.replace(this);
 	}
 	
 	public void left(Node<?> l) {

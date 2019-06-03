@@ -1,7 +1,5 @@
 package tree;
 
-import java.util.function.Consumer;
-
 import algorithms.Functions.Function;
 import helpers.Shape;
 import helpers.exceptions.TreeException;
@@ -66,7 +64,7 @@ public class Tree {
 			newNode.right(toBeReplaced.right());
 			root = newNode;
 		} else
-			toBeReplaced.replace(newNode);
+			toBeReplaced.swap(newNode);
 	}
 	
 	public Node<?> updateRoot() {
@@ -75,7 +73,7 @@ public class Tree {
 		return root;
 	}
 	
-	public void DFS(Node<?> n, Consumer<Node<?>> c) {
+	private void DFS(Node<?> n, DFSTask c) {
 		if(n.left() != null)
 			DFS(n.left(), c);
 		if(n.right() != null)
@@ -83,8 +81,10 @@ public class Tree {
 		c.accept(n);
 	}
 	
-	public void DFS(Consumer<Node<?>> c) {
+	public void DFS(DFSTask c) {
 		DFS(root, c);
+		if(c.usesFlags)
+			DFS(resetFlags);
 	}
 	
 	/**
@@ -126,4 +126,13 @@ public class Tree {
 	public Tree copy(java.util.function.Function<Node<?>, Node<?>> func) {
 		return new Tree(copy(root, func));
 	}
+	
+	private static final DFSTask resetFlags = new DFSTask(false) {
+
+		@Override
+		public void accept(Node<?> t) {
+			t.flags = 0;
+		}
+		
+	};
 }

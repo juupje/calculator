@@ -1,14 +1,20 @@
 package algorithms.algebra;
 
+import java.util.Comparator;
+import java.util.HashMap;
+
 import algorithms.Algorithm;
+import algorithms.Functions.Function;
 import helpers.Shape;
 import main.Operator;
+import main.Variable;
 import mathobjects.MComplex;
 import mathobjects.MConst;
 import mathobjects.MExpression;
 import mathobjects.MFunction;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
+import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
 import tree.DFSTask;
@@ -30,9 +36,11 @@ public class Simplifier extends Algorithm {
 		prepared =true;
 	}
 	
-	public Simplifier() {}
+	public Simplifier() {
+		OrderComperator.init();
+	}
 	
-	static DFSTask numericOperants = new DFSTask() {
+	static DFSTask numericOperants = new DFSTask(false) {
 		@Override
 		public void accept(Node<?> n) {
 			if(n.data instanceof Operator) {
@@ -61,7 +69,7 @@ public class Simplifier extends Algorithm {
 		}
 	};
 	
-	static DFSTask simplifyOperators = new DFSTask() {
+	static DFSTask simplifyOperators = new DFSTask(false) {
 		@Override
 		public void accept(Node<?> n) {
 			//Whenever this gets called, it is not possible that both operants are numeric
@@ -108,12 +116,29 @@ public class Simplifier extends Algorithm {
 				default:
 					break;					
 				}
+				if(n.left != null && n.right != null) {
+					
+				}
 			}
 		}
+	};
+	
+	public static DFSTask sort = new DFSTask(true) {
+		
+		@Override
+		public void accept(Node<?> n) {
+			n.flags += OrderComperator.getImportance(n.data);
+			if(n.parent!=null)
+				n.parent.flags += n.flags;
+			if(n.left != null && n.right != null && (n.data.equals(Operator.ADD) || n.data.equals(Operator.MULTIPLY)) && n.left.flags < n.right.flags)
+				n.switchChildren();
+		}
+		
 	};
 
 	public Tree simplify(Tree tr) {
 		tr.DFS(numericOperants);
+		tr.DFS(sort);
 		tr.DFS(simplifyOperators);
 		return tr;
 		/**
@@ -155,7 +180,47 @@ public class Simplifier extends Algorithm {
 	@Override
 	public Shape shape(Shape... shapes) {
 		if(shapes.length != 1)
-			throw new IllegalArgumentException("Simplifier requires 1 argument, got " +shapes.length);
+			throw new IllegalArgumentException("Simplifier requires 1 argument, got " + shapes.length);
 		return shapes[0];
+	}
+	
+	static class OrderComperator implements Comparator<Object> {
+
+		/*
+		 * possible entries are:
+		 * -MConst 0
+		 * -numeric MathObject 1
+		 * -Operator 2
+		 * -MFunction/variable 3
+		 * -Function 4
+		 */		
+		private static HashMap<Class<?>, Integer> importance;
+		public static void init() {
+			if(importance!=null) return;
+			importance = new HashMap<Class<?>, Integer>(8);
+			importance.put(MConst.class, new Integer(4));
+			importance.put(MScalar.class, new Integer(3));
+			importance.put(Operator.class, new Integer(2));
+			importance.put(Variable.class, new Integer(1));
+			importance.put(Function.class, new Integer(0));
+		}
+		
+		private static int getImportance(Object obj) {
+			if(obj instanceof MathObject)
+				return ((MathObject) obj).isNumeric() ? importance.get(MScalar.class) : importance.get(Variable.class);
+			else {
+				Integer result = importance.get(obj.getClass());
+				if(result == null)
+					return 5;
+				else
+					return result;
+			}
+		}
+		
+		@Override
+		public int compare(Object a, Object b) {
+			return getImportance(a) - getImportance(b);
+		}
+		
 	}
 }

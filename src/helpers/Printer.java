@@ -295,15 +295,15 @@ public class Printer {
 				s += nodeToText(n.left()) + (op == Operator.ADD ? "+" : "-") + nodeToText(n.right());
 				break;
 			case MULTIPLY:
-				String s1 = nodeToText(n.right());
-				String s2 = nodeToText(n.left());
-				boolean brackets1 = n.right().data.equals(Operator.ADD) || n.right().data.equals(Operator.SUBTRACT);//s1.contains("-") || s1.contains("+");
-				boolean brackets2 = n.left().data.equals(Operator.ADD) || n.left().data.equals(Operator.SUBTRACT);//s2.contains("-") || s2.contains("+");
+				String s1 = nodeToText(n.left());
+				String s2 = nodeToText(n.right());
+				boolean brackets1 = n.left().data.equals(Operator.ADD) || n.left().data.equals(Operator.SUBTRACT);
+				boolean brackets2 = n.right().data.equals(Operator.ADD) || n.right().data.equals(Operator.SUBTRACT);
 				if (brackets2)
 					s2 = "(" + s2 + ")";
 				if(brackets1)
 					s1 = "(" + s1 + ")";
-				if (n.left().isNumeric() && !Character.isDigit(s2.charAt(0))) // there needn't be a multiplication dot
+				if (n.left().isNumeric() && s2.charAt(0)!='-' && !Character.isDigit(s2.charAt(0))) // there needn't be a multiplication dot
 																			  // between a number and a variable.
 					s += s1 + s2;
 				else
@@ -533,6 +533,7 @@ public class Printer {
 	 */
 	public static String numToString(MScalar scalar) {
 		if (scalar.isComplex()) {
+			((MComplex) scalar).fixPhi();
 			if (Setting.getBool(Setting.COMPLEX_IN_POLAR))
 				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
 			else {

@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
+import helpers.exceptions.ShapeException;
 import mathobjects.MExpression;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
@@ -163,6 +164,31 @@ public enum Operator {
 			if(b.length==1)
 				return Shape.multiply(a, b[0]);
 			throw new InvalidOperationException("Can only multiply two mathobjects, got " + (b.length+1));
+		}
+	},
+	
+	CROSS {
+		@Override
+		public MathObject evaluate(MathObject a, MathObject... b)  {
+			if (b.length != 1)
+				throw new IllegalArgumentException(
+						"You can only cross multiply exactly two vectors, got " + (1 + b.length));
+			if (a instanceof MVector && b[0] instanceof MVector) {
+				return ((MVector) a).cross((MVector) b[0]);
+			}
+			throw new InvalidOperationException(
+					"CROSS operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b)  {
+			if(b.length==1) {
+				if(a.dim()==1 && a.equals(b[0]) && (a.get(0) == 3 || a.get(0) == 2))
+					return a.copy();
+				else
+					throw new ShapeException("Cross product is only defined for vector shaped object of length 2 or 3, got " + a + " and " + b);
+			}
+			throw new InvalidOperationException("Can only cross multiply two objects, got " + (b.length+1));
 		}
 	},
 
