@@ -498,8 +498,8 @@ public class MComplex extends MScalar {
 			phi = 0;
 		else
 			phi = Tools.reduce(phi, 0, 2*Math.PI);
-		if(Math.abs(a)<1e-15) a = 0;
-		if(Math.abs(b)<1e-15) b = 0;
+		if(Math.abs(a)<1e-14) a = 0;
+		if(Math.abs(b)<1e-14) b = 0;
 	}
 	
 	@Override

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import algorithms.Algorithms;
+import algorithms.Functions;
 import helpers.Printer;
 import helpers.exceptions.CircularDefinitionException;
 import helpers.exceptions.InvalidFunctionException;
@@ -105,6 +107,7 @@ public class Interpreter {
 	
 	private static boolean checkNameValidity(String name) {
 		if(name.startsWith("_") || Character.isDigit(name.codePointAt(0))) return false;
+		if(name.equals("pi") || name.equals("e") || name.equals("i") || Functions.isFunction(name) || Algorithms.isAlgorithm(name)) return false;
 		for(int i = 0; i < name.length(); i++) {
 			int c = name.codePointAt(i);
 			if(c<65 && c>90 && c<97 && c>120 && c<945 && c>969 && c<913 && c>937 && c<30 && c<48 && c>57)

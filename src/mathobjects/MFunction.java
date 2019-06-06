@@ -39,7 +39,7 @@ public class MFunction extends MExpression {
 	}
 
 	@Override
-	public MathObject copy() {
+	public MFunction copy() {
 		return new MFunction(vars, tree.copy(new TreeFunction() {
 			@Override
 			public Node<?> apply(Node<?> n) {

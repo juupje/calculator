@@ -233,6 +233,11 @@ public class MVector implements MathObject{
 		v[index] = new MReal(d);
 	}
 	
+	/**
+	 * Applies the a function to every element and packs the outputs into a new vector.
+	 * @param f the Function to be applied to this vector element-wise.
+	 * @return the result of the function for each element.
+	 */
 	public MVector forEach(Function<MathObject, MathObject> f) {
 		MathObject[] v2 = new MathObject[v.length];
 		for(int i = 0; i < v2.length; i++)

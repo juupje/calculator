@@ -1,10 +1,6 @@
 package main;
 
-import static main.Operator.ADD;
-import static main.Operator.DIVIDE;
-import static main.Operator.MULTIPLY;
-import static main.Operator.SUBTRACT;
-import static main.Operator.CROSS;
+import static main.Operator.*;
 
 import java.util.ArrayList;
 
@@ -47,6 +43,10 @@ public class Parser {
 		else
 			ch = -1;
 		return ch;
+	}
+	
+	protected int getPrevChar() {
+		return expr.charAt(pos-1);
 	}
 
 	/**
@@ -163,22 +163,26 @@ public class Parser {
 			return new Node<MathObject>(getVector());
 		} else if (ch == ']')
 			return null;
+		else if(consume('&')) {
+			n = new Node<Operator>(CONJUGATE);
+			n.left(getFactor());
+		}
 		else if (Character.isDigit(ch) || ch == '.' || ch == '-') {
 			do {
 				nextChar();
-			} while (Character.isDigit(ch) || ch == '.');
+			} while (Character.isDigit(ch) || ch == '.' || ch=='E' || (ch=='-' && getPrevChar()=='E'));
 			String s1 = expr.substring(position, pos);
 			if (s1.equals("-")) {
 				if (p == null)
-					tree.root = p = new Node<Operator>(Operator.MULTIPLY);
+					tree.root = p = new Node<Operator>(MULTIPLY);
 				else
-					p = new Node<Operator>(Operator.MULTIPLY);
+					p = new Node<Operator>(MULTIPLY);
 				p.left(n = new Node<MScalar>(new MReal(-1.0)));
 				p.right(getFactor());
 				return p.right();
 			} else
 				n = new Node<MScalar>(new MReal(Double.valueOf(s1)));
-			if(consume('í'))
+			if(consume('i'))
 				((Node<MScalar>) n).setData(new MComplex(0,((MReal) n.getData()).getValue()));
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z' || ch=='_')) {
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch=='_' || (ch>='0' && ch<='9'))
@@ -197,7 +201,7 @@ public class Parser {
 				if (!Variables.exists(str))
 					Calculator.ioHandler.err("The variable " + str + " is undefined. Statement was parsed regardless.");
 			}
-		} else if(consume('í'))
+		} else if(consume('i'))
 			n = new Node<MConst>(MConst.i);
 		else
 			throw new UnexpectedCharacterException(expr, pos);
@@ -209,49 +213,49 @@ public class Parser {
 		if (consume(')'))
 			return null;
 		else if (consume('+')) {
-			n = new Node<Operator>(Operator.ADD);
+			n = new Node<Operator>(ADD);
 			n.left(tree.root);
 			n.right(getFactor());
 			tree.root = n;
 			return n.right();
 		} else if (consume('-')) {
-			n = new Node<Operator>(Operator.SUBTRACT);
+			n = new Node<Operator>(SUBTRACT);
 			n.left(tree.root);
 			n.right(getFactor());
 			tree.root = n;
 			return n.right();
 		} else if (consume('*')) {
-			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), Node.LEFT);
+			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
 			//n = p;
 			p = p.parent;
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('×') || consume('~')) {
-			tree.insert(p, new Node<Operator>(Operator.CROSS), Node.LEFT);
+			tree.insert(p, new Node<Operator>(CROSS), Node.LEFT);
 			//n = p;
 			p = p.parent;
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('/')) {
-			tree.insert(p, new Node<Operator>(Operator.DIVIDE), Node.LEFT);
+			tree.insert(p, new Node<Operator>(DIVIDE), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('^')) {
-			tree.insert(p, new Node<Operator>(Operator.POWER), Node.LEFT);
+			tree.insert(p, new Node<Operator>(POWER), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p;
 		} else if(consume('\'')) {
-			tree.insert(p, new Node<Operator>(Operator.TRANSPOSE), Node.LEFT);
+			tree.insert(p, new Node<Operator>(TRANSPOSE), Node.LEFT);
 			p = p.parent;
 			return p;
 		} else if (!Character.isDigit(ch)) { // Does the same as consume('*')
-			tree.insert(p, new Node<Operator>(Operator.MULTIPLY), Node.LEFT);
+			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
 			n = p;
 			p = p.parent;
 			n = new Node<>(p.data);
@@ -302,6 +306,8 @@ public class Parser {
 			return processFactor();
 		if (consume('-'))
 			return processFactor().negate();
+		if(consume('&'))
+			return CONJUGATE.evaluate(processFactor());
 
 		MathObject d = null;
 		int p = pos;
@@ -319,8 +325,8 @@ public class Parser {
 				nextChar();
 			d = new MReal(Double.parseDouble(expr.substring(p, pos)));
 			if (consume('E'))
-				d = Operator.MULTIPLY.evaluate(d, Operator.POWER.evaluate(new MReal(10), processFactor()));
-			if(consume('í')) {
+				d = MULTIPLY.evaluate(d, POWER.evaluate(new MReal(10), processFactor()));
+			if(consume('i')) {
 				if(((MScalar) d).isComplex())
 					((MScalar) d).multiply(MConst.i.evaluate());
 				else
@@ -342,7 +348,7 @@ public class Parser {
 				if(d instanceof MVector || d instanceof MMatrix) {
 					do {
 						if(consume('['))
-							d = Operator.ELEMENT.evaluate(d, getArgumentsAsMathObject(findEndOfBrackets()));
+							d = ELEMENT.evaluate(d, getArgumentsAsMathObject(findEndOfBrackets()));
 						else break;
 					} while(d instanceof MVector || d instanceof MMatrix);
 				} else
@@ -362,7 +368,7 @@ public class Parser {
 				else
 					throw new UnexpectedCharacterException(expr, p, pos);
 			}
-		} else if(consume('í')) {
+		} else if(consume('i')) {
 			d = MConst.i.evaluate();
 		} else {
 			throw new UnexpectedCharacterException(expr, pos);
@@ -370,11 +376,11 @@ public class Parser {
 
 		// If the factor has to be risen to a power
 		if (consume('^'))
-			d = Operator.POWER.evaluate(d, processFactor());
+			d = POWER.evaluate(d, processFactor());
 		if (consume('%'))
-			d = Operator.MOD.evaluate(d, processFactor());
+			d = MOD.evaluate(d, processFactor());
 		if(consume('\''))
-			d = Operator.TRANSPOSE.evaluate(d);
+			d = TRANSPOSE.evaluate(d);
 		return d;
 	}
 	

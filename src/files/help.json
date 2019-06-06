@@ -54,6 +54,42 @@
 			"arguments": "Any real or complex number.",
 			"result": "A complex or real number whose tangent equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
 		},
+        "sinh": {
+			"syntax": "sinh(s)",
+			"description": "Calculates the hyperbolic sine of the argument, defined as sinh(s)=(exp(s)-exp(-s))/2.",
+			"arguments": "Any real or complex number in radians.",
+			"result": "A complex or real number which equals the hyperbolic sine of the argument."
+		},
+		"cosh": {
+			"syntax": "cosh(s)",
+			"description": "Calculates the hyperbolic cosine of the argument, defined as cosh(s)=(exp(s)+exp(-s))/2.",
+			"arguments": "Any real or complex number in radians.",
+			"result": "A complex or real number which equals the hyperbolic cosine of the argument."
+		},
+		"tanh": {
+			"syntax": "tanh(s)",
+			"description": "Calculates the hyperbolic tangent of the argument, defined as tanh(s)=sinh(s)/cosh(s)",
+			"arguments": "Any real or complex number in radians.",
+			"result": "A complex or real number which equals the hyperbolic tangent of the argument."
+		},
+        "asinh": {
+			"syntax": "asinh(s)",
+			"description": "Calculates the inverse hyperbolic sine of the argument, defined by asinh(z)=ln(z+sqrt(z^2+1)). For real arguments: sinh(asinh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
+			"arguments": "Any complex number or a real number.",
+			"result": "A complex or real number which equals the inverse hyperbolic sine of the argument."
+		},
+		"acosh": {
+			"syntax": "acosh(s)",
+			"description": "Calculates the inverse hyperbolic cosine of the argument, defined by acosh(z)=ln(z+sqrt(z^2-1)). For real arguments: cosh(acoshh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
+			"arguments": "Any complex number or a real number.",
+			"result": "A complex or real number which equals the inverse hyperbolic cosine of the argument."
+		},
+        "atanh": {
+			"syntax": "atanh(s)",
+			"description": "Calculates the inverse hyperbolic tangent of the argument, defined by atanh(z)=ln((z+1)/(z-1))/2. For real arguments: tanh(atanh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
+			"arguments": "Any complex number or a real number.",
+			"result": "A complex or real number which equals the inverse hyperbolic tangent of the argument."
+		},
 		"toRad": {
 			"syntax": "toRad(s)",
 			"description": "Converts the argument from degrees to radians. This is done using rad=deg*pi/180",
@@ -71,7 +107,50 @@
 			"description": "Calculates the square root of the argument. If the setting COMPLEX_ENABLED is set to true, the argument can be negative too, in which case the result will be complex.",
 			"arguments": "A positive (zero included) number, or a negative or complex number (see above).",
 			"result": "A real non-negative number whose square equals the argument, or a complex number (see above)."
-		}
+		},
+        "abs": {
+            "syntax": "abs(x)",
+			"description": "Calculates the absolute value |x| of the argument.",
+			"arguments": "Any number or vector, complex or real.",
+			"result": "A real non-negative number which equals the distance from x to the coordinate origin."
+        },
+        "ln": {
+            "syntax": "ln(s)",
+			"description": "Calculates the natural logarithm of the argument. If s is complex, it returns the natural logarithm of s in the principle branch, defined by Ln(s)=ln(abs(s))+i*abs(s)",
+			"arguments": "Any non-zero complex or real number.",
+			"result": "If s is real: a number y such that e^y=x. If s is complex: a number w such that Exp(w)=s, where Exp is the complex exponential on the principle branch."
+        },
+        "log": {
+            "syntax": "log(s)",
+			"description": "Calculates the base-10 logarithm of the argument. If s is complex, it returns the natural logarithm of s in the principle branch divided by ln(10), see help(ln).",
+			"arguments": "Any non-zero complex or real number.",
+			"result": "If s is real: a number y such that 10^y=x. If s is complex: Ln(s)/ln(10), where Ln is the complex natural logarithm on the principle branch."
+        },
+        "exp": {
+            "syntax": "exp(s)",
+			"description": "Calculates the exponential of the argument. If s is complex, it returns the exponential of s in the principle branch.",
+			"arguments": "Any complex or real number.",
+			"result": "If s is real: e^s, where e is Euler's number. If s is complex: Exp(s)=e^(Re(s))*(cos(Im(s))+i*sin(Im(s))), where Re(s) and Im(s) are the real and imaginary parts of s."
+        },
+        "fact": {
+            "syntax": "fact(n)",
+			"description": "Calculates the factorial of the argument (written as n!)",
+			"arguments": "Any non-negative real integer.",
+			"result": "the factorial of n: n!=n*(n-1)*(n-2)*...*1"
+        },
+        "conj": {
+            "syntax": "conj(z)",
+			"description": "Calculates the complex conjugate of the argument: conj(z)=conj(x+iy)=x-iy",
+			"arguments": "Any real or complex number, vector or matrix.",
+			"result": "The complex conjugate of the argument (if the argument is vector or matrix shaped, a new vector or matrix of the conjugates of each element is returned)."
+        },
+        "det": {
+            "syntax": "det(A)",
+			"description": "Calculates the determinant of the argument.",
+			"arguments": "Any real-valued square matrix.",
+			"result": "The determinant of A."
+        },
+        
 	},
 	"algorithms": {
 		"derivative": {
@@ -80,6 +159,12 @@
 			"arguments": "f: a function depending on one or more variables. x: the name of the variable to which f should be derived (not need if the function only has one variable). For multivariate functions x can also be a vector for a directional derivative. a: (optional) the value to be used as the input for the derivative.",
 			"result": "If a is given (df/dx)(a) (or (x*grad(f))(a) ) will be returned, otherwise (df/dx) is returned."
 		},
+        "grad": {
+            "syntax": "grad(f) or grad(f, a)",
+            "description": "Analytically calculates the gradient of the given scalarfunction. The gradient is defined as (grad f)_i=(del/del_i)f. If a location a is provided, the gradient at a will be calculated.",
+            "arguments": "f: a scalar-shaped function (that means f.shape()==0), depending on one or more variables. a (optional): the value to be used as the input for the gradient.",
+            "result": "If a is given, (grad(f))(a) will be returned as a vector, otherwise grad(f) is returned as a vectorfunction."
+        },
 		"integral": {
 			"syntax": "integral(f, a, b) or integral(f, a, b, s)",
 			"description": "Numerically approximates the definite integral of the function f from a to b with (optional) s steps (nodes) using Gaussian-Legendre Quadrature.",
@@ -98,11 +183,29 @@
 			"arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Jordan-Gauss Elimination.",
 			"result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Jordan-Gauss Elimination on M augmented with b."
 		},
+        "lu": {
+			"syntax": "lu(M)",
+			"description": "Calculates the PLU decomposition of M. This means that three matrices (L, U, P) are calculated, such that PM=LU (so M=inv(P)LU). L is a lower triangular matrix, U is an upper triangular matrix, and P is a pivot matrix.",
+			"arguments": "M: a (n x n)-matrix with real elements.",
+			"result": "A vector containing (L, U, P), with L upper triangular, U lower triangular and P a pivot matrix. Such that LU=PM."
+		},
 		"abc": {
 			"syntax": "abc(a, b, c)",
 			"description": "Uses the ABC-Formula to calculate the root of a quadratic equation of the form y=ax^2+bx+c. If the setting COMPLEX_ENABLED is set to true, the a complex result may be returned.",
 			"arguments": "a, b and c: real numbers",
 			"result": "A vector with 2 elements containing both roots, if one or both of the roots is complex and the setting COMPLEX_ENABLED is set to false, one or both of the elements may be null. If only one element is null, it will be the second one."
+		},
+        "simplify": {
+			"syntax": "simplify(e)",
+			"description": "Tries to simplify a given expression (or function). This involves computing all numerical operations (like 2*3 or log(12)), removing trivial operations (such as x*0, x*1, y+0, y^1) and reordering the expression (see help(reorder)).",
+			"arguments": "e: a function or an expression",
+			"result": "An object (function or expression) which (mathematically) equals e, but without numerical operations and trivial operations."
+		},
+        "reorder": {
+			"syntax": "reorder(e)",
+			"description": "Tries to reorder a given expression (or function). This involves moving numberical values to the front, and functions to he back of the expression.",
+			"arguments": "e: a function or an expression",
+			"result": "An object (function or expression) which (mathematically) equals e, but in a different (more natural) order."
 		}
 	},
 	"commands": {
@@ -222,5 +325,95 @@
 			"description": "The default amount of runs of the time command. See help(time) for more info.",
 			"default": 100
 		}
-	}
+	},
+    "constants": {
+        "pi": {
+            "name": "Mathematical constant pi: the ratio of the circumference and diameter of a circle.",
+            "value": "3.1415926..."
+        },
+        "e": {
+            "name": "Mathematical constant e (Euler's number): the limit of (1+1/n)^n for n->infinity.",
+            "value": "2.7182818285..."
+        },
+        "i": {
+            "name": "Imaginary unit: a number such that i^2=-1.",
+            "value": "i"
+        },
+        "_c": {
+            "name": "Physical constant c: speed of light in a vacuum.",
+            "value": "299792458 (m/s)"
+        },
+        "_e": {
+            "name": "Physical constant e: electron charge.",
+            "value": "1.60217662e-19 (C)"
+        },
+        "_mu0": {
+            "name": "Physical constant mu_0: magnetic permeability of vacuum.",
+            "value": "1.2566370614359173e-06 (N/A^2)"
+        },
+        "_epsilon0": {
+            "name": "Physical constant epsilon_0: the electric permittivity of vacuum (also: (di)electric constant.",
+            "value": "8.854187817620389e-12 (F/m)"
+        },
+        "_h": {
+            "name": "Physical constant h: Plank's constant",
+            "value": "6.62607004e-34 (Js)"
+        },
+        "_hbar": {
+            "name": "Physical constant hbar: reduces Plank's constant.",
+            "value": "_h/(2pi)=1.0545718001391127e-34 Js"
+        },
+        "_G": {
+            "name": "Physical constant G: Newton's gravitational constant.",
+            "value": "6.67408e-11 (m^3/(kg s^2))"
+        },
+        "_g": {
+            "name": "Physical constant g: standard gravitational acceleration on earth.",
+            "value": "9.80665 (m/s^2)"
+        },
+        "_R": {
+            "name": "Physical constant R: molar gas constant.",
+            "value": "8.3144598 (J/(K mol))"
+        },
+        "_alpha": {
+            "name": "Physical constant alpha: fine structure constant",
+            "value": "0.0072973525664"
+        },
+        "_NA": {
+            "name": "Physical constant N_A: Avogadro's number.",
+            "value": "6.022140857e23 (1/mol)"
+        },
+        "_k": {
+            "name": "Physical constant k (or k_B): Boltzmann constant.",
+            "value": "1.38064852e-23 (J/K)"
+        },
+        "_sigma": {
+            "name": "Physical constant c: Stefan-Boltzmann constant.",
+            "value": "5.670367e-8 (W/(m^2 K^4))"
+        },
+        "_wien": {
+            "name": "Physical constant c: Wien's displacement contant.",
+            "value": "0.0028977729 (m K)"
+        },
+        "_Ry": {
+            "name": "Physical constant Ry: Rydberg constant",
+            "value": "10973731.568508 (m/s)"
+        },
+        "_m_e": {
+            "name": "Physical constant m_e: electron mass",
+            "value": "9.10938356e-31 (kg)"
+        },
+        "_m_p": {
+            "name": "Physical constant m_p: proton mass",
+            "value": "1.672621898e-27 (kg)"
+        },
+        "_m_n": {
+            "name": "Physical constant m_n: neutron mass",
+            "value": "1.674927471e-27 (kg)"
+        },
+        "_u": {
+            "name": "Physical constant u: atomic mass unit",
+            "value": "1.66053904e-27 (kg)"
+        }
+    }
 }

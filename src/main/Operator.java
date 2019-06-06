@@ -12,6 +12,8 @@ import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
+import tree.Node;
+import tree.Tree;
 
 public enum Operator {
 	// ###### double argument operators #######
@@ -338,7 +340,13 @@ public enum Operator {
 				return a instanceof MMatrix ? ((MMatrix) a).forEach(f) : ((MVector) a).forEach(f);
 			} else if(a instanceof MScalar)
 				return ((MScalar) a).copy().conjugate();
-			throw new InvalidOperationException("Can't transpose object " + a.getClass().getSimpleName());
+			else if(a instanceof MExpression) {
+				MExpression c = ((MExpression)a).copy();
+				Tree tr = ((MExpression) c).getTree();
+				tr.insert(tr.root, new Node<Operator>(CONJUGATE), Node.LEFT);
+				return c;
+			}
+			throw new InvalidOperationException("Can't conjugate object " + a.getClass().getSimpleName());
 		}
 
 		@Override

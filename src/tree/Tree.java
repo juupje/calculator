@@ -44,9 +44,11 @@ public class Tree {
 		if(n.isInternal()) {
 			if(n.data instanceof Function)
 				return ((Function) n.data).evaluate(evaluateNode(n.left()));
-			else if(n.data instanceof Operator)
-				return ((Operator) n.data).evaluate(evaluateNode(n.left()), evaluateNode(n.right()));
-			else if(n.data instanceof Variable && ((Variable) n.data).get() instanceof MFunction) {
+			else if(n.data instanceof Operator) {
+				if(n.right() != null)
+					return ((Operator) n.data).evaluate(evaluateNode(n.left()), evaluateNode(n.right()));
+				return ((Operator) n.data).evaluate(evaluateNode(n.left()));
+			}else if(n.data instanceof Variable && ((Variable) n.data).get() instanceof MFunction) {
 				return ((MFunction) ((Variable) n.data).get()).evaluateAt(((MVector) evaluateNode(n.left())).elements());
 			}
 		} //else
@@ -95,9 +97,11 @@ public class Tree {
 	 * @
 	 */
 	public Shape getShape(Node<?> n)  {
-		if(n.data instanceof Operator)
-			return ((Operator) n.data).shape(getShape(n.left()), getShape(n.right()));
-		else if(n.data instanceof MathObject)
+		if(n.data instanceof Operator) {
+			if(n.right != null)
+				return ((Operator) n.data).shape(getShape(n.left()), getShape(n.right()));
+			return ((Operator) n.data).shape(getShape(n.left()));
+		} else if(n.data instanceof MathObject)
 			return ((MathObject) n.data).shape();
 		else if(n.data instanceof Variable)
 			if(((Variable) n.data).get()!=null)

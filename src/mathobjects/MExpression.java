@@ -78,19 +78,19 @@ public class MExpression implements MathObject {
 	}
 	
 	@Override
-	public MathObject negate() {
+	public MExpression negate() {
 		tree.insert(tree.getRoot(), new Node<Operator>(Operator.NEGATE), Node.LEFT);
 		return this;
 	}
 
 	@Override
-	public MathObject invert() {
+	public MExpression invert() {
 		tree.insert(tree.getRoot(), new Node<Operator>(Operator.INVERT), Node.LEFT);
 		return this;
 	}
 
 	@Override
-	public MathObject copy() {
+	public MExpression copy() {
 		return new MExpression(tree.copy());
 	}
 

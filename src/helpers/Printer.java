@@ -171,6 +171,8 @@ public class Printer {
 			case ELEMENT:
 				s += printNodeLatex(n.left()) + "_{" + printNodeLatex(n.right()) + "}";
 				break;
+			case CONJUGATE:
+				s += printNodeLatex(n.left()) + "^*";
 			default:
 				break;
 			}
@@ -330,6 +332,12 @@ public class Printer {
 				break;
 			case ELEMENT:
 				s += nodeToText(n.left()) + "[" + nodeToText(n.right()) + "]";
+				break;
+			case CONJUGATE:
+				if(n.left().isInternal())
+					s += "&(" +nodeToText(n.left()) + ")";
+				else
+					s += "&" + nodeToText(n.left());
 				break;
 			default:
 				break;

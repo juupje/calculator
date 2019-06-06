@@ -5,6 +5,7 @@ import helpers.Shape;
 import helpers.Tools;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
+import main.Operator;
 import mathobjects.MComplex;
 import mathobjects.MConst;
 import mathobjects.MMatrix;
@@ -175,6 +176,17 @@ public class Functions {
 			@Override
 			public MReal evaluate(MathObject m) {
 				return fact(m);
+			}
+		},
+		CONJ {
+			@Override
+			public MathObject evaluate(MathObject m) {
+				return conj(m);
+			}
+			
+			@Override
+			public Shape shape(Shape s) {
+				return s.copy();
 			}
 		},
 		DET {
@@ -667,6 +679,10 @@ public class Functions {
 		if (m instanceof MScalar && n instanceof MScalar)
 			return ((MScalar) m.copy()).power(((MScalar) n).invert());
 		throw new InvalidOperationException("The root is not defined for " + m.getClass());
+	}
+	
+	public static MathObject conj(MathObject m) {
+		return Operator.CONJUGATE.evaluate(m);
 	}
 
 	/**
