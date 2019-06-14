@@ -95,7 +95,6 @@ public abstract class MScalar implements MathObject {
 	
 	public abstract boolean isNaN();
 	
-	
 	/**
 	 * @return {@code Printer.numToString(this);}
 	 * @see Printer#numToString(MScalar)

@@ -388,11 +388,11 @@
             "value": "1.38064852e-23 (J/K)"
         },
         "_sigma": {
-            "name": "Physical constant c: Stefan-Boltzmann constant.",
+            "name": "Physical constant sigma: Stefan-Boltzmann constant.",
             "value": "5.670367e-8 (W/(m^2 K^4))"
         },
         "_wien": {
-            "name": "Physical constant c: Wien's displacement contant.",
+            "name": "Physical constant b: Wien's displacement contant.",
             "value": "0.0028977729 (m K)"
         },
         "_Ry": {

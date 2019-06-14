@@ -39,8 +39,13 @@ public class Helper {
 						jobj = json.getJSONObject("settings").getJSONObject(command);
 						type = "setting";
 					} catch(JSONException e4) {
-						Calculator.ioHandler.err("No known help page for " + command + ", type list for a list of commands/functions/algorithms");
-						return;
+						try {
+							jobj = json.getJSONObject("constants").getJSONObject(command);
+							type = "constant";
+						} catch(JSONException e5) {							
+							Calculator.ioHandler.err("No known help page for " + command + ", type list for a list of commands/functions/algorithms/settings/constants");
+							return;
+						}
 					}
 				}
 			}
@@ -51,7 +56,10 @@ public class Helper {
 					+ "\n\tType: " + jobj.getString("type")
 					+ "\n\tDescription: " + jobj.getString("description")
 					+ "\n\tDefault: " + jobj.get("default");
-		else
+		else if(type.equals("constant")) {
+			help += "\tName: " + jobj.getString("name")
+			+ "\n\tValue: " + jobj.getString("value");
+		} else
 			help += "\tSyntax: " + jobj.getString("syntax")
 					+ "\n\tDescription: " + jobj.getString("description")
 					+ "\n\tArguments: " + jobj.getString("arguments")
@@ -67,7 +75,8 @@ public class Helper {
 			list = "Algorithms:\n\t" + Tools.join("\n\t", json.getJSONObject("algorithms").keySet())
 					+ "\n\nFunctions:\n\t" + Tools.join("\n\t", json.getJSONObject("functions").keySet()) 
 					+ "\n\nCommands:\n\t" + Tools.join("\n\t", json.getJSONObject("commands").keySet())
-					+ "\n\nSettings:\n\t" + Tools.join("\n\t", json.getJSONObject("settings").keySet());
+					+ "\n\nSettings:\n\t" + Tools.join("\n\t", json.getJSONObject("settings").keySet())
+					+ "\n\nConstantss:\n\t" + Tools.join("\n\t", json.getJSONObject("constants").keySet());
 		else
 			list = args + ":\n\t" + Tools.join("\n\t", json.getJSONObject(args).keySet());
 		Calculator.ioHandler.out(list);
