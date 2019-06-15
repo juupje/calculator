@@ -540,6 +540,8 @@ public class Printer {
 	 * @return the created String.
 	 */
 	public static String numToString(MScalar scalar) {
+		if(scalar.isNaN())
+			return "NaN";
 		if (scalar.isComplex()) {
 			((MComplex) scalar).fixPhi();
 			if (Setting.getBool(Setting.COMPLEX_IN_POLAR))

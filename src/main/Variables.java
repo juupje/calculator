@@ -20,7 +20,7 @@ public class Variables {
 		if(value instanceof MExpression) {
 			Calculator.dependencyGraph.setConnections(new Variable(key), ((MExpression) value).getDependencies());
 		}
-		vars.put(key, value);
+		vars.put(key.trim(), value);
 	}
 	
 	public static boolean exists(String str) {

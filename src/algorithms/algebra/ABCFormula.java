@@ -35,14 +35,20 @@ public class ABCFormula extends Algorithm {
 		double D = b*b-4*a*c;
 		MathObject[] result = new MathObject[2];
 		if(D>0) {
-			result[0] = new MReal((b+Math.sqrt(D))/(2*a));
+			result[0] = new MReal((-b+Math.sqrt(D))/(2*a));
 			result[1] = new MReal((-b-Math.sqrt(D))/(2*a));
 		} else if(D==0) {
 			result[0]=new MReal(-b/(2*a));
-			result[1]=result[0].copy();
+			result[1]= MReal.NaN();
 		} else {
-			result[0] = new MComplex(-b/(2*a), Math.sqrt(-D));
-			result[1] = new MComplex(-b/(2*a), -Math.sqrt(-D));
+			if(Setting.getBool(Setting.COMPLEX_ENABLED)) {
+				result[0] = new MComplex(-b, Math.sqrt(-D)).divide(2*a);
+				result[1] = new MComplex(-b, -Math.sqrt(-D)).divide(2*a);
+			} else {
+				result[0] = MReal.NaN();
+				result[1] = MReal.NaN();
+			}
+		
 		}
 		if(Setting.getBool(Setting.ABC_SHOW_TEXT)) {
 			Calculator.ioHandler.out("ABC-Formula: a=" + a + ", b=" + b + ", c=" + c + "\n\tD=b^2-4ac="+D+"\n\tx_+="+result[0] + "\n\tx_-=" + result[1]);

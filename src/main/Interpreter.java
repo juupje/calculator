@@ -48,6 +48,8 @@ public class Interpreter {
 
 	private static void assign(String name, String op, String expr)
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
+		name = name.trim();
+		expr = expr.trim();
 		if(!checkNameValidity(name))
 			throw new UnexpectedCharacterException(name + " is not a valid name.");
 		Operator operator = null;

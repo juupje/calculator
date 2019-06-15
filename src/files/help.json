@@ -149,8 +149,7 @@
 			"description": "Calculates the determinant of the argument.",
 			"arguments": "Any real-valued square matrix.",
 			"result": "The determinant of A."
-        },
-        
+        }        
 	},
 	"algorithms": {
 		"derivative": {
