@@ -7,6 +7,7 @@ import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
+import main.Operator;
 import main.Parser;
 import main.Variable;
 import main.Variables;
@@ -268,43 +269,23 @@ public class MFunction extends MExpression {
 		return vars;
 	}
 
-	public MFunction add(MScalar other) {
-		super.add(other);
+	public MFunction add(MathObject other) {
+		addOperation(Operator.ADD, other);
 		return this;
 	}
 
-	public MFunction add(MExpression other) {
-		super.add(other);
+	public MFunction subtract(MathObject other) {
+		addOperation(Operator.SUBTRACT, other);
 		return this;
 	}
 
-	public MFunction subtract(MScalar other) {
-		super.subtract(other);
+	public MFunction multiply(MathObject other) {
+		addOperation(Operator.MULTIPLY, other);
 		return this;
 	}
 
-	public MFunction subtract(MExpression other) {
-		super.subtract(other);
-		return this;
-	}
-
-	public MFunction multiply(MScalar other) {
-		super.multiply(other);
-		return this;
-	}
-
-	public MFunction multiply(MExpression other) {
-		super.multiply(other);
-		return this;
-	}
-
-	public MFunction divide(MScalar other) {
-		super.divide(other);
-		return this;
-	}
-
-	public MFunction divide(MExpression other) {
-		super.divide(other);
+	public MFunction divide(MathObject other) {
+		addOperation(Operator.DIVIDE, other);
 		return this;
 	}
 

@@ -90,6 +90,18 @@ public class MVectorFunction extends MVector {
 	public boolean isDefined() {
 		return defined;
 	}
+	
+	/**
+	 * returns the i-th element of the vector. (Note that the vector starts at index 0).
+	 * @param i the element's index.
+	 * @return the i-the element.
+	 */
+	@Override
+	public MFunction get(int i) {
+		if(i < 0 || i >=size)
+			throw new IndexOutOfBoundsException("You're trying to access component " + i + " of a vector with " + size + " elements.");
+		return (MFunction) v[i];
+	}
 
 	@Override
 	public String toString() {

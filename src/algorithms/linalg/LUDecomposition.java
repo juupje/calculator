@@ -11,12 +11,15 @@ import mathobjects.MathObject;
 public class LUDecomposition extends Algorithm {
 
 	Shape shape;
-	MatrixToolkit mtk;
+	DoubleMatrixToolkit mtk;
 	
 	public LUDecomposition() {}
 	
 	public LUDecomposition(MMatrix m) {
-		mtk = new MatrixToolkit(m);
+		MatrixToolkit<?> tk = MatrixToolkit.getToolkit(m);
+		if(!(tk instanceof DoubleMatrixToolkit))
+			throw new IllegalArgumentException("LU-Decomposition only works for real-values matrices.");
+		mtk = (DoubleMatrixToolkit) tk;
 		shape = new Shape(mtk.rows, mtk.cols);
 		prepared = true;
 	}
@@ -31,8 +34,8 @@ public class LUDecomposition extends Algorithm {
 		int n = mtk.cols;
 		double[][] L = new double[n][n];
 		double[][] U = new double[n][n];
-		double[][] P = mtk.getPivotMatrix();
-		mtk.matrix = MatrixToolkit.multiply(P, mtk.matrix);
+		Double[][] P = mtk.getPivotMatrix();
+		mtk.matrix = DoubleMatrixToolkit.multiply(P, mtk.matrix);
 		for(int col = 0; col < n; col++) {
 			L[col][col]=1;
 			for(int row = 0; row < col+1; row++) {
@@ -49,7 +52,7 @@ public class LUDecomposition extends Algorithm {
 				L[row][col] = (mtk.matrix[row][col] - s)/U[col][col];
 			}
 		}
-		return new MVector(new MMatrix(L), new MMatrix(U), new MMatrix(P));
+		return new MVector(new MMatrix(L), new MMatrix(U), new DoubleMatrixToolkit(P).toMMatrix());
 	}
 	
 	@Override
@@ -61,9 +64,13 @@ public class LUDecomposition extends Algorithm {
 	@Override
 	public void prepare(MathObject[] args) {
 		super.prepare(args);
-		if(args.length == 1 && args[0] instanceof MMatrix)
-			mtk = new MatrixToolkit((MMatrix) args[0]); //no need to copy as the toolkit only works with the double values.
-		else
+		if(args.length == 1 && args[0] instanceof MMatrix) {
+			//no need to copy as the toolkit only works with the double values.
+			MatrixToolkit<?> tk = MatrixToolkit.getToolkit((MMatrix) args[0]);
+			if(!(tk instanceof DoubleMatrixToolkit))
+				throw new IllegalArgumentException("LU-Decomposition only works for real-values matrices.");
+			mtk = (DoubleMatrixToolkit) tk; 
+		}else
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args) + " not applicable for LU-decomposition, see help for correct use.");
 		shape = new Shape(mtk.rows, mtk.cols);
 	}

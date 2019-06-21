@@ -3,29 +3,36 @@ package algorithms.linalg;
 import algorithms.Algorithm;
 import helpers.Shape;
 import helpers.Tools;
+import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
+import helpers.exceptions.TreeException;
+import helpers.exceptions.UnexpectedCharacterException;
+import main.Calculator;
+import main.Operator;
+import main.Parser;
 import mathobjects.MMatrix;
+import mathobjects.MReal;
 import mathobjects.MVector;
 import mathobjects.MathObject;
 
 public class GaussianElimination extends Algorithm {
 
 	Shape shape;
-	MatrixToolkit mtk;
+	MatrixToolkit<?> mtk;
 	
 	public GaussianElimination() {}
 	
 	public GaussianElimination(MMatrix m, MMatrix b) {
 		if(m.shape().rows() != b.shape().rows())
 			throw new ShapeException("Augmented matrix needs to have the same amount of rows as the matrix, got " + m.shape() + " and " + b.shape());
-		mtk = new MatrixToolkit(m.augment(b));
+		mtk = MatrixToolkit.getToolkit(m.augment(b));
 		mtk.setAugmCols(b.shape().cols());
 		shape = new Shape(mtk.rows, mtk.cols);
 		prepared = true;
 	}
 	
 	public GaussianElimination(MMatrix m) {
-		mtk = new MatrixToolkit(m);
+		mtk = MatrixToolkit.getToolkit(m);
 		shape = m.shape();
 		prepared = true;
 	}
@@ -34,20 +41,35 @@ public class GaussianElimination extends Algorithm {
 	public MMatrix execute() {
 		if(!prepared) return null;
 		gauss();
-		return new MMatrix(mtk.matrix);
+		return mtk.toMMatrix();
 	}
 	
 	protected void gauss() {
 		mtk.reorder(mtk.rows);
-		for(int i = 0; i < shape.rows(); i++) {
-			mtk.multiplyRow(i, 1.0/mtk.matrix[i][i]);
-			for(int row = i+1; row < shape.rows(); row++) {
-				if(mtk.matrix[row][i] != 0) {
-					mtk.addToRow(row, i, -mtk.matrix[row][i]);
-					mtk.matrix[row][i] = 0;
+		if(mtk.isReal()) {
+			DoubleMatrixToolkit tk = (DoubleMatrixToolkit) mtk;
+			for(int i = 0; i < shape.rows(); i++) {
+				tk.multiplyRow(i, 1.0/tk.matrix[i][i]);
+				for(int row = i+1; row < shape.rows(); row++) {
+					if(tk.matrix[row][i] != 0) {
+						tk.addToRow(row, i, -tk.matrix[row][i]);
+						tk.matrix[row][i] = 0d;
+					}
 				}
+				tk.reorder(tk.rows);
 			}
-			mtk.reorder(mtk.rows);
+		} else {
+			AlgebraicMatrixToolkit tk = (AlgebraicMatrixToolkit) mtk;
+			for(int i = 0; i < shape.rows(); i++) {
+				tk.multiplyRow(i, Operator.DIVIDE.evaluate(new MReal(1.0), tk.matrix[i][i]));
+				for(int row = i+1; row < shape.rows(); row++) {
+					if(!tk.matrix[row][i].equals(0)) {
+						tk.addToRow(row, i, Operator.NEGATE.evaluate(tk.matrix[row][i]));
+						tk.matrix[row][i] = new MReal(0);
+					}
+				}
+				tk.reorder(tk.rows);
+			}
 		}
 	}
 	
@@ -58,16 +80,26 @@ public class GaussianElimination extends Algorithm {
 	}
 	
 	@Override
+	public MathObject execute(String... args) {
+		try {
+			return execute(Parser.toMathObjects(args));
+		} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
+			Calculator.errorHandler.handle(e);
+			return MReal.NaN();
+		}
+	}
+	
+	@Override
 	public void prepare(MathObject[] args) {
 		super.prepare(args);
 		if(args.length == 2 && args[0] instanceof MMatrix && args[1] instanceof MMatrix) {
-			mtk = new MatrixToolkit(((MMatrix) args[0]).augment((MMatrix) args[1]));
+			mtk = MatrixToolkit.getToolkit(((MMatrix) args[0]).augment((MMatrix) args[1]));
 			mtk.setAugmCols(((MMatrix) args[1]).shape().cols());
 		} else if(args.length == 2 && args[0] instanceof MMatrix && args[1] instanceof MVector) {
-			mtk = new MatrixToolkit(((MMatrix) args[0]).augment((MVector) args[1]));
+			mtk = MatrixToolkit.getToolkit(((MMatrix) args[0]).augment((MVector) args[1]));
 			mtk.setAugmCols(1);
 		} else if(args.length == 1 && args[0] instanceof MMatrix)
-			mtk = new MatrixToolkit((MMatrix) args[0]); //no need to copy as the toolkit only works with the double values.
+			mtk = MatrixToolkit.getToolkit((MMatrix) args[0]); //no need to copy as the toolkit only works with the double values.
 		else
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args) + " not applicable for Gaussian Elimination, see help for correct use.");
 		shape = new Shape(mtk.rows, mtk.cols);

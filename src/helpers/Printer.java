@@ -24,6 +24,7 @@ import mathobjects.MMatrix;
 import mathobjects.MReal;
 import mathobjects.MScalar;
 import mathobjects.MVector;
+import mathobjects.MVectorFunction;
 import mathobjects.MathObject;
 import tree.Node;
 import tree.Tree;
@@ -59,6 +60,18 @@ public class Printer {
 	 * @param node the {@link Node} to be printed.
 	 */
 	private static void printNodeDot(Node<?> node) {
+		if(node.data instanceof MVectorFunction) {
+			MVectorFunction v = (MVectorFunction) node.data;
+			String name = "";
+			for(int i = 0; i < v.size(); i++) {
+				name += i + ", ";
+				writer.println(node.hashCode() + " -> " + i);
+				writer.println(i + " -> " + v.get(i).getTree().getRoot().hashCode());
+				printNodeDot(v.get(i).getTree().getRoot());
+			}
+			writer.println(node.hashCode() + "[label=\"(" + name.substring(0, name.length()-2) + ")\"];");			
+			return;
+		}
 		writer.println(node.hashCode() + "[label=\"" + node.toString() + "\"];");
 		if (node.left() != null) {
 			writer.println(node.hashCode() + " -> " + node.left().hashCode());
@@ -86,7 +99,7 @@ public class Printer {
 			writer.println("node [fontname=\"Arial\"];");
 			if (tree.root == null)
 				writer.println("");
-			else if (!tree.root.isInternal())
+			else if (!tree.root.isInternal() && !(tree.root.data instanceof MVectorFunction))
 				writer.println(tree.root.toString());
 			else
 				printNodeDot(tree.root);

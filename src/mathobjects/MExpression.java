@@ -31,50 +31,28 @@ public class MExpression implements MathObject {
 		}
 	}
 	
-	public MExpression add(MScalar other) {
-		join(Operator.ADD, new Node<MScalar>(other));
+	public MExpression addOperationRight(Operator op, MathObject other) {
+		join(op, new Node<MathObject>(other), Node.RIGHT);
 		return this;
 	}
 	
-	public MExpression add(MExpression other) {
-		join(Operator.ADD, other.getTree().getRoot());
+	public MExpression addOperation(Operator op, MathObject other) {
+		join(op, new Node<MathObject>(other), Node.LEFT);
 		return this;
 	}
 	
-	public MExpression subtract(MScalar other) {
-		join(Operator.SUBTRACT, new Node<MScalar>(other));
+	public MExpression addOperation(Operator op, MExpression other) {
+		join(op, other.getTree().getRoot(), Node.LEFT);
 		return this;
 	}
 	
-	public MExpression subtract(MExpression other) {
-		join(Operator.SUBTRACT, other.getTree().getRoot());
-		return this;
-	}
-	
-	public MExpression multiply(MScalar other) {
-		join(Operator.MULTIPLY, new Node<MScalar>(other));
-		return this;
-	}
-	
-	public MExpression multiply(MExpression other) {
-		join(Operator.MULTIPLY, other.getTree().getRoot());
-		return this;
-	}
-	
-	public MExpression divide(MScalar other) {
-		join(Operator.DIVIDE, new Node<MScalar>(other));
-		return this;
-	}
-	
-	public MExpression divide(MExpression other) {
-		join(Operator.DIVIDE, other.getTree().getRoot());
-		return this;
-	}
-	
-	private void join(Operator op, Node<?> n) {
+	private void join(Operator op, Node<?> n, byte dir) {
 		Node<Operator> node = new Node<Operator>(op);
-		node.right(n);
-		tree.insert(tree.getRoot(), node, Node.LEFT);
+		if(dir == Node.LEFT)
+			node.right(n);
+		else
+			node.left(n);
+		tree.insert(tree.getRoot(), node, dir);
 	}
 	
 	@Override

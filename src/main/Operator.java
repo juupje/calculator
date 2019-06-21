@@ -7,6 +7,7 @@ import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
 import mathobjects.MExpression;
+import mathobjects.MFunction;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
 import mathobjects.MScalar;
@@ -42,13 +43,10 @@ public enum Operator {
 				return b[0];
 			if (b[0] == null)
 				return a;
-			if (a instanceof MExpression) {
-				if (b[0] instanceof MExpression)
-					return ((MExpression) a.copy()).add((MExpression) b[0]);
-				else if (b[0] instanceof MScalar)
-					return ((MExpression) a.copy()).add((MScalar) b[0]);
-			}
-			if (a instanceof MVector) {
+		
+			if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
+			else if (a instanceof MVector) {
 				if (b[0] instanceof MVector)
 					return ((MVector) a.copy()).add((MVector) b[0]);
 				else
@@ -58,8 +56,6 @@ public enum Operator {
 			} else if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).add((MScalar) b[0]);
-				else if (b[0] instanceof MExpression)
-					return ((MExpression) a.copy()).add((MScalar) b[0]);
 				else
 					throw new InvalidOperationException(
 							"Only other scalars can be added to scalars. You're trying to add " + b[0].getClass()
@@ -92,7 +88,9 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only substract exactly two MathObjects, got " + (1 + b.length));
-			if (a instanceof MVector) {
+			if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
+			else if (a instanceof MVector) {
 				if (b[0] instanceof MVector)
 					return ((MVector) a.copy()).subtract((MVector) b[0]);
 				else
@@ -134,7 +132,9 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only multiply exactly two MathObjects, got " + (1 + b.length));
-			if (a instanceof MVector) {
+			if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
+			else if (a instanceof MVector) {
 				if (b[0] instanceof MVector)
 					return ((MVector) a).multiply((MVector) b[0]); // copy is not needed, because MVector.multiply(MVector) doesn't
 																// change either of the MVectors.
@@ -177,7 +177,8 @@ public enum Operator {
 						"You can only cross multiply exactly two vectors, got " + (1 + b.length));
 			if (a instanceof MVector && b[0] instanceof MVector) {
 				return ((MVector) a).cross((MVector) b[0]);
-			}
+			} else if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
 					"CROSS operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
@@ -209,7 +210,8 @@ public enum Operator {
 			} else if (a instanceof MMatrix) {
 				if (b[0] instanceof MScalar)
 					return ((MMatrix) a.copy()).divide((MScalar) b[0]);
-			}
+			} else if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
 					"DIVIDE operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
@@ -236,7 +238,8 @@ public enum Operator {
 					if (((MReal) b[0]).getValue() == -1)
 						return ((MMatrix) a.copy()).invert();
 				// return ((MMatrix) a.copy()).power((MScalar) b[0]);
-			}
+			} else if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
 					"POWER operator is not defined for " + a.getClass() + " and " + b[0].getClass());
 		}
@@ -283,7 +286,7 @@ public enum Operator {
 		
 		@Override
 		public Shape shape(Shape a, Shape... b)  {
-			if(b.length==01)
+			if(b.length==0)
 				return Shape.invert(a);
 			throw new InvalidOperationException("Can only invert one mathobject to  got " + (b.length+1));
 		}
@@ -314,6 +317,8 @@ public enum Operator {
 				return ((MMatrix) a.copy()).transpose();
 			else if(a instanceof MVector)
 				return ((MVector) a.copy()).transpose();
+			else if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, null, this);
 			throw new InvalidOperationException("Can't transpose object " + a.getClass().getSimpleName());
 		}
 
@@ -340,12 +345,8 @@ public enum Operator {
 				return a instanceof MMatrix ? ((MMatrix) a).forEach(f) : ((MVector) a).forEach(f);
 			} else if(a instanceof MScalar)
 				return ((MScalar) a).copy().conjugate();
-			else if(a instanceof MExpression) {
-				MExpression c = ((MExpression)a).copy();
-				Tree tr = ((MExpression) c).getTree();
-				tr.insert(tr.root, new Node<Operator>(CONJUGATE), Node.LEFT);
-				return c;
-			}
+			else if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, null, this);
 			throw new InvalidOperationException("Can't conjugate object " + a.getClass().getSimpleName());
 		}
 
@@ -385,7 +386,8 @@ public enum Operator {
 								"Matrix indices need to be one or two (integer) scalar value(s) (first one may be null/empty), got "
 										+ (b[0] == null ? "null" : b[0].getClass()) + " and " + b[1].getClass());
 				}
-			}
+			}else if(a instanceof MExpression || b[0] instanceof MExpression)
+				return applyOnExpression(a, b[0], this);
 			throw new IllegalArgumentException(
 					"Only matrices and vectors have indexed components, got " + a.getClass());
 		}
@@ -429,4 +431,20 @@ public enum Operator {
 
 	public abstract MathObject evaluate(MathObject a, MathObject... b) ;
 	public abstract Shape shape(Shape a, Shape... b) ;
+	
+	private static MExpression applyOnExpression(MathObject a, MathObject b, Operator op) {
+		if(a instanceof MExpression) {
+			if(b == null) {
+				Tree tr = ((MExpression) a.copy()).getTree();
+				tr.insert(tr.getRoot(), new Node<Operator>(op), Node.LEFT);
+			} else if(b instanceof MFunction) {
+				throw new InvalidOperationException("Can't add expression to function.");
+			} else if(b instanceof MExpression)
+				return ((MExpression) a.copy()).addOperation(op, (MExpression) b);
+			else
+				return ((MExpression) a.copy()).addOperation(op, b);
+		} else if(b instanceof MExpression)
+			return ((MExpression) b.copy()).addOperationRight(op, a);
+		throw new IllegalArgumentException("Something went wrong while processing and operator...");
+	}
 }

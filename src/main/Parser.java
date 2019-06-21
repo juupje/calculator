@@ -198,6 +198,18 @@ public class Parser {
 				if(((Variable) n.data).get() instanceof MFunction)
 					if(consume('('))
 						n.left(new Node<MVector>(getParameters()));
+				if(consume('[')) {
+					MathObject mo = getVector();
+					if(!(mo instanceof MVector)) throw new UnexpectedCharacterException(expr, expr.indexOf(";", pos));
+					MVector v = (MVector) mo;
+					Node<?> m = n;
+					n = new Node<Operator>(ELEMENT);
+					n.left(m);
+					if(v.size() == 1)
+						n.right(new Node<MathObject>(v.get(0)));
+					else
+						n.right(new Node<MVector>(v));
+				}
 				if (!Variables.exists(str))
 					Calculator.ioHandler.err("The variable " + str + " is undefined. Statement was parsed regardless.");
 			}
@@ -226,28 +238,22 @@ public class Parser {
 			return n.right();
 		} else if (consume('*')) {
 			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
-			//n = p;
 			p = p.parent;
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('×') || consume('~')) {
 			tree.insert(p, new Node<Operator>(CROSS), Node.LEFT);
-			//n = p;
 			p = p.parent;
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('/')) {
 			tree.insert(p, new Node<Operator>(DIVIDE), Node.LEFT);
-			n = p;
 			p = p.parent;
-			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('^')) {
 			tree.insert(p, new Node<Operator>(POWER), Node.LEFT);
-			n = p;
 			p = p.parent;
-			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p;
 		} else if(consume('\'')) {
@@ -256,9 +262,7 @@ public class Parser {
 			return p;
 		} else if (!Character.isDigit(ch)) { // Does the same as consume('*')
 			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
-			n = p;
 			p = p.parent;
-			n = new Node<>(p.data);
 			p.right(getFactor());
 			return p.right();
 		} else if (consume('(')) {
@@ -402,8 +406,20 @@ public class Parser {
 	
 	public static MathObject[] toMathObjects(String... s) throws ShapeException, UnexpectedCharacterException, InvalidFunctionException, TreeException {
 		MathObject[] moArgs = new MathObject[s.length];
-		for(int i = 0; i < s.length; i++)
-			moArgs[i] = new Parser(s[i]).evaluate();
+		for(int i = 0; i < s.length; i++) {
+				moArgs[i] = new Parser(s[i]).evaluate();
+		}
+		return moArgs;
+	}
+	
+	public static MathObject[] toMathObjectsKeepVariables(String... s) throws ShapeException, UnexpectedCharacterException, InvalidFunctionException, TreeException {
+		MathObject[] moArgs = new MathObject[s.length];
+		for(int i = 0; i < s.length; i++) {
+			if(Variables.exists(s[i]))
+				moArgs[i] = Variables.get(s[i]);
+			else
+				moArgs[i] = new Parser(s[i]).evaluate();
+		}
 		return moArgs;
 	}
 	

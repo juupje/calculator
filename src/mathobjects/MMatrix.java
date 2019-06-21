@@ -232,7 +232,7 @@ public class MMatrix implements MathObject {
 	 * @return the resulting (m x k)-matrix. @ if the columncount of A does not
 	 * equal the rowcount of B.
 	 */
-	public MathObject multiplyLeft(MMatrix other) {
+	public MMatrix multiplyLeft(MMatrix other) {
 		if (shape.cols() != other.shape().rows())
 			throw new ShapeException("Matrix product is only defined for n x m and m x k Matrices. Shapes: " + shape()
 					+ ", " + other.shape());
@@ -248,7 +248,7 @@ public class MMatrix implements MathObject {
 		return C;
 	}
 
-	public MathObject multiplyRight(MMatrix other) {
+	public MMatrix multiplyRight(MMatrix other) {
 		return other.multiplyLeft(this);
 	}
 
@@ -437,7 +437,7 @@ public class MMatrix implements MathObject {
 	 * @see MathObject#negate()
 	 */
 	@Override
-	public MathObject negate() {
+	public MMatrix negate() {
 		for (MathObject[] row : m)
 			for (MathObject mo : row)
 				mo.negate();
@@ -452,7 +452,7 @@ public class MMatrix implements MathObject {
 	 * @throws InvalidOperationException if the matrix is not square.
 	 */
 	@Override
-	public MathObject invert() {
+	public MMatrix invert() {
 		if (shape.cols() != shape.rows())
 			throw new InvalidOperationException("Only square matrices can be inverted: dimension" + shape);
 		m = new JordanElimination(this, identity(shape.rows())).execute()
@@ -468,7 +468,7 @@ public class MMatrix implements MathObject {
 	 * @throws InvalidOperationException if the matrix is not square.
 	 */
 	@Override
-	public MathObject copy() {
+	public MMatrix copy() {
 		MathObject[][] co = new MathObject[m.length][m[0].length];
 		for (int i = 0; i < m.length; i++)
 			for (int j = 0; j < m[i].length; j++)
@@ -480,7 +480,7 @@ public class MMatrix implements MathObject {
 	 * Evaluates every element in the Matrix
 	 */
 	@Override
-	public MathObject evaluate() {
+	public MMatrix evaluate() {
 		MMatrix copy = (MMatrix) copy();
 		for (MathObject[] row : copy.elements())
 			for (int i = 0; i < row.length; i++)
