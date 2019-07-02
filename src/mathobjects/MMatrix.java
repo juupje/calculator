@@ -420,6 +420,14 @@ public class MMatrix implements MathObject {
 	// TODO method to raise matrix to a integer power. First the algorithm for
 	// Jordan-Normal Form is needed.
 
+	/**
+	 * Applies a function to each element one by one.
+	 * The results are then packed into a new MMatrix, leaving this one unchanged.
+	 * In order to ensure that this matrix does not change, the function should not
+	 * affect its arguments.
+	 * @param f a function which takes a MathObject as its argument and returns another as its result.
+	 * @return the newly created MMatrix of the same shape.
+	 */
 	public MMatrix forEach(Function<MathObject, MathObject> f) {
 		MathObject[][] m2 = new MathObject[m.length][m[0].length];
 		for(int i = 0; i < m2.length; i++)

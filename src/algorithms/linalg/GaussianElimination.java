@@ -3,13 +3,7 @@ package algorithms.linalg;
 import algorithms.Algorithm;
 import helpers.Shape;
 import helpers.Tools;
-import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
-import helpers.exceptions.TreeException;
-import helpers.exceptions.UnexpectedCharacterException;
-import main.Calculator;
-import main.Operator;
-import main.Parser;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
 import mathobjects.MVector;
@@ -59,12 +53,12 @@ public class GaussianElimination extends Algorithm {
 				tk.reorder(tk.rows);
 			}
 		} else {
-			AlgebraicMatrixToolkit tk = (AlgebraicMatrixToolkit) mtk;
+			ScalarMatrixToolkit tk = (ScalarMatrixToolkit) mtk;
 			for(int i = 0; i < shape.rows(); i++) {
-				tk.multiplyRow(i, Operator.DIVIDE.evaluate(new MReal(1.0), tk.matrix[i][i]));
+				tk.multiplyRow(i, new MReal(1.0).divide(tk.matrix[i][i]));
 				for(int row = i+1; row < shape.rows(); row++) {
 					if(!tk.matrix[row][i].equals(0)) {
-						tk.addToRow(row, i, Operator.NEGATE.evaluate(tk.matrix[row][i]));
+						tk.addToRow(row, i, tk.matrix[row][i].copy().negate());
 						tk.matrix[row][i] = new MReal(0);
 					}
 				}
@@ -77,16 +71,6 @@ public class GaussianElimination extends Algorithm {
 	public MMatrix execute(MathObject... args) {
 		prepare(args);
 		return execute();
-	}
-	
-	@Override
-	public MathObject execute(String... args) {
-		try {
-			return execute(Parser.toMathObjects(args));
-		} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
-			Calculator.errorHandler.handle(e);
-			return MReal.NaN();
-		}
 	}
 	
 	@Override

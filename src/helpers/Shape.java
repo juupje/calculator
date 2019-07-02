@@ -165,6 +165,14 @@ public class Shape {
 		return shape[1];
 	}
 	
+	public boolean isSquare() {
+		int i = shape[0];
+		for(int j = 1; j < shape.length; j++)
+			if(shape[j] != i)
+				return false;
+		return true;
+	}
+	
 	@Override
 	public String toString() {
 		return "("+Tools.join(", ", shape)+")";

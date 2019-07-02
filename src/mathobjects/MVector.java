@@ -234,9 +234,12 @@ public class MVector implements MathObject{
 	}
 	
 	/**
-	 * Applies the a function to every element and packs the outputs into a new vector.
-	 * @param f the Function to be applied to this vector element-wise.
-	 * @return the result of the function for each element.
+	 * Applies a function to each element one by one.
+	 * The results are then packed into a new MVector, leaving this one unchanged.
+	 * In order to ensure that this vector does not change, the function should not
+	 * affect its arguments.
+	 * @param f a function which takes a MathObject as its argument and returns another as its result.
+	 * @return the newly created MVector of the same shape.
 	 */
 	public MVector forEach(Function<MathObject, MathObject> f) {
 		MathObject[] v2 = new MathObject[v.length];

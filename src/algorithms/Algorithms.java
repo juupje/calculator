@@ -9,9 +9,13 @@ public enum Algorithms {
 	INTEGRAL(new Integrator()),
 	DERIVATIVE(new Deriver()),
 	GRAD(new Gradient()),
+	
 	REF(new GaussianElimination()),
 	RREF(new JordanElimination()),
 	LU(new LUDecomposition()),
+	DIAG(new Diagonal()),
+	ID(new Identity()),
+	
 	ABC(new ABCFormula()),
 	SIMPLIFY(new Simplifier()),
 	REORDER(new Reorderer()),

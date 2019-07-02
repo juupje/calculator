@@ -1,7 +1,9 @@
 package algorithms.linalg;
 
+import mathobjects.MComplex;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
+import mathobjects.MScalar;
 
 public abstract class MatrixToolkit<T> {
 	T[][] matrix;
@@ -9,20 +11,31 @@ public abstract class MatrixToolkit<T> {
 	
 	public static MatrixToolkit<?> getToolkit(MMatrix m) {
 		boolean allReal = true;
+		boolean complex = true;
 		for(int i = 0; i < m.shape().rows(); i++) {
 			for(int j = 0; j < m.shape().cols(); j++) {
 				if(!(m.get(i, j) instanceof MReal)) {
 					allReal = false;
-					break;
+					if(!(m.get(i, j) instanceof MComplex)) {
+						complex = false;
+						break;
+					}
 				}
 			}
-			if(!allReal)
+			if(!complex)
 				break;
 		}
 		if(allReal)
 			return new DoubleMatrixToolkit(m);
+		else if(complex) {
+			MScalar[][] s = new MScalar[m.shape().rows()][m.shape().cols()];
+			for(int i = 0; i < s.length; i++)
+				for(int j = 0; j < s[i].length; j++)
+					s[i][j] = (MScalar) m.get(i, j);
+			return new ScalarMatrixToolkit(s);
+		}
 		else
-			return new AlgebraicMatrixToolkit(m);
+			throw new IllegalArgumentException("Matrix operations are only supported for scalar valued matrices.");
 	}
 	
 	public void setAugmCols(int cols) {

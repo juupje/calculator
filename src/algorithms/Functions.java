@@ -5,7 +5,6 @@ import helpers.Shape;
 import helpers.Tools;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
-import main.Operator;
 import mathobjects.MComplex;
 import mathobjects.MConst;
 import mathobjects.MMatrix;
@@ -19,189 +18,234 @@ public class Functions {
 	public enum Function {
 		TODEG {
 			@Override
-			public MathObject evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return toDegree(m);
-			}
-
-			@Override
-			public Shape shape(Shape s) {
-				if (s.dim() < 2)
-					return s;
-				throw new ShapeException("Function TODEG is not defined for arguments of shape " + s);
 			}
 		},
 		TORAD {
 			@Override
-			public MathObject evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return toRadians(m);
-			}
-
-			@Override
-			public Shape shape(Shape s) {
-				if (s.dim() < 2)
-					return s;
-				throw new ShapeException("Function TORAD is not defined for arguments of shape " + s);
 			}
 		},
 		SIN {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return sin(m);
 			}
 		},
 		COS {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return cos(m);
 			}
 		},
 		TAN {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return tan(m);
 			}
 		},
 		SINH {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return sinh(m);
 			}
 		},
 		COSH {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return cosh(m);
 			}
 		},
 		TANH {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return tanh(m);
 			}
 		},
 		SIND {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return sind(m);
 			}
 		},
 		COSD {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return cosd(m);
 			}
 		},
 		TAND {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return tand(m);
 			}
 		},
 		ASIN {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return asin(m);
 			}
 		},
 		ACOS {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return acos(m);
 			}
 		},
 		ATAN {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return atan(m);
 			}
 		},
 		ASINH {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return asinh(m);
 			}
 		},
 		ACOSH {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return acosh(m);
 			}
 		},
 		ATANH {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return atanh(m);
 			}
 		},
 		SQRT {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return sqrt(m);
 			}
 		},
 		ABS {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return abs(m);
+			}
+			@Override
+			public MScalar evaluate(MVector v) {
+				return Norm.eucl(v);
+			}
+			@Override
+			public MScalar evaluate(MMatrix m) {
+				return det(m);
+			}
+			@Override
+			public Shape shape(Shape s) {
+				return Shape.SCALAR.copy();
 			}
 		},
 		LN {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return ln(m);
 			}
 		},
 		LOG {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return log(m);
 			}
 		},
 		EXP {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return exp(m);
 			}
 		},
 		ROOT {
 			@Override
-			public MScalar evaluate(MathObject m) {
-				if (m instanceof MVector)
-					return root(((MVector) m).elements()[0], ((MVector) m).elements()[0]);
+			public MScalar evaluate(MScalar m) {
+				throw new IllegalArgumentException(
+						"This method should be called with an MVector, please contact the developer.");
+			}
+			
+			@Override
+			public MScalar evaluate(MVector m) {
+				return root((MScalar) m.elements()[0], (MScalar) m.elements()[1]);
+			}
+			
+			@Override
+			public MMatrix evaluate(MMatrix m) {
 				throw new IllegalArgumentException(
 						"This method should be called with an MVector, please contact the developer.");
 			}
 		},
 		FACT {
 			@Override
-			public MReal evaluate(MathObject m) {
+			public MReal evaluate(MScalar m) {
 				return fact(m);
 			}
 		},
 		CONJ {
 			@Override
-			public MathObject evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
 				return conj(m);
-			}
-			
-			@Override
-			public Shape shape(Shape s) {
-				return s.copy();
 			}
 		},
 		DET {
 			@Override
-			public MScalar evaluate(MathObject m) {
+			public MScalar evaluate(MScalar m) {
+				throw new IllegalArgumentException("DET is not defined for scalars.");
+			}
+			@Override
+			public MScalar evaluate(MVector m) {
+				throw new IllegalArgumentException("DET is not defined for vectors.");
+			}
+			@Override
+			public MScalar evaluate(MMatrix m) {
 				return det(m);
+			}
+			
+			@Override
+			public Shape shape(Shape s) {
+				if(s.dim() == 2 && s.isSquare())
+					return Shape.SCALAR.copy();
+				throw new ShapeException("DET is only defined for square matrices, got shape " + s);
 			}
 		};
 
-		public abstract MathObject evaluate(MathObject m);
-
+		public abstract MScalar evaluate(MScalar s);
+		public MathObject evaluate(MVector v) {
+			Function f = this;
+			return v.copy().forEach(new java.util.function.Function<MathObject, MathObject>() {
+				@Override
+				public MathObject apply(MathObject m) {
+					return f.evaluate(m);
+				}
+			});
+		}
+		public MathObject evaluate(MMatrix m) {
+			Function f = this;
+			return m.copy().forEach(new java.util.function.Function<MathObject, MathObject>() {
+				@Override
+				public MathObject apply(MathObject m) {
+					return f.evaluate(m);
+				}
+			});
+		}
+		
+		public MathObject evaluate(MathObject m) {
+			if(m instanceof MScalar)
+				return evaluate((MScalar) m);
+			else if(m instanceof MVector)
+				return evaluate((MVector) m);
+			else if(m instanceof MMatrix)
+				return evaluate((MMatrix) m);
+			else
+				throw new IllegalArgumentException(name() + " is only defined for scalars, vectors and matrices, got " + m.getClass().getCanonicalName());
+		}
+		
+		
 		public Shape shape(Shape s) {
-			if (s.dim() == 0)
-				return s;
-			throw new ShapeException("Function " + name().toLowerCase() + " not defined for shape " + s);
+			return s.copy();
 		}
 
 		public String toString() {
@@ -221,15 +265,12 @@ public class Functions {
 	 *         give a real result, complex arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar sin(MathObject m) {
+	public static MScalar sin(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.sin(((MReal) m).getValue()));
-		else if (m instanceof MComplex) {
-			MComplex z = (MComplex) m;
-			return new MComplex(Math.sin(z.real()) * Math.cosh(z.imag()),
+		MComplex z = (MComplex) m;
+		return new MComplex(Math.sin(z.real()) * Math.cosh(z.imag()),
 					-1 * Math.cos(z.real()) * Math.sinh(z.imag()));
-		} else
-			throw new InvalidOperationException("Sine is not defined for " + m.getClass());
 	}
 
 	/**
@@ -244,14 +285,11 @@ public class Functions {
 	 *         result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar cos(MathObject m) {
+	public static MScalar cos(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.cos(((MReal) m).getValue()));
-		else if (m instanceof MComplex) {
-			MComplex z = (MComplex) m;
-			return new MComplex(Math.cos(z.real()) * Math.cosh(z.imag()), Math.sin(z.real()) * Math.sinh(z.imag()));
-		} else
-			throw new InvalidOperationException("Cosine is not defined for " + m.getClass());
+		MComplex z = (MComplex) m;
+		return new MComplex(Math.cos(z.real()) * Math.cosh(z.imag()), Math.sin(z.real()) * Math.sinh(z.imag()));
 	}
 
 	/**
@@ -266,15 +304,12 @@ public class Functions {
 	 *         result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar tan(MathObject m) {
+	public static MScalar tan(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.tan(((MReal) m).getValue()));
-		else if (m instanceof MComplex) {
-			MComplex z = (MComplex) m;
-			double d = Math.cos(2 * z.real()) + Math.cosh(2 * z.imag());
-			return new MComplex(Math.sin(2 * z.real()) / d, Math.sinh(2 * z.imag()) / d);
-		} else
-			throw new InvalidOperationException("Tangent is not defined for " + m.getClass());
+		MComplex z = (MComplex) m;
+		double d = Math.cos(2 * z.real()) + Math.cosh(2 * z.imag());
+		return new MComplex(Math.sin(2 * z.real()) / d, Math.sinh(2 * z.imag()) / d);
 	}
 
 	/**
@@ -284,7 +319,7 @@ public class Functions {
 	 * @see #sin(MathObject)
 	 * @see #toDegree(MathObject)
 	 */
-	public static MScalar sind(MathObject m) {
+	public static MScalar sind(MScalar m) {
 		return sin(toRadians(m));
 	}
 
@@ -295,7 +330,7 @@ public class Functions {
 	 * @see #cos(MathObject)
 	 * @see #toDegree(MathObject)
 	 */
-	public static MScalar cosd(MathObject m) {
+	public static MScalar cosd(MScalar m) {
 		return cos(toRadians(m));
 	}
 
@@ -306,7 +341,7 @@ public class Functions {
 	 * @see #tan(MathObject)
 	 * @see #toDegree(MathObject)
 	 */
-	public static MScalar tand(MathObject m) {
+	public static MScalar tand(MScalar m) {
 		return tan(toRadians(m));
 	}
 
@@ -323,12 +358,9 @@ public class Functions {
 	 *         result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar sinh(MathObject m) {
-		if (m instanceof MScalar) {
-			MScalar s = ((MScalar) m).copy();
-			return exp(s).subtract(exp(s.negate())).divide(2);
-		}
-		throw new InvalidOperationException("Hyperbolic sine is not defined for " + m.getClass().getName());
+	public static MScalar sinh(MScalar m) {
+		MScalar s = m.copy();
+		return exp(s).subtract(exp(s.negate())).divide(2);
 	}
 
 	/**
@@ -344,12 +376,9 @@ public class Functions {
 	 *         result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar cosh(MathObject m) {
-		if (m instanceof MScalar) {
-			MScalar s = ((MScalar) m).copy();
-			return exp(s).add(exp(s.negate())).divide(2);
-		}
-		throw new InvalidOperationException("Hyperbolic cosine is not defined for " + m.getClass().getName());
+	public static MScalar cosh(MScalar m) {
+		MScalar s = m.copy();
+		return exp(s).add(exp(s.negate())).divide(2);
 	}
 
 	/**
@@ -365,10 +394,8 @@ public class Functions {
 	 *         result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar tanh(MathObject m) {
-		if (m instanceof MScalar)
-			return sinh(m).divide(cosh(m));
-		throw new InvalidOperationException("Hyperbolic tangent is not defined for " + m.getClass().getName());
+	public static MScalar tanh(MScalar m) {
+		return sinh(m).divide(cosh(m));
 	}
 
 	/**
@@ -388,19 +415,17 @@ public class Functions {
 	 *         result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar asin(MathObject m) {
+	public static MScalar asin(MScalar m) {
 		if (m instanceof MReal) {
 			double val = ((MReal) m).getValue();
 			if (val > 1 || val < -1)
 				throw new IllegalArgumentException("Domain error: arcsin is defined on [-1,1], got " + val);
 			return new MReal(Math.asin(((MReal) m).getValue()));
-		} else if (m instanceof MComplex) {
-			MComplex z = (MComplex) m;
-			MComplex w = z.copy().power(2).negate().add(1);
-			MScalar v = w.power(0.5).add(z.copy().multiply(0, 1));
-			return ((MComplex) ln(v)).multiply(0, -1);
-		} else
-			throw new InvalidOperationException("Arc sine is not defined for " + m.getClass());
+		}
+		MComplex z = (MComplex) m;
+		MComplex w = z.copy().power(2).negate().add(1);
+		MScalar v = w.power(0.5).add(z.copy().multiply(0, 1));
+		return ((MComplex) ln(v)).multiply(0, -1);
 	}
 
 	/**
@@ -419,18 +444,16 @@ public class Functions {
 	 *         a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar acos(MathObject m) {
+	public static MScalar acos(MScalar m) {
 		if (m instanceof MReal) {
 			double val = ((MReal) m).getValue();
 			if (val > 1 || val < -1)
 				throw new IllegalArgumentException("Domain error: arccos is defined on [-1,1], got " + val);
 			return new MReal(Math.acos(((MReal) m).getValue()));
-		} else if (m instanceof MComplex) {
-			MComplex z = (MComplex) m;
-			MComplex w = z.copy().multiply(z).negate().add(1);
-			return ((MComplex) ln(w.power(0.5).multiply(0, 1).add(z))).multiply(0, -1);
-		} else
-			throw new InvalidOperationException("Arc cosine is not defined for " + m.getClass());
+		}
+		MComplex z = (MComplex) m;
+		MComplex w = z.copy().multiply(z).negate().add(1);
+		return ((MComplex) ln(w.power(0.5).multiply(0, 1).add(z))).multiply(0, -1);
 	}
 
 	/**
@@ -445,17 +468,14 @@ public class Functions {
 	 *         a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar atan(MathObject m) {
+	public static MScalar atan(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.atan(((MReal) m).getValue()));
-		else if (m instanceof MComplex) {
-			double a = ((MComplex) m).real();
-			double b = ((MComplex) m).imag();
-			double c = a * a + (b + 1) * (b + 1);
-			return ((MComplex) ln(new MComplex((-a * a - b * b + 1) / c, 2 * a / c))
+		double a = ((MComplex) m).real();
+		double b = ((MComplex) m).imag();
+		double c = a * a + (b + 1) * (b + 1);
+		return ((MComplex) ln(new MComplex((-a * a - b * b + 1) / c, 2 * a / c))
 					.multiply(MConst.i.evaluate().multiply(-0.5)));
-		} else
-			throw new InvalidOperationException("Arc tangent is not defined for " + m.getClass());
 	}
 
 	/**
@@ -471,12 +491,9 @@ public class Functions {
 	 *         a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar asinh(MathObject m) {
-		if (m instanceof MScalar) {
-			MScalar s = ((MScalar) m).copy();
-			return ln(s.add(sqrt(s.copy().multiply(s).add(1))));
-		}
-		throw new InvalidOperationException("Inverse hyperbolic sine is not defined for " + m.getClass().getName());
+	public static MScalar asinh(MScalar m) {
+		MScalar s = m.copy();
+		return ln(s.add(sqrt(s.copy().multiply(s).add(1))));
 	}
 
 	/**
@@ -492,12 +509,9 @@ public class Functions {
 	 *         arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar acosh(MathObject m) {
-		if (m instanceof MScalar) {
-			MScalar s = ((MScalar) m).copy();
-			return ln(s.add(sqrt(s.copy().multiply(s).subtract(1))));
-		}
-		throw new InvalidOperationException("Inverse hyperbolic cosine is not defined for " + m.getClass().getName());
+	public static MScalar acosh(MScalar m) {
+		MScalar s = m.copy();
+		return ln(s.add(sqrt(s.copy().multiply(s).subtract(1))));
 	}
 
 	/**
@@ -513,12 +527,9 @@ public class Functions {
 	 *         arguments give a complex result).
 	 * @throws InvalidOperationException if <tt>m</tt> is not an <tt>MScalar</tt>
 	 */
-	public static MScalar atanh(MathObject m) {
-		if (m instanceof MScalar) {
-			MScalar s = ((MScalar) m).copy();
-			return ln(s.copy().add(1).divide(s.subtract(1).negate())).divide(2);
-		}
-		throw new InvalidOperationException("Inverse hyperbolic tangent is not defined for " + m.getClass().getName());
+	public static MScalar atanh(MScalar m) {
+		MScalar s = m.copy();
+		return ln(s.copy().add(1).divide(s.subtract(1).negate())).divide(2);
 	}
 
 	// ############### CONVERSION FUNCTIONS ###############
@@ -531,16 +542,11 @@ public class Functions {
 	 * @throws InvalidOperationException if the given <tt>MathObject</tt> cannot be
 	 *                                   converted to degrees.
 	 */
-	public static MathObject toDegree(MathObject m) {
+	public static MScalar toDegree(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.toDegrees(((MReal) m).getValue()));
-		else if (m instanceof MVector) {
-			MVector v = (MVector) m.copy();
-			for (MathObject el : v.elements())
-				el = toDegree(el);
-			return v;
-		}
-		throw new InvalidOperationException("Can't convert " + m.getClass() + " to degrees.");
+		else
+			throw new InvalidOperationException("Can't convert " + m.getClass() + " to degrees.");
 	}
 
 	/**
@@ -552,15 +558,9 @@ public class Functions {
 	 * @throws InvalidOperationException if the given <tt>MathObject</tt> cannot be
 	 *                                   converted to radians.
 	 */
-	public static MathObject toRadians(MathObject m) {
+	public static MScalar toRadians(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.toRadians(((MReal) m).getValue()));
-		else if (m instanceof MVector) {
-			MVector v = (MVector) m.copy();
-			for (MathObject el : v.elements())
-				el = toRadians(el);
-			return v;
-		}
 		throw new InvalidOperationException("Can't convert " + m.getClass() + " to degrees.");
 	}
 
@@ -576,12 +576,10 @@ public class Functions {
 	 * @throws InvalidOperationException if the absolute value is not defined for
 	 *                                   the type of <tt>m</tt>.
 	 */
-	public static MReal abs(MathObject m) {
-		if (m instanceof MScalar)
-			return new MReal(((MScalar) m).abs());
-		else if (m instanceof MVector)
-			return Norm.eucl((MVector) m);
-		throw new InvalidOperationException("The absolute value is not defined for " + m.getClass());
+	public static MReal abs(MScalar m) {
+		return new MReal(((MScalar) m).abs());
+		//else if (m instanceof MVector)
+			//return Norm.eucl((MVector) m);
 	}
 
 	/**
@@ -594,13 +592,10 @@ public class Functions {
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#log(double)
 	 */
-	public static MScalar ln(MathObject m) {
+	public static MScalar ln(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.log(((MReal) m).getValue()));
-		else if (m instanceof MComplex) {
-			return new MComplex(Math.log(((MComplex) m).getR()), ((MComplex) m).arg());
-		}
-		throw new InvalidOperationException("The logarithm is not defined for " + m.getClass());
+		return new MComplex(Math.log(((MComplex) m).getR()), ((MComplex) m).arg());
 	}
 
 	/**
@@ -613,12 +608,10 @@ public class Functions {
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#log10(double)
 	 */
-	public static MScalar log(MathObject m) {
+	public static MScalar log(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.log10(((MReal) m).getValue()));
-		else if (m instanceof MComplex)
-			return ((MComplex) ln(m)).divide(Math.log(10));
-		throw new InvalidOperationException("The logarithm is not defined for " + m.getClass());
+		return ((MComplex) ln(m)).divide(Math.log(10));
 	}
 
 	/**
@@ -632,16 +625,14 @@ public class Functions {
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#exp(double)
 	 */
-	public static MScalar exp(MathObject m) {
+	public static MScalar exp(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.exp(((MReal) m).getValue()));
-		else if (m instanceof MComplex) {
-			MComplex z = (MComplex) m;
-			return new MComplex(Math.cos(z.imag()), Math.sin(z.imag())).multiply(Math.exp(z.real()));
-		} else if (m instanceof MMatrix)
-			throw new InvalidOperationException(
-					"The matrix exponential, though defined, has not yet been implemented.");
-		throw new InvalidOperationException("The exponential function is not defined for " + m.getClass().getName());
+		MComplex z = (MComplex) m;
+		return new MComplex(Math.cos(z.imag()), Math.sin(z.imag())).multiply(Math.exp(z.real()));
+//		} else if (m instanceof MMatrix)
+	//		throw new InvalidOperationException(
+		//			"The matrix exponential, though defined, has not yet been implemented.");
 	}
 
 	/**
@@ -654,15 +645,13 @@ public class Functions {
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see Math#sqrt(double)
 	 */
-	public static MScalar sqrt(MathObject m) {
+	public static MScalar sqrt(MScalar m) {
 		if (m instanceof MReal) {
 			if (((MReal) m).getValue() < 0 && (Setting.getBool(Setting.COMPLEX_ENABLED)))
 				return new MComplex(0, Math.sqrt(((MReal) m).getValue() * -1));
 			return new MReal(Math.sqrt(((MReal) m).getValue()));
 		}
-		if (m instanceof MComplex)
-			return ((MComplex) m.copy()).power(0.5);
-		throw new InvalidOperationException("The square root is not defined for " + m.getClass());
+		return ((MComplex) m.copy()).power(0.5);
 	}
 
 	/**
@@ -675,14 +664,12 @@ public class Functions {
 	 * @throws InvalidOperationException if <tt>m</tt> is not a <tt>MScalar</tt>
 	 * @see MScalar#power(double)
 	 */
-	public static MScalar root(MathObject m, MathObject n) {
-		if (m instanceof MScalar && n instanceof MScalar)
-			return ((MScalar) m.copy()).power(((MScalar) n).invert());
-		throw new InvalidOperationException("The root is not defined for " + m.getClass());
+	public static MScalar root(MScalar m, MScalar n) {
+		return ((MScalar) m.copy()).power(((MScalar) n).invert());
 	}
 	
-	public static MathObject conj(MathObject m) {
-		return Operator.CONJUGATE.evaluate(m);
+	public static MScalar conj(MScalar m) {
+		return m.copy().conjugate();
 	}
 
 	/**
@@ -692,7 +679,7 @@ public class Functions {
 	 * @return n! (where n is the value of m).
 	 * @throws IllegalArgumentException if n is not a positive integer value.
 	 */
-	public static MReal fact(MathObject m) {
+	public static MReal fact(MScalar m) {
 		if (m instanceof MReal && ((MReal) m).isInteger()) {
 			int n = (int) ((MReal) m).getValue();
 			return new MReal(Tools.fact(n));
@@ -700,12 +687,12 @@ public class Functions {
 		throw new IllegalArgumentException("Factorial is only defined for integer values, got " + m.toString());
 	}
 
-	public static MScalar det(MathObject m) {
+	public static MScalar det(MMatrix m) {
 		if (m instanceof MMatrix && ((MMatrix) m).isSquare()) {
 			return ((MMatrix) m).det();
 		}
 		throw new IllegalArgumentException(
-				"The determinant is only defined for (square) matrices, got " + m.getClass().getCanonicalName());
+				"The determinant is only defined for (square) matrices, got shape " + m.shape());
 	}
 
 	public static boolean isFunction(String s) {

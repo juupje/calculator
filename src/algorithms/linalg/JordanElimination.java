@@ -1,13 +1,6 @@
 package algorithms.linalg;
 
 import helpers.Shape;
-import helpers.exceptions.InvalidFunctionException;
-import helpers.exceptions.ShapeException;
-import helpers.exceptions.TreeException;
-import helpers.exceptions.UnexpectedCharacterException;
-import main.Calculator;
-import main.Operator;
-import main.Parser;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
 import mathobjects.MVector;
@@ -33,25 +26,15 @@ public class JordanElimination extends GaussianElimination {
 				}
 			}
 		} else {
-			AlgebraicMatrixToolkit tk = (AlgebraicMatrixToolkit) mtk;
+			ScalarMatrixToolkit tk = (ScalarMatrixToolkit) mtk;
 			for(int j = tk.cols - tk.augmcols-1; j>0; j--) {
 				for(int i = j-1; i>=0; i--) {
-					tk.addToRow(i, j, Operator.NEGATE.evaluate(tk.matrix[i][j]));
+					tk.addToRow(i, j, tk.matrix[i][j].negate());
 					tk.matrix[i][j] = new MReal(0);
 				}
 			}
 		}
 		return mtk.toMMatrix();
-	}
-	
-	@Override
-	public MathObject execute(String... args) {
-		try {
-			return execute(Parser.toMathObjects(args));
-		} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException e) {
-			Calculator.errorHandler.handle(e);
-			return MReal.NaN();
-		}
 	}
 	
 	@Override

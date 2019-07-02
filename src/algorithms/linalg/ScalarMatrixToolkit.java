@@ -1,20 +1,13 @@
 package algorithms.linalg;
 
 import helpers.exceptions.ShapeException;
-import main.Operator;
 import mathobjects.MMatrix;
-import mathobjects.MathObject;
+import mathobjects.MScalar;
 
-public class AlgebraicMatrixToolkit extends MatrixToolkit<MathObject> {
+public class ScalarMatrixToolkit extends MatrixToolkit<MScalar> {
 	
-	public AlgebraicMatrixToolkit(MathObject[][] matrix) {
+	public ScalarMatrixToolkit(MScalar[][] matrix) {
 		this.matrix = matrix;
-		rows = matrix.length;
-		cols = matrix[0].length;
-	}
-	
-	public AlgebraicMatrixToolkit(MMatrix m) {
-		matrix = m.copy().elements();
 		rows = matrix.length;
 		cols = matrix[0].length;
 	}
@@ -24,12 +17,12 @@ public class AlgebraicMatrixToolkit extends MatrixToolkit<MathObject> {
 	 * <tt>M_nj -> M_nj+c*M_ij   with   j=1....m</tt>
 	 * @param n the index of the row to which the <tt>i</tt>-th row will be added.
 	 * @param i the row to be added to the <tt>n</tt>-th row
-	 * @param c a constant with which the i-th row will be multiplied before being added to the <tt>n</tt>-th row.
+	 * @param c a constant with which the i-th row will be multiplied before being added to the <tt>n</tt>-th row. Left unchanged.
 	 */
 	@Override
-	public void addToRow(int n, int i, MathObject c) { 
+	public void addToRow(int n, int i, MScalar c) { 
 		for(int j = 0; j < matrix[n].length; j++)
-			matrix[n][j] = Operator.ADD.evaluate(Operator.MULTIPLY.evaluate(c, matrix[i][j]));
+			matrix[n][j].add(c.copy().multiply(matrix[i][j]));
 	}
 	
 	/**
@@ -38,9 +31,9 @@ public class AlgebraicMatrixToolkit extends MatrixToolkit<MathObject> {
 	 * @param c the value with which the row will be multiplied.
 	 */
 	@Override
-	public void multiplyRow(int n, MathObject c) {
+	public void multiplyRow(int n, MScalar c) {
 		for(int j = 0; j < matrix[n].length; j++)
-			matrix[n][j] = Operator.MULTIPLY.evaluate(matrix[n][j], c);
+			matrix[n][j].multiply(c);
 	}
 	
 	/**
@@ -50,16 +43,16 @@ public class AlgebraicMatrixToolkit extends MatrixToolkit<MathObject> {
 	 * @param M
 	 */
 	@Override
-	public void multiply(MathObject[][] M) {
+	public void multiply(MScalar[][] M) {
 		if(cols != M.length)
 			throw new ShapeException("Can't multiply matrices of size ("
 					+ rows + "x" + cols + ") and (" + M.length + "x" + M[0].length + ")");
-		MathObject[][] result = new MathObject[rows][M[0].length];
+		MScalar[][] result = new MScalar[rows][M[0].length];
 		for(int i = 0; i < result.length; i++) {
 			for(int j = 0; j < result[0].length; j++) {
 				result[i][j] = null;
 				for(int k = 0; k < cols; k++)
-					result[i][j] = Operator.ADD.evaluate(result[i][j], Operator.MULTIPLY.evaluate(matrix[i][k],M[k][j]));
+					result[i][j].add(matrix[i][k].copy().multiply(M[k][j]));
 			}
 		}
 		rows = result.length;

@@ -322,7 +322,7 @@ public class Parser {
 		} else if(consume('[')) {
 			d = getVector().evaluate();
 		} else if (consume('|')) {
-			d = Functions.abs(processExpression());
+			d = Functions.Function.ABS.evaluate(processExpression());
 			consume('|');
 		} else if ((ch >= '0' && ch <= '9') || ch == '.') {// number
 			while ((ch >= '0' && ch <= '9') || ch == '.')
@@ -365,7 +365,9 @@ public class Parser {
 				d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
 				if(Functions.isFunction(letters)) {
-					d = processFactor(); // Gets the factor inside the function
+					if(!consume('('))
+						throw new UnexpectedCharacterException("Expected '(' after a function name instead of '" + (char) ch + "'.");
+					d = new Parser(findEndOfBrackets()).evaluate(); // Gets the factor inside the function
 					d = Functions.getFunction(letters).evaluate(d);
 				} else if(letters.equals("inv"))
 					d = processFactor().invert();
@@ -407,17 +409,6 @@ public class Parser {
 	public static MathObject[] toMathObjects(String... s) throws ShapeException, UnexpectedCharacterException, InvalidFunctionException, TreeException {
 		MathObject[] moArgs = new MathObject[s.length];
 		for(int i = 0; i < s.length; i++) {
-				moArgs[i] = new Parser(s[i]).evaluate();
-		}
-		return moArgs;
-	}
-	
-	public static MathObject[] toMathObjectsKeepVariables(String... s) throws ShapeException, UnexpectedCharacterException, InvalidFunctionException, TreeException {
-		MathObject[] moArgs = new MathObject[s.length];
-		for(int i = 0; i < s.length; i++) {
-			if(Variables.exists(s[i]))
-				moArgs[i] = Variables.get(s[i]);
-			else
 				moArgs[i] = new Parser(s[i]).evaluate();
 		}
 		return moArgs;
