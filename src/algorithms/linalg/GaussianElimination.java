@@ -38,12 +38,14 @@ public class GaussianElimination extends Algorithm {
 		return mtk.toMMatrix();
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	protected void gauss() {
 		mtk.reorder(mtk.rows);
 		if(mtk.isReal()) {
 			DoubleMatrixToolkit tk = (DoubleMatrixToolkit) mtk;
 			for(int i = 0; i < shape.rows(); i++) {
-				tk.multiplyRow(i, 1.0/tk.matrix[i][i]);
+				if(tk.matrix[i][i]!=0 && tk.matrix[i][i] != 1)
+					tk.multiplyRow(i, 1.0/tk.matrix[i][i]);
 				for(int row = i+1; row < shape.rows(); row++) {
 					if(tk.matrix[row][i] != 0) {
 						tk.addToRow(row, i, -tk.matrix[row][i]);
@@ -55,7 +57,8 @@ public class GaussianElimination extends Algorithm {
 		} else {
 			ScalarMatrixToolkit tk = (ScalarMatrixToolkit) mtk;
 			for(int i = 0; i < shape.rows(); i++) {
-				tk.multiplyRow(i, new MReal(1.0).divide(tk.matrix[i][i]));
+				if(!tk.matrix[i][i].equals(0) && !tk.matrix[i][i].equals(1))
+					tk.multiplyRow(i, new MReal(1.0).divide(tk.matrix[i][i]));
 				for(int row = i+1; row < shape.rows(); row++) {
 					if(!tk.matrix[row][i].equals(0)) {
 						tk.addToRow(row, i, tk.matrix[row][i].copy().negate());

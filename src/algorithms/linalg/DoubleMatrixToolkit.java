@@ -23,9 +23,11 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	}
 	
 	public DoubleMatrixToolkit(MMatrix m) {
-		matrix = new Double[m.shape().rows()][m.shape().cols()];
-		for(int i = 0; i < m.shape().rows(); i++) {
-			for(int j = 0; j < m.shape().cols(); j++) {
+		rows = m.shape().rows();
+		cols = m.shape().cols();
+		matrix = new Double[rows][cols];
+		for(int i = 0; i < rows; i++) {
+			for(int j = 0; j < cols; j++) {
 				if(m.get(i, j) instanceof MReal)
 					matrix[i][j] = ((MReal) m.get(i, j)).getValue();
 				else if(m.get(i, j) instanceof MExpression)
@@ -34,8 +36,6 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 					throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + m.getClass());
 			}
 		}
-		rows = matrix.length;
-		cols = matrix[0].length;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		int prevZeros = 0, curZeros = 0;
 		for(int i = 0; i < maxRow; i++) {
 			int j = curZeros = 0;
-			while(matrix[i][j] == 0 && j < cols-augmcols) { j++; curZeros++;}
+			while(j < cols-augmcols && matrix[i][j] == 0) { j++; curZeros++;}
 			if(curZeros < prevZeros)
 				switchRows(i, i-1);
 			else
@@ -143,6 +143,17 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	@Override
 	public boolean isReal() {
 		return true;
+	}
+	
+	/**
+	 * Checks if the matrix is hermitian. This means that the matrix equals its conjugated transpose.
+	 * As this matrix consists only of doubles, this means that the matrix is hermitian iff its symmetric.
+	 * @param mask the mask integer holding (at least) the flag SYMMETRIC.
+	 * @return {@code true} if the flag SYMMETRIC is on, {@code false} otherwise.
+	 */
+	@Override
+	public boolean isHermitian(int mask) {
+		return (mask & SYMMETRIC) == SYMMETRIC;
 	}
 	
 	/**

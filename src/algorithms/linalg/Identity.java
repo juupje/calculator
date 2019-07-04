@@ -12,16 +12,7 @@ public class Identity extends Algorithm {
 	
 	@Override
 	public MathObject execute() {
-		MMatrix m = new MMatrix(new Shape(size, size));
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				if (j == i)
-					m.set(i, j, new MReal(1));
-				else
-					m.set(i, j, new MReal(0));
-			}
-		}
-		return m;
+		return MMatrix.identity(size);
 	}
 
 	@Override

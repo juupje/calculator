@@ -234,10 +234,14 @@ public enum Operator {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).power((MScalar) b[0]);
 			} else if (a instanceof MMatrix) {
-				if (b[0] instanceof MReal)
+				if (b[0] instanceof MReal) {
 					if (((MReal) b[0]).getValue() == -1)
 						return ((MMatrix) a.copy()).invert();
-				// return ((MMatrix) a.copy()).power((MScalar) b[0]);
+					else if(((MReal) b[0]).isInteger())
+						return ((MMatrix) a).pow((int) ((MReal) b[0]).getValue());
+					else
+						throw new InvalidOperationException("Matrices can only be raised to integer powers, got " + b[0]);
+				}
 			} else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(

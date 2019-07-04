@@ -560,15 +560,15 @@ public class Printer {
 			if (Setting.getBool(Setting.COMPLEX_IN_POLAR))
 				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
 			else {
-				String stra = numToString(((MComplex) scalar).real());
-				String strb = numToString(((MComplex) scalar).imag());
+				String stra = numToString(scalar.real());
+				String strb = numToString(scalar.imag());
 				if(stra.equals("0") && strb.equals("0"))
 					return "0";
 				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
 						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "í" : "");
 			}
 		}
-		return numToString(((MReal) scalar).getValue());
+		return numToString(scalar.real());
 	}
 
 	/**

@@ -2,6 +2,7 @@ package main;
 
 import java.io.File;
 
+import algorithms.linalg.MatrixToolkit;
 import helpers.Helper;
 import helpers.Printer;
 import helpers.Setting;
@@ -11,6 +12,7 @@ import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
+import mathobjects.MMatrix;
 import mathobjects.MathObject;
 
 public enum Command {
@@ -94,7 +96,14 @@ public enum Command {
 	TYPE {
 		@Override
 		public void process(String args) {
-			Calculator.ioHandler.out(Variables.get(args).getClass().getName());
+			MathObject mo = Variables.get(args);
+			if(mo == null)
+				throw new IllegalArgumentException("There exists no variable with the name " + args);
+			if(mo instanceof MMatrix) {
+				MatrixToolkit<?> mtk = MatrixToolkit.getToolkit((MMatrix) mo);
+				Calculator.ioHandler.out(mo.getClass().getSimpleName() + "\nThis matrix is" + mtk.maskAsString(mtk.classify()));
+			} else
+				Calculator.ioHandler.out(mo.getClass().getSimpleName());
 		}
 	};
 

@@ -1,10 +1,12 @@
 package main;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import mathobjects.MExpression;
 import mathobjects.MathObject;
 public class Variables {
 	private static HashMap<String, MathObject> vars = new HashMap<String, MathObject>();
+	private static ArrayList<MathObject> ans = new ArrayList<>();
 	
 	/**
 	 * Returns the variable with the given name from the map, or {@code null} if no mapping with such name exists.
@@ -32,11 +34,17 @@ public class Variables {
 	}
 	
 	public static void ans(MathObject mo) {
-		vars.put("ans", mo);
+		ans.add(mo);
 	}
 	
 	public static MathObject ans() {
-		return get("ans");
+		return ans.get(ans.size()-1);
+	}
+	
+	public static MathObject ans(int i) {
+		if(i<=0)
+			return ans.get(ans.size()+i-1);
+		return ans.get(i-1);
 	}
 
 	public static HashMap<String, MathObject> getAll() {

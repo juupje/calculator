@@ -411,14 +411,49 @@ public class MMatrix implements MathObject {
 			throw new ShapeException("Determinant is only defined for square matrices. Shape: " + shape);
 		//Decompose the matrix into LU decomposition and use Det(A)=Det(PLU)=Det(P)Det(L)Det(U)=Det(L)Det(U)
 		MVector lup = new LUDecomposition(this).execute();
+		MMatrix L = (MMatrix) lup.get(0);
+		MMatrix U = (MMatrix) lup.get(1);
 		MReal det = new MReal(1);
-		for(int i = 0; i < ((MMatrix) lup.get(0)).shape.rows(); i++) {
-			det.multiply(((MScalar) ((MMatrix) lup.get(0)).get(i, i))).multiply(((MScalar) ((MMatrix) lup.get(1)).get(i, i)));
+		for(int i = 0; i < L.shape.rows(); i++) {
+			det.multiply(((MScalar) L.get(i, i))).multiply(((MScalar) U.get(i, i)));
 		}
 		return det;	
 	}
-	// TODO method to raise matrix to a integer power. First the algorithm for
-	// Jordan-Normal Form is needed.
+	
+	public MMatrix pow(int i) {
+		if(!isSquare())
+			throw new ShapeException("Only square matrices can raised to a power, shape: " + shape);
+		if(i<0)
+			return power(-i).invert();
+		return power(i);
+	}
+	
+	private MMatrix power(int i) {
+		if(i==1) return copy();
+		if(i==0) return identity(shape.rows());
+		int a = (int) Math.floor(Math.log(i)/Math.log(2)+1);
+		boolean[] bits = new boolean[a];
+		for(int j = a-1; j>=0; j--)
+			bits[j] = (i & (1<<j)) != 0;
+		MMatrix B = this;
+		MMatrix result = bits[0] ? B : identity(shape.rows());
+		for(int j = 1; j < a; j++) {
+			B = B.multiplyLeft(B);
+			if(bits[j]) result = result.multiplyLeft(B);
+		}
+		
+		/*if(i%2!=0) {
+			odd = true;
+			i-=1;
+		}
+		MMatrix B = this;
+		while(i>1) {
+			B = B.multiplyLeft(B);
+			i/=2;
+		}
+		if(odd) return B.multiplyLeft(this);*/
+		return result;
+	}
 
 	/**
 	 * Applies a function to each element one by one.

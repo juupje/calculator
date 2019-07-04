@@ -360,9 +360,13 @@ public class Parser {
 			} else if (MConst.isConstant(letters))
 				d = MConst.get(letters).evaluate();
 			else if(Algorithms.isAlgorithm(letters)) {
-				if(!consume('('))
-					throw new UnexpectedCharacterException("Expected '(' after a algorithm name instead of '" + (char) ch + "'.");
-				d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
+				if(!consume('(')) {
+					if(letters.equals("ans"))
+						d = Variables.ans();
+					else
+						throw new UnexpectedCharacterException("Expected '(' after a algorithm name instead of '" + (char) ch + "'.");
+				} else
+					d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
 				if(Functions.isFunction(letters)) {
 					if(!consume('('))
@@ -392,6 +396,7 @@ public class Parser {
 	
 	public String findEndOfBrackets() throws UnexpectedCharacterException {
 		int count = 1, position = pos;
+		count += (ch == '(' || ch == '{' || ch == '[' ? 1 : (ch == ')' || ch == '}' || ch == ']' ? -1 : 0));
 		while(count > 0) {
 			nextChar();
 			if(ch == -1)

@@ -67,7 +67,29 @@ public class ScalarMatrixToolkit extends MatrixToolkit<MScalar> {
 	
 	@Override
 	public boolean isReal() {
-		return false;
+		for(int i = 0; i<rows; i++)
+			for(int j = 0; j < cols; j++)
+				if(matrix[i][j].isComplex()) return false;
+		return true;
+	}
+	
+	/**
+	 * Checks if the matrix is hermitian. This means that the matrix equals its conjugated transpose.
+	 * If the matrix is real and symmetric, it is also hermitian (this is not valid the other way around).
+	 * @param mask the mask integer holding (at least) the flags REAL and SYMMETRIC.
+	 * @return {@code true} if A_ij=A_ji* for every element A_ij in the matrix, {@code false} otherwise.
+	 */
+	@Override
+	public boolean isHermitian(int mask) {
+		if((mask & REAL) == REAL)
+			return (mask & SYMMETRIC) == SYMMETRIC;
+		for(int i = 0; i < rows; i++) {
+			if(matrix[i][i].isComplex()) return false;
+			for(int j = i+1; j<cols; j++)
+				if(!matrix[i][j].equals(matrix[j][i].copy().conjugate()))
+					return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -77,13 +99,14 @@ public class ScalarMatrixToolkit extends MatrixToolkit<MScalar> {
 	 * @author Siemen Geurts
 	 * @param maxRow the row at which the reordering stops (used for the recursion. To reorder the whole matrix, set <tt>maxRow=matrix.rows-1</tt>)
 	 */
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public void reorder(int maxRow) {
 		if(maxRow == 0) return;
 		int prevZeros = 0, curZeros = 0;
 		for(int i = 0; i < maxRow; i++) {
 			int j = curZeros = 0;
-			while(matrix[i][j].equals(0) && j < cols-augmcols) { j++; curZeros++;}
+			while(j < cols-augmcols && matrix[i][j].equals(0)) { j++; curZeros++;}
 			if(curZeros < prevZeros)
 				switchRows(i, i-1);
 			else

@@ -15,11 +15,13 @@ public enum Algorithms {
 	LU(new LUDecomposition()),
 	DIAG(new Diagonal()),
 	ID(new Identity()),
+	TRACE(new Trace()),
 	
 	ABC(new ABCFormula()),
 	SIMPLIFY(new Simplifier()),
 	REORDER(new Reorderer()),
-	COM(new Commutator());
+	COM(new Commutator()),
+	ANS(new Ans());
 	
 	Algorithm a;
 	Algorithms(Algorithm a) {

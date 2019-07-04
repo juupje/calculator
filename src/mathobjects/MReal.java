@@ -11,6 +11,16 @@ public class MReal extends MScalar {
 		value = d;
 	}
 	
+	@Override
+	public double real() { 
+		return value;
+	}
+	
+	@Override
+	public double imag() {
+		return 0d;
+	}
+	
 	/**
 	 * Adds the value of the given {@code MScalar} to the value of this one.
 	 * @param other the {@code MScalar} containing the value to be added.
@@ -19,7 +29,7 @@ public class MReal extends MScalar {
 	public MScalar add(MScalar other) {
 		if(other.isComplex())
 			return new MComplex(this).add(other);
-		value += ((MReal) other).getValue();
+		value += other.real();
 		return this;
 	}
 	
@@ -42,7 +52,7 @@ public class MReal extends MScalar {
 	public MScalar subtract(MScalar other) {
 		if(other.isComplex())
 			return new MComplex(this).subtract(other);
-		value -= ((MReal) other).getValue();
+		value -= other.real();
 		return this;
 	}
 	
@@ -64,7 +74,7 @@ public class MReal extends MScalar {
 	public MScalar multiply(MScalar other) {
 		if(other.isComplex())
 			return new MComplex(this).multiply(other);
-		value *= ((MReal) other).getValue();
+		value *= other.real();
 		return this;
 	}
 	
@@ -87,7 +97,7 @@ public class MReal extends MScalar {
 		if(other.isComplex())
 			return new MComplex(this).divide(other);
 		else
-			value /= ((MReal) other).getValue();
+			value /= other.real();
 		return this;
 	}
 	

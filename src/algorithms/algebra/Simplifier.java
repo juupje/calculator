@@ -172,7 +172,7 @@ public class Simplifier extends Algorithm {
 		else if(args[0] instanceof MExpression)
 			expr = (MExpression) args[0];
 		else 
-			throw new IllegalArgumentException("First argument needs to be a function or an expression, got " + args[0].getClass().getName());
+			throw new IllegalArgumentException("First argument needs to be a function or an expression, got " + args[0].getClass().getSimpleName());
 		prepared = true;
 		
 	}

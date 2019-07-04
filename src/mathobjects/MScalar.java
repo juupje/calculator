@@ -6,6 +6,20 @@ import helpers.Shape;
 public abstract class MScalar implements MathObject {
 	
 	/**
+	 * returns the real component of the complex number.
+	 * This recalculates the Cartesian form.
+	 * @return {@code Re(z)}, where z is this number.
+	 */
+	public abstract double real();
+	
+	/**
+	 * Returns the imaginary component of this number.
+	 * This recalculates the Cartesian form.
+	 * @return {@code Im(z)}, where z is this number.
+	 */
+	public abstract double imag();
+	
+	/**
 	 * Adds the value of the given {@code MScalar} to the value of this one.
 	 * @param other the {@code MScalar} containing the value to be added.
 	 * @return {@code this}

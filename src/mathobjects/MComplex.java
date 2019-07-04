@@ -37,11 +37,7 @@ public class MComplex extends MScalar {
 		cartesian = polar = true;
 	}
 	
-	/**
-	 * returns the real component of the complex number.
-	 * This recalculates the Cartesian form.
-	 * @return {@code Re(z)}, where z is this number.
-	 */
+	@Override
 	public double real() {
 		if(!cartesian)
 			updateCartesian();
@@ -61,11 +57,7 @@ public class MComplex extends MScalar {
 		polar = false;
 	}
 
-	/**
-	 * Returns the imaginary component of this number.
-	 * This recalculates the Cartesian form.
-	 * @return {@code Im(z)}, where z is this number.
-	 */
+	@Override
 	public double imag() {
 		if(!cartesian)
 			updateCartesian();
@@ -225,11 +217,8 @@ public class MComplex extends MScalar {
 	public MComplex subtract(MScalar other) {
 		if(!cartesian)
 			updateCartesian();
-		if(other.isComplex()) {
-			a -= ((MComplex) other).real();
-			b -= ((MComplex) other).imag();
-		} else
-			a -= ((MReal) other).getValue();
+		a -= other.real();
+		b -= other.imag();
 		polar = polar && other.equals(0);
 		return this;
 	}
@@ -263,18 +252,18 @@ public class MComplex extends MScalar {
 				phi += ((MComplex) other).arg();
 				fixPhi();
 			} else
-				r*= ((MReal) other).getValue();
+				r*= other.real();
 			cartesian = false;
 		} else {
 			if(other.isComplex()) {
-				double c = ((MComplex) other).real();
-				double d = ((MComplex) other).imag();
+				double c = other.real();
+				double d = other.imag();
 				double old_A = a;
 				a = a*c-b*d;
 				b = c*b+old_A*d;
 			} else {
-				a *= ((MReal) other).getValue();
-				b *= ((MReal) other).getValue();
+				a *= other.real();
+				b *= other.real();
 			}
 			polar = false;
 		}
@@ -331,19 +320,19 @@ public class MComplex extends MScalar {
 				phi -= ((MComplex) other).arg();
 				fixPhi();
 			} else
-				r /= ((MReal) other).getValue();
+				r /= other.real();
 			cartesian = false;
 		} else {
 			if(other.isComplex()) {
-				double c = ((MComplex) other).real();
-				double d = ((MComplex) other).imag();
+				double c = other.real();
+				double d = other.imag();
 				double r = ((MComplex) other).getR();
 				double oldA = a;
 				a = (a*c+b*d)/(r*r);
 				b = (b*c-oldA*d)/(r*r);
 			} else {
-				a /= ((MReal) other).getValue();
-				b /= ((MReal) other).getValue();
+				a /= other.real();
+				b /= other.real();
 			}
 			polar = false;
 		}
@@ -387,11 +376,11 @@ public class MComplex extends MScalar {
 			if(!polar)
 				updatePolar();
 			MComplex z = (MComplex) new MReal(r).power(other);
-			z.multiply(Math.exp(-((MComplex) other).imag()*phi)).multiply(fromPolar(1, phi*((MComplex) other).real()));
+			z.multiply(Math.exp(-other.imag()*phi)).multiply(fromPolar(1, phi*other.real()));
 			r = z.getR();
 			phi = z.arg();
 		} else
-			return power(((MReal) other).getValue());
+			return power(other.real());
 		return null;
 	}
 
@@ -427,11 +416,12 @@ public class MComplex extends MScalar {
 
 	/**
 	 * Returns a boolean indicating if this number is complex.
-	 * @return true
+	 * @return In the Cartesian form, {@code false} is returned if {@code b==0} or {@code true} otherwise.
+	 * In the polar form, {@code false} is returned if {@code phi==0} or {@code phi==pi} or {@code true} otherwise.
 	 */
 	@Override
 	public boolean isComplex() {
-		return true;
+		return cartesian ? b!=0 : phi!=0 && phi != Math.PI;
 	}
 	
 	/**

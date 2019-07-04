@@ -60,7 +60,7 @@ public class Divergence extends Algorithm {
 			throw new IllegalArgumentException("Expected one or two arguments, got " + args.length + ". see 'help div' for more help.");
 		MathObject obj  = Variables.get(args[0]);
 		if(obj == null || !(obj instanceof MFunction))
-			throw new IllegalArgumentException("First argument needs to be a function, got " + (obj==null ? args[0] : obj.getClass().getName()));
+			throw new IllegalArgumentException("First argument needs to be a function, got " + (obj==null ? args[0] : obj.getClass().getSimpleName()));
 		f = (MFunction) obj;
 		if(f.shape().dim()==0)
 			throw new IllegalArgumentException("Divergence is only defined for vector functions, got function of scalar shape");

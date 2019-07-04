@@ -240,7 +240,7 @@ public class Functions {
 			else if(m instanceof MMatrix)
 				return evaluate((MMatrix) m);
 			else
-				throw new IllegalArgumentException(name() + " is only defined for scalars, vectors and matrices, got " + m.getClass().getCanonicalName());
+				throw new IllegalArgumentException(name() + " is only defined for scalars, vectors and matrices, got " + m.getClass().getSimpleName());
 		}
 		
 		

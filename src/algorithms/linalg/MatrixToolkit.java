@@ -6,6 +6,17 @@ import mathobjects.MReal;
 import mathobjects.MScalar;
 
 public abstract class MatrixToolkit<T> {
+	
+	public final static int REAL 		= 0b00000001;
+	public final static int SYMMETRIC 	= 0b10000010;
+	public final static int HERMITIAN 	= 0b10000100;
+	public final static int UHESSENBERG = 0b10001000;
+	public final static int LHESSENBERG = 0b10010000;
+	public final static int UTRIANGULAR = 0b10101000;
+	public final static int LTRIANGULAR = 0b11010000;
+	public final static int SQUARE		= 0b10000000;
+	public final static int DIAGONAL	= 0b11111010;
+	
 	T[][] matrix;
 	int rows, cols, augmcols = 0;
 	
@@ -91,4 +102,121 @@ public abstract class MatrixToolkit<T> {
 	 * @param maxRow the row at which the reordering stops (used for the recursion. To reorder the whole matrix, set <tt>maxRow=matrix.rows-1</tt>)
 	 */
 	public abstract void reorder(int maxRow);
+	
+	public boolean isSquare() {
+		return rows==cols;
+	}
+	
+	public boolean isSymmetric() {
+		return isSymmetric(isSquare() ? SQUARE : 0);
+	}
+	
+	public boolean isSymmetric(int mask) {
+		if((mask & SQUARE) != SQUARE)
+			return false;
+		for(int i = 0; i < rows; i++)
+			for(int j = i+1; j < cols; j++)
+				if(!matrix[i][j].equals(matrix[j][i]))
+					return false;
+		return true;
+	}
+	
+	public boolean isUTriangular() {
+		return isUTriangular(isUHessenberg() ? UHESSENBERG : 0);
+	}
+	
+	public boolean isUTriangular(int mask) {
+		if((mask & UHESSENBERG) != UHESSENBERG) return false;
+		//because the matrix is upper hessenberg,
+		//only the first negative subdiagonal needs to contain no non-zero elements.
+		for(int i = 1; i < rows; i++)
+			if(!matrix[i][i-1].equals(0d)) return false;
+		return true;				
+	}
+	
+	public boolean isLTriangular() {
+		return isLTriangular(isLHessenberg() ? LHESSENBERG : 0);
+	}
+	
+	public boolean isLTriangular(int mask) {
+		if((mask & LHESSENBERG) != LHESSENBERG) return false;
+		//because the matrix is lower hessenberg,
+		//only the first positive subdiagonal needs to contain no non-zero elements.
+		for(int i = 0; i < rows-1; i++)
+				if(!matrix[i][i+1].equals(0d)) return false;
+		return true;				
+	}
+	
+	public boolean isUHessenberg() {
+		return isUHessenberg(isSquare() ? SQUARE : 0);
+	}
+	
+	public boolean isUHessenberg(int mask) {
+		if((mask & SQUARE) != SQUARE) return false;
+		for(int i = 0; i < rows; i++)
+			for(int j = 0; j < i-1; j++)
+				if(!matrix[i][j].equals(0d)) return false;
+		return true;				
+	}
+	
+	public boolean isLHessenberg() {
+		return isLHessenberg(isSquare() ? SQUARE : 0);
+	}
+	
+	public boolean isLHessenberg(int mask) {
+		if((mask & SQUARE) != SQUARE) return false;
+		for(int i = 0; i < rows; i++)
+			for(int j = i+2; j < cols; j++)
+				if(!matrix[i][j].equals(0d)) return false;
+		return true;				
+	}
+	
+	public boolean isHermitian() {
+		return isHermitian((0 | (isReal() ? REAL : 0)) | (isSymmetric() ? SYMMETRIC : 0));
+	}
+	
+	public abstract boolean isHermitian(int mask);
+	
+	public int classify() {
+		int mask = 0;
+		if(isSquare()) mask |= SQUARE;
+		else return mask;
+		if(rows < 2) return mask;
+		
+		if(isReal()) mask |= REAL;
+		
+		if(isSymmetric(mask)) mask |= SYMMETRIC;
+		if(isHermitian(mask)) mask |= HERMITIAN;
+		
+		if(isUHessenberg(mask)) mask |= UHESSENBERG;
+		if(isUTriangular(mask)) mask |= UTRIANGULAR;
+		if((mask & UTRIANGULAR) == UTRIANGULAR && (mask & SYMMETRIC) == SYMMETRIC)
+			return mask |= DIAGONAL;
+		if(isLHessenberg(mask)) mask |= LHESSENBERG;
+		if(isLTriangular(mask)) mask |= LTRIANGULAR;
+		return mask;
+	}
+	
+	public String maskAsString(int mask) {
+		String s = "";
+		if((mask & REAL)==REAL)
+			s += " real";
+		if((mask & SQUARE) == SQUARE)
+			s += " square";
+		if((mask & SYMMETRIC) == SYMMETRIC)
+			s += " symmetric";
+		if((mask & HERMITIAN) == HERMITIAN)
+			s += " hermitian";
+		if((mask & UHESSENBERG) == UHESSENBERG)
+			s += " upper-hessenberg";
+		if((mask & LHESSENBERG) == LHESSENBERG)
+			s += " lower-hessenberg";
+		if((mask & UTRIANGULAR) == UTRIANGULAR)
+			s += " upper-triangular";
+		if((mask & LTRIANGULAR) == LTRIANGULAR)
+			s += " lower-triangular";
+		if((mask & DIAGONAL) == DIAGONAL)
+			s += " diagonal";
+		return s;
+	}
 }

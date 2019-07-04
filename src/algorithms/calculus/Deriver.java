@@ -303,7 +303,7 @@ public class Deriver extends Algorithm {
 			throw new IllegalArgumentException("No arguments found. See 'help derivative' for more info.");
 		MathObject obj  = Variables.get(args[0]);
 		if(obj == null || !(obj instanceof MFunction))
-			throw new IllegalArgumentException("First argument needs to be a function, got " + obj.getClass().getName());
+			throw new IllegalArgumentException("First argument needs to be a function, got " + obj.getClass().getSimpleName());
 		f = (MFunction) obj;
 		String[] params = f.getParameters();
 		if(args.length == 1) {
