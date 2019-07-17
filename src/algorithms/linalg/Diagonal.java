@@ -15,6 +15,20 @@ public class Diagonal extends Algorithm {
 	int index = 0;
 	Shape s;
 	MScalar obj;
+	
+	public Diagonal(MathObject... mo) {
+		for(MathObject m : mo)
+			if(!(m instanceof MScalar || m instanceof MVector || (m instanceof MMatrix && m.shape().isSquare())))
+				throw new IllegalArgumentException("Arguments need to be either scalars or square matrices, got " + m);
+		v = new MVector(mo);
+	}
+	
+	public Diagonal(MMatrix m) {
+		this.m = m;
+		prepared = true;
+	}
+	
+	public Diagonal() {}
 
 	@Override
 	public MathObject execute() {
@@ -29,16 +43,32 @@ public class Diagonal extends Algorithm {
 			return v;
 		}
 		if (v != null) { // fill a matrix with this MVector on its diagonal
-			MathObject[][] matrix = new MathObject[v.size() + rowshift][v.size() + colshift];
-			for (int i = 0; i < matrix.length; i++) {
-				for (int j = 0; j < matrix[0].length; j++) {
-					if (j - colshift == i - rowshift)
-						matrix[i][j] = v.get(i);
-					else
-						matrix[i][j] = new MReal(0);
+			int size = 0;
+			for(MathObject mo : v.elements()) {
+				if(mo instanceof MScalar)
+					size+=1;
+				else
+					size += mo.shape().rows();
+			}
+			MMatrix matrix = MMatrix.zeros(size+rowshift, size+colshift);
+			int index = 0;
+			for(int i = 0; i < v.size(); i++) {
+				if(v.get(i) instanceof MScalar)
+					matrix.set(index+rowshift, (index++)+colshift, v.get(i));
+				else if(v.get(i) instanceof MVector) {
+					MathObject[] m = ((MVector) v.get(i)).elements();
+					for(int j = 0; j < m.length; j++)
+						matrix.set(index+rowshift+j, index+colshift+j, m[j]);
+					index += m.length;
+				} else {
+					MathObject[][] m = ((MMatrix) v.get(i)).elements();
+					for(int j = 0; j < m.length; j++)
+						for(int k = 0; k < m[0].length; k++)
+							matrix.set(index+rowshift+j, index+colshift+k, m[j][k]);
+					index += m.length;
 				}
 			}
-			return new MMatrix(matrix);
+			return matrix;
 		}
 		// s != null
 		m = new MMatrix(s);
@@ -68,6 +98,9 @@ public class Diagonal extends Algorithm {
 		obj = null;
 		if ((args.length == 1 || args.length == 2) && args[0] instanceof MVector) {
 			v = (MVector) args[0];
+			for(MathObject mo : v.elements())
+				if(!(mo instanceof MScalar || mo instanceof MVector || (mo instanceof MMatrix && mo.shape().isSquare())))
+					throw new IllegalArgumentException("Diagonal entries can only be scalars, vectors or square matrices, got " + mo);
 		} else if ((args.length == 1 || args.length == 2) && args[0] instanceof MMatrix) {
 			m = (MMatrix) args[0];
 		} else if ((args.length == 3 || args.length == 4) && args[0] instanceof MScalar && args[1] instanceof MReal

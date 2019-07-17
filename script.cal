@@ -1,7 +1,5 @@
-f(x)=3x^3*2/x
-g=derivative(f)
-dot(g)
-reorder(g)
-dot(ans)
-simplify(g)
-dot(ans)
+a=2
+b=3
+c:=a^2*2+sqrt(b)
+f(x):=2c*x
+export()

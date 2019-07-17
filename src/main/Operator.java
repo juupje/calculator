@@ -375,11 +375,19 @@ public enum Operator {
 							"Vector index needs to be an (integer) scalar value, got " + b[0].toString());
 			} else if (a instanceof MMatrix) {
 				if (b.length == 1) {
-					if (b[0] instanceof MReal)
+					if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())
 						return ((MMatrix) a).getRow((int) ((MReal) b[0]).getValue());
+					else if(b[0] instanceof MVector && ((MVector) b[0]).size()==2) {
+						MathObject c = ((MVector) b[0]).get(0);
+						MathObject d = ((MVector) b[0]).get(1);
+						if(c instanceof MReal && ((MReal) c).isPosInteger() && d instanceof MReal && ((MReal) d).isPosInteger())
+							return ((MMatrix) a).get((int) ((MReal) c).getValue(), (int) ((MReal) d).getValue());
+						else
+							throw new IllegalArgumentException("Matrix index needs to contain integer values, got " + b[0]);
+					}
 					else
 						throw new IllegalArgumentException(
-								"Matrix index needs to be an (integer) scalar value, got " + b[0].toString());
+								"Matrix index needs to be an (integer) scalar value or a size 2 vector, got " + b[0].toString());
 				} else if (b.length == 2) {
 					if (b[0] == null && b[1] instanceof MReal)
 						return ((MMatrix) a).getColumn((int) ((MReal) b[1]).getValue());

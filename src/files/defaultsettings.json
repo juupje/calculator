@@ -6,5 +6,6 @@
 	"abc_show_text": true,
 	"complex_in_polar": false,
 	"complex_enabled": false,
-	"show_stacktrace": false
+	"show_stacktrace": false,
+	"multiline_matrix": true
 }

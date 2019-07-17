@@ -5,7 +5,7 @@ import algorithms.algebra.*;
 import algorithms.calculus.*;
 import algorithms.linalg.*;
 
-public enum Algorithms {
+public enum AlgorithmEnum {
 	INTEGRAL(new Integrator()),
 	DERIVATIVE(new Deriver()),
 	GRAD(new Gradient()),
@@ -16,6 +16,7 @@ public enum Algorithms {
 	DIAG(new Diagonal()),
 	ID(new Identity()),
 	TRACE(new Trace()),
+	EIG(new Eigenvalues()),
 	
 	ABC(new ABCFormula()),
 	SIMPLIFY(new Simplifier()),
@@ -24,7 +25,7 @@ public enum Algorithms {
 	ANS(new Ans());
 	
 	Algorithm a;
-	Algorithms(Algorithm a) {
+	AlgorithmEnum(Algorithm a) {
 		this.a = a;
 	}
 	
@@ -40,7 +41,7 @@ public enum Algorithms {
 		try {return getAlgorithm(s) != null;}catch(IllegalArgumentException e) {return false;}
 	}
 	
-	public static Algorithms getAlgorithm(String s) {
+	public static AlgorithmEnum getAlgorithm(String s) {
 		return valueOf(s.toUpperCase());
 	}
 }

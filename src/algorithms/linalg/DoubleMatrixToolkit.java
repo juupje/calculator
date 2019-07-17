@@ -178,4 +178,42 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		}
 		return result;
 	}
+	
+	/**
+	 * Multiplies the matrix (from the right) with the given matrix using a matrix product.
+	 * In Einstein notation: M_ij=A_ik*B_kj
+	 * Note that this method does not take the augmented columns into account.
+	 * @param A
+	 * @param B
+	 * @return A*B
+	 */
+	public static Double[][] multiply(double[][] A, Double[][] B) {
+		if(A[0].length != B.length)
+			throw new ShapeException("Can't multiply matrices of size ("
+					+ A.length + "x" + A[0].length + ") and (" + B.length + "x" + B[0].length + ")");
+		Double[][] result = new Double[A.length][B[0].length];
+		for(int i = 0; i < result.length; i++) {
+			for(int j = 0; j < result[0].length; j++) {
+				result[i][j] = 0d;
+				for(int k = 0; k < B.length; k++)
+					result[i][j] += A[i][k]*B[k][j];
+			}
+		}
+		return result;
+	}
+	
+	public static Double[][] multiply(Double[][] A, double d) {
+		for(int i = 0; i < A.length; i++)
+			for(int j = 0; j < A[0].length; j++)
+				A[i][j] *= d;
+		return A;
+	}
+	
+	public static Double[][] identity(int n) {
+		Double[][] A = new Double[n][n];
+		for(int i = 0; i < n; i++)
+			for(int j = 0; j < n; j++)
+				A[i][j] = (i==j ? 1d : 0d);
+		return A;
+	}
 }

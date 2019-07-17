@@ -4,7 +4,7 @@ import static main.Operator.*;
 
 import java.util.ArrayList;
 
-import algorithms.Algorithms;
+import algorithms.AlgorithmEnum;
 import algorithms.Functions;
 import algorithms.Functions.Function;
 import helpers.exceptions.InvalidFunctionException;
@@ -359,14 +359,14 @@ public class Parser {
 					d = d.evaluate();
 			} else if (MConst.isConstant(letters))
 				d = MConst.get(letters).evaluate();
-			else if(Algorithms.isAlgorithm(letters)) {
+			else if(AlgorithmEnum.isAlgorithm(letters)) {
 				if(!consume('(')) {
 					if(letters.equals("ans"))
 						d = Variables.ans();
 					else
 						throw new UnexpectedCharacterException("Expected '(' after a algorithm name instead of '" + (char) ch + "'.");
 				} else
-					d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
+					d = AlgorithmEnum.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
 				if(Functions.isFunction(letters)) {
 					if(!consume('('))

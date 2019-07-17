@@ -167,6 +167,10 @@ public class MReal extends MScalar {
 	public boolean isInteger() {
 		return Math.floor(value) == Math.ceil(value);
 	}
+
+	public boolean isPosInteger() {
+		return isInteger() && value>=0;
+	}
 	
 	/**
 	 * Seriously? Checking the JavaDoc for a getter? What do you think this does?!

@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
+import java.util.Map.Entry;
 
 import com.sun.scenario.Settings;
 
@@ -15,6 +16,7 @@ import algorithms.Functions.Function;
 import graph.Graph;
 import main.Calculator;
 import main.Operator;
+import main.Variable;
 import main.Variables;
 import mathobjects.MComplex;
 import mathobjects.MConst;
@@ -487,7 +489,7 @@ public class Printer {
 			lastTextFileName = params[1].trim();
 		else if (lastTextFileName == null)
 			lastTextFileName = findAvailableName("output_text", "txt");
-		printText(toText(mo), lastTextFileName);
+		printText(toText(mo), lastTextFileName, "tex");
 	}
 
 	/**
@@ -533,10 +535,11 @@ public class Printer {
 	 * @param str      the {@code String} to be printed.
 	 * @param fileName the name of the file to which <tt>str</tt> will be printed
 	 *                 to.
+	 * @param ext	   the extension of the file. 
 	 */
-	private static void printText(String str, String fileName) {
+	private static void printText(String str, String fileName, String ext) {
 		try {
-			File f = new File(fileName + ".tex");
+			File f = new File(fileName + "." + ext);
 			if (f.exists())
 				Files.write(f.toPath(), (System.lineSeparator() + str).getBytes(), StandardOpenOption.APPEND);
 			else
@@ -546,6 +549,38 @@ public class Printer {
 		}
 	}
 
+	public static void export(String name) {
+		if(name.trim().length() == 0)
+			name = findAvailableName("export", "cal");
+		StringBuilder export = new StringBuilder();
+		for(Entry<String, MathObject> entry : Variables.getAll().entrySet()) {
+			if(!(entry.getValue() instanceof MExpression))
+				export.append(entry.getKey() + "=" + entry.getValue().toString() + System.lineSeparator());
+		}
+		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
+			n.start = n.finish = 0;
+		int time = 0;
+		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
+			if(n.start==0)
+				time = DFS(n, time+1, export);
+		printText(export.toString(), name, "cal");
+	}
+	
+	private static int DFS(Graph<Variable>.Node n, int time, StringBuilder s) {
+		n.start = time;
+		for(Graph<Variable>.Edge e : n.getEdges()) {
+			if(e.getB().start == 0)
+				time = DFS(e.getB(), time+1, s);
+		}
+		n.finish = ++time;
+		if(n.getData().get() instanceof MFunction) {
+			MFunction f = (MFunction) n.getData().get();
+			s.append(n.getData().getName() + "(" + Tools.join(", ", f.getParameters()) + ")" + (f.isDefined() ? ":=" : "=") + ((MExpression) n.getData().get()).toString() + System.lineSeparator());
+		} else if(n.getData().get() instanceof MExpression)
+			s.append(n.getData().getName() + ":=" + ((MExpression) n.getData().get()).toString() + System.lineSeparator());
+		return time;
+	}
+	
 	/**
 	 * Converts the double value of the {@link MScalar} to a String.
 	 * 

@@ -24,7 +24,8 @@ public enum Setting {
 	//Display stuff
 	NOTATION(Integer.class),
 	COMPLEX_IN_POLAR(Boolean.class),
-	SHOW_STACKTRACE(Boolean.class);
+	SHOW_STACKTRACE(Boolean.class),
+	MULTILINE_MATRIX(Boolean.class);
 
 	// Constants
 	public static final short NORMAL = 1;

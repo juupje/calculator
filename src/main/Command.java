@@ -47,6 +47,12 @@ public enum Command {
 			}
 		}
 	},
+	EXPORT {
+		@Override
+		public void process(String args) {
+			Printer.export(args);
+		}
+	},
 	HELP {
 		@Override
 		public void process(String args) {

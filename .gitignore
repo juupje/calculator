@@ -9,4 +9,6 @@ gaussquad.cpp
 *.pdf
 *.xlsx
 *.txt
+*.py
+*.png
 script.cal

@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import algorithms.linalg.JordanElimination;
 import algorithms.linalg.LUDecomposition;
+import helpers.Setting;
 import helpers.Shape;
 import helpers.exceptions.InvalidOperationException;
 import helpers.exceptions.ShapeException;
@@ -546,13 +547,39 @@ public class MMatrix implements MathObject {
 
 	@Override
 	public String toString() {
-		String s = "[";
-		for (MathObject[] row : m) {
-			for (MathObject mo : row)
-				s += mo.toString() + ", ";
-			s = s.substring(0, s.length() - 2) + ";";
+		if(Setting.getBool(Setting.MULTILINE_MATRIX)) {
+			String[][] s = new String[m.length][m[0].length];
+			int[] colmax = new int[m[0].length];
+			for(int i = 0; i < m.length; i++)
+				for(int j = 0; j < m[0].length; j++) {
+					s[i][j] = m[i][j].toString();
+					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
+				}
+			String str = "";
+			for(int i = 0; i < m.length; i++) {
+				String row = "  ";
+				for(int j = 0; j < m[0].length; j++) {
+					row += s[i][j];
+					for(int k = s[i][j].length(); k < colmax[j]; k++)
+						row += " ";
+				}
+				if(i==0)
+					str = "/" + row + "\\\n";
+				else if(i==m.length-1)
+					str += "\\" + row + "/";
+				else
+					str += "|" + row + "|\n";
+			}
+			return str;
+		} else {
+			String s = "[";
+			for (MathObject[] row : m) {
+				for (MathObject mo : row)
+					s += mo.toString() + ", ";
+				s = s.substring(0, s.length() - 2) + ";";
+			}
+			return s.substring(0, s.length() - 1) + "]";
 		}
-		return s.substring(0, s.length() - 1) + "]";
 	}
 
 	public static MMatrix identity(int size) {
@@ -560,6 +587,14 @@ public class MMatrix implements MathObject {
 		for (int i = 0; i < size; i++)
 			for (int j = 0; j < size; j++)
 				matrix.set(i, j, new MReal(i == j ? 1 : 0));
+		return matrix;
+	}
+	
+	public static MMatrix zeros(int rows, int cols) {
+		MMatrix matrix = new MMatrix(new Shape(rows, cols));
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
+				matrix.set(i, j, new MReal(0));
 		return matrix;
 	}
 
