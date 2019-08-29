@@ -13,6 +13,7 @@ import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
 import mathobjects.MComplex;
 import mathobjects.MConst;
+import mathobjects.MFraction;
 import mathobjects.MFunction;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
@@ -328,6 +329,14 @@ public class Parser {
 			while ((ch >= '0' && ch <= '9') || ch == '.')
 				nextChar();
 			d = new MReal(Double.parseDouble(expr.substring(p, pos)));
+			if(pos+2<expr.length() && expr.substring(pos, pos+2).equals("//")) {
+				nextChar();nextChar();
+				MathObject b = processFactor();
+				if(b instanceof MReal)
+					d = MFraction.create((MReal) d, (MReal) b);
+				else
+					throw new UnexpectedCharacterException("Can't create a fractions from " + d + " and " + b);
+			}
 			if (consume('E'))
 				d = MULTIPLY.evaluate(d, POWER.evaluate(new MReal(10), processFactor()));
 			if(consume('i')) {

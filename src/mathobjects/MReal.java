@@ -13,7 +13,7 @@ public class MReal extends MScalar {
 	
 	@Override
 	public double real() { 
-		return value;
+		return getValue();
 	}
 	
 	@Override
@@ -164,12 +164,13 @@ public class MReal extends MScalar {
 		return false;
 	}
 	
+	@Override
 	public boolean isInteger() {
 		return Math.floor(value) == Math.ceil(value);
 	}
 
 	public boolean isPosInteger() {
-		return isInteger() && value>=0;
+		return isInteger() && getValue()>=0;
 	}
 	
 	/**
@@ -219,7 +220,7 @@ public class MReal extends MScalar {
 
 	@Override
 	public double abs() {
-		return value < 0 ? -1*value : value;
+		return getValue() < 0 ? -1*getValue() : getValue();
 	}
 	
 	
@@ -240,22 +241,26 @@ public class MReal extends MScalar {
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof MReal)
-			return ((MReal) other).getValue() == value || (isNaN() && ((MReal) other).isNaN());
+			return ((MReal) other).getValue() == getValue() || (isNaN() && ((MReal) other).isNaN());
 		if (other instanceof Number)
-			return ((Number) other).doubleValue() == value || (Double.isNaN(((Number) other).doubleValue()) && isNaN());
+			return ((Number) other).doubleValue() == getValue() || (Double.isNaN(((Number) other).doubleValue()) && isNaN());
 		if(other instanceof MComplex) {
 			MComplex z = (MComplex) other;
-			return (z.polar ? z.arg()==0 && z.getR()==value : z.imag()==0 && z.real()==value) || (z.isNaN() && isNaN());
+			return (z.polar ? z.arg()==0 && z.getR()==getValue() : z.imag()==0 && z.real()==getValue()) || (z.isNaN() && isNaN());
 		}
 		return false;
 	}
 	
 	@Override
 	public boolean isNaN() {
-		return Double.isNaN(value);
+		return Double.isNaN(getValue());
 	}
 	
 	public static final MReal NaN() {
 		return NaN.copy();
+	}
+	
+	public static boolean isInteger(double d) {
+		return Math.floor(d) == d;
 	}
 }

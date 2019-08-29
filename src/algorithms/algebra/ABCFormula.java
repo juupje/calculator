@@ -30,7 +30,7 @@ public class ABCFormula extends Algorithm {
 	}
 	
 	@Override
-	public MathObject execute() {
+	public MVector execute() {
 		if(!prepared) return null;
 		double D = b*b-4*a*c;
 		MathObject[] result = new MathObject[2];
@@ -57,7 +57,7 @@ public class ABCFormula extends Algorithm {
 	}
 
 	@Override
-	public MathObject execute(MathObject... args) {
+	public MVector execute(MathObject... args) {
 		prepare(args);
 		return execute();
 	}

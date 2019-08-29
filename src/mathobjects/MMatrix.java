@@ -28,6 +28,14 @@ public class MMatrix implements MathObject {
 				this.m[i][j] = new MReal(m[i][j]);
 		shape = new Shape(m.length, m[0].length);
 	}
+	
+	public MMatrix(Double[][] m) {
+		this.m = new MathObject[m.length][m[0].length];
+		for (int i = 0; i < m.length; i++)
+			for (int j = 0; j < m[i].length; j++)
+				this.m[i][j] = new MReal(m[i][j]);
+		shape = new Shape(m.length, m[0].length);
+	}
 
 	/**
 	 * Constructs an empty (all entries are <tt>null</tt>) matrix with the given

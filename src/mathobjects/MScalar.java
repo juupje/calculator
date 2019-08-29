@@ -107,6 +107,8 @@ public abstract class MScalar implements MathObject {
 	
 	public abstract boolean isComplex();
 	
+	public abstract boolean isInteger();
+	
 	public abstract boolean isNaN();
 	
 	/**

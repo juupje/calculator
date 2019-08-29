@@ -379,9 +379,10 @@ public class MComplex extends MScalar {
 			z.multiply(Math.exp(-other.imag()*phi)).multiply(fromPolar(1, phi*other.real()));
 			r = z.getR();
 			phi = z.arg();
+			cartesian=false;
 		} else
 			return power(other.real());
-		return null;
+		return this;
 	}
 
 	/**
@@ -422,6 +423,11 @@ public class MComplex extends MScalar {
 	@Override
 	public boolean isComplex() {
 		return cartesian ? b!=0 : phi!=0 && phi != Math.PI;
+	}
+	
+	@Override
+	public boolean isInteger() {
+		return !isComplex() && MReal.isInteger(real());
 	}
 	
 	/**

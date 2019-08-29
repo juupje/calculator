@@ -4,8 +4,10 @@ import algorithms.Algorithm;
 import helpers.Shape;
 import helpers.Tools;
 import helpers.exceptions.ShapeException;
+import mathobjects.MComplex;
 import mathobjects.MMatrix;
 import mathobjects.MReal;
+import mathobjects.MScalar;
 import mathobjects.MVector;
 import mathobjects.MathObject;
 import static algorithms.linalg.MatrixToolkit.*;
@@ -24,42 +26,60 @@ public class Eigenvalues extends Algorithm {
 		if ((matrixType & REAL) == REAL) {
 			DoubleMatrixToolkit tk = (DoubleMatrixToolkit) mtk;
 			if((matrixType & UHESSENBERG) != UHESSENBERG)
-				householder(tk);
-			Double[][][] qr;
-			double[] lambda = new double[tk.rows];
+				hessenberg(tk);
 			
-			double x = 0;
-			int counter = 0;
-			do {
-				for(int j = 0; j <lambda.length; j++)
-					lambda[j] = tk.matrix[j][j];
-				
-				for(int i = 0; i < 5; i++) {
-					qr = QR(tk.matrix);
-					tk.matrix = DoubleMatrixToolkit.multiply(qr[1], qr[0]);
-				}
-				counter += 5;
-				x=0;
-				for(int j = 0; j < lambda.length; j++)
-					x += Math.abs(lambda[j]/tk.matrix[j][j]);
-				x/=lambda.length;
-			} while(Math.abs(x-1)>epsilon && counter<100);
-			System.out.println(tk.toMMatrix().toString());
-			System.out.println("Used " + counter + " QR-steps");
-			//The eigenvalues can be read along the diagonal of the matrix
-			MVector vec = new MVector(tk.rows);
-			for(int i = 0; i < vec.size(); i++)
-				vec.set(i, new MReal(tk.matrix[i][i]));
-			return vec;
+			MScalar[] eigs = QR(tk.matrix);
+			return new MVector(eigs);
 		}
 		return MReal.NaN();
 	}
 	
+	private MScalar[] QR(Double[][] H) {
+		Double[][][] qr;
+		int n = H.length;
+		MScalar[] eigs = new MScalar[n];
+		
+		while(n>=2) {			
+			int count = 0;
+			do {
+				double lambda = H[n-1][n-1]; 
+				//H -> H-lambda*I
+				for(int i=0; i<n; i++) H[i][i] -= lambda;
+				qr = QRDecomposition(H);
+				H=DoubleMatrixToolkit.multiply(qr[1], qr[0]);
+				for(int i=0; i<n; i++) H[i][i] += lambda;
+				if(n==2) {
+					System.out.println(new MMatrix(H).toString());
+					double tr = H[0][0]+H[1][1];
+					double det = H[0][0]*H[1][1]-H[0][1]*H[1][0];
+					MScalar a, b;
+					if(det<0) {
+						a = new MComplex(tr/2, Math.sqrt(-det)/2);
+						b = new MComplex(tr/2, -Math.sqrt(-det)/2);
+					} else {
+						a = new MReal((tr+Math.sqrt(det))/2);
+						b = new MReal((tr-Math.sqrt(det))/2);
+					}
+					System.out.println(a + " :  " + b);
+					System.out.println();
+						
+				}
+			} while(count++<50 && Math.abs(H[n-1][n-2])>epsilon);
+			eigs[eigs.length-n] = new MReal(H[n-1][n-1]);
+			Double[][] A = new Double[n-1][n-1];
+			for(int i = 0; i<A.length; i++) for(int j =0; j<A[0].length; j++) A[i][j] = H[i][j];
+			H = A;
+			n -= 1;
+		}
+		eigs[eigs.length-1] = new MReal(H[0][0]);
+		return eigs;
+	}
+
 	/*
 	 * This uses Householder reflections to transform the given matrix
 	 * to a similar Hessenberg matrix. 
 	 */
-	private Double[][] householder(DoubleMatrixToolkit tk) {
+	private Double[][] hessenberg(DoubleMatrixToolkit tk) {
 		Double[][] A = tk.matrix;
 		Double[][] U = null;
 		for(int k = 0; k < tk.cols-2;k++) {	
@@ -97,7 +117,7 @@ public class Eigenvalues extends Algorithm {
 		return A;
 	}
 	
-	private Double[][][] QR(Double[][] H) {
+	private Double[][][] QRDecomposition(Double[][] H) {
 		Double[][] G = DoubleMatrixToolkit.identity(H.length);
 		Double[][] Q = DoubleMatrixToolkit.identity(H.length);
 		for(int k = 0; k < H.length-1; k++) {
