@@ -27,7 +27,7 @@ public class Timer {
 			Calculator.ioHandler.disable();
 			long startTime = System.nanoTime();
 			for (int i = 0; i < repeats; i++) {
-				Interpreter.Interpret(args[0]);
+				Interpreter.interpret(args[0]);
 			}
 			time = System.nanoTime() - startTime;
 		} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {

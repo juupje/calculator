@@ -23,6 +23,7 @@ public class Variables {
 			Calculator.dependencyGraph.setConnections(new Variable(key), ((MExpression) value).getDependencies());
 		}
 		vars.put(key.trim(), value);
+		Calculator.dependencyGraph.onValueChanged(new Variable(key));
 	}
 	
 	public static boolean exists(String str) {

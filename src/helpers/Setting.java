@@ -26,7 +26,7 @@ public enum Setting {
 	COMPLEX_IN_POLAR(Boolean.class),
 	SHOW_STACKTRACE(Boolean.class),
 	MULTILINE_MATRIX(Boolean.class);
-
+	
 	// Constants
 	public static final short NORMAL = 1;
 	public static final short ENG = 2;
@@ -58,7 +58,6 @@ public enum Setting {
 		if (value == null)
 			return;
 		if (value.getClass().equals(setting.getType())) {
-			map.put(setting, value);
 			if (setting.getType().equals(Integer.class))
 				pref.putInt(setting.toString(), (Integer) value);
 			else if (setting.getType().equals(Double.class))
@@ -67,6 +66,7 @@ public enum Setting {
 				pref.put(setting.toString(), (String) value);
 			else if (setting.getType().equals(Boolean.class))
 				pref.putBoolean(setting.toString(), (Boolean) value);
+			map.put(setting, value);
 		} else
 			throw new IllegalArgumentException("Setting " + setting.toString().toLowerCase() + " expects value of type "
 					+ setting.getType() + ", got " + value.getClass());

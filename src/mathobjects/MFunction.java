@@ -1,6 +1,7 @@
 package mathobjects;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import helpers.Printer;
 import helpers.exceptions.InvalidFunctionException;
@@ -47,6 +48,15 @@ public class MFunction extends MExpression {
 				return new Node<Object>(n.data);
 			}
 		}), defined);
+	}
+	
+	@Override
+	public HashSet<Variable> getDependencies() {
+		HashSet<Variable> dependencies = super.getDependencies();
+		for(String var : vars) {
+			dependencies.remove(new Variable(var));
+		}
+		return dependencies;
 	}
 
 	/**

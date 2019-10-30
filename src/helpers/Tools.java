@@ -5,38 +5,43 @@ import java.util.Set;
 public class Tools {
 
 	public static String join(String s, Object... list) {
-		String result = "";
+		if(list.length==0) return "";
+		StringBuilder builder = new StringBuilder();
 		for(Object obj : list)
-			result += obj.toString() + s;
-		return result.substring(0, result.length()-s.length());
+			builder.append(obj).append(s);
+		return builder.substring(0, builder.length()-s.length());
 	}
 	
 	public static String join(String s, Set<? extends Object> set) {
-		String result = "";
+		if(set.size()==0) return "";
+		StringBuilder builder = new StringBuilder();
 		for(Object obj : set)
-			result += obj.toString() + s;
-		return result.substring(0, result.length()-s.length());
+			builder.append(obj.toString()).append(s);
+		return builder.substring(0, builder.length()-s.length());
 	}
 	
 	public static String join(String s, int[] list) {
-		String result = "";
+		if(list.length==0) return "";
+		StringBuilder builder = new StringBuilder();
 		for(int i : list)
-			result += i + s;
-		return result.substring(0, result.length()-s.length());
+			builder.append(i).append(s);
+		return builder.substring(0, builder.length()-s.length());
 	}
 	
 	public static String join(String s, double[] list) {
-		String result = "";
+		if(list.length==0) return "";
+		StringBuilder builder = new StringBuilder();
 		for(double i : list)
-			result += i + s;
-		return result.substring(0, result.length()-s.length());
+			builder.append(i).append(s);
+		return builder.substring(0, builder.length()-s.length());
 	}
 	
 	public static String join(String s, String... list) {
-		String result = "";
+		if(list.length==0) return "";
+		StringBuilder builder = new StringBuilder();
 		for(String str : list)
-			result += str + s;
-		return result.substring(0, result.length()-s.length());
+			builder.append(str).append(s);
+		return builder.substring(0, builder.length()-s.length());
 	}
 	
 	public static double fact(int n) {
@@ -72,5 +77,12 @@ public class Tools {
 			return a;
 		double interval = b-a;
 		return num-Math.floor(num/interval)*interval+a;
+	}
+	
+	public static double clamp(double val, double min, double max) {
+		if(min==max) return min;
+		if(val<min) return min;
+		if(val>max) return max;
+		return val;
 	}
 }

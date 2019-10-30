@@ -44,9 +44,12 @@ public class IOHandler {
 		while(reading) {
 			outNoLine(">>> ");
 			String line = in();
-			if(line.equals("quit") || line.equals("exit")) break;
+			if(line.equals("quit") || line.equals("exit")) {
+				Calculator.exit();
+				break;
+			}
 			try {
-				Interpreter.Interpret(line);
+				Interpreter.interpret(line);
 			} catch (Exception e) {
 				Calculator.errorHandler.handle(e);
 			}

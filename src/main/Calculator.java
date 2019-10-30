@@ -11,6 +11,7 @@ import helpers.exceptions.InvalidFunctionException;
 import helpers.exceptions.ShapeException;
 import helpers.exceptions.TreeException;
 import helpers.exceptions.UnexpectedCharacterException;
+import main.plugins.PluginLoader;
 
 public class Calculator {
 	
@@ -44,9 +45,15 @@ public class Calculator {
 		}
 	}
 	
+	public static void exit() {
+		PluginLoader.exit();
+		System.exit(0);
+	}
+	
 	public static void main(String[] args) {
 		setIOHandler(new IOHandler());
 		setErrorHandler(new ErrorHandler());
+		PluginLoader.load();
 		start(args);
 		new Calculator();
 	}

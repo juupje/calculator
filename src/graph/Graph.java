@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import main.Variable;
+
 public class Graph<T> {
 	
 	Set<Node> nodes = new HashSet<Node>();
@@ -31,9 +33,25 @@ public class Graph<T> {
 	
 	public void setConnections(T a, Set<T> b) {
 		Node node = addNode(a);
-		node.getEdges().clear();
+		node.clearEdges();
 		for(T element : b)
 			addEdge(node, addNode(element));
+	}
+	
+	public void onValueChanged(T a) {
+		for(Node n : nodes)
+			if(n.getData().equals(a)) {
+				n.onValueChanged();
+				return;
+			}
+	}
+
+	public void addListener(Variable var, ValueChangedListener<T> listener) {
+		for(Node n : nodes)
+			if(n.getData().equals(var)) {
+				n.setListener(listener);
+				return;
+			}
 	}
 	
 	public void remove(T n) {
@@ -64,7 +82,7 @@ public class Graph<T> {
 	private int DFS(Node n, int time) {
 		n.start = time;
 		for(Edge e : n.edges) {
-			if(e.getB().start == 0)
+			if(e.getB().equals(n) && e.getB().start == 0)
 				time = DFS(e.getB(), time+1);
 		}
 		n.finish = ++time;
@@ -101,6 +119,8 @@ public class Graph<T> {
 		Set<Edge> edges;
 		public int start, finish;
 		
+		private ValueChangedListener<T> listener;
+		
 		Node(T var) {
 			this.var = var;
 			edges = new HashSet<>(4);
@@ -112,10 +132,34 @@ public class Graph<T> {
 		
 		public void addEdge(Edge e) {
 			edges.add(e);
+			if(e.a.equals(this)) //add the same edge to the other node
+				e.b.addEdge(e);
 		}
 		
 		public Set<Edge> getEdges() {
 			return edges;
+		}
+		
+		public void clearEdges() {
+			for(Iterator<Edge> iter = edges.iterator(); iter.hasNext();) {
+				Edge e = iter.next();
+				if(e.a.equals(this)) { //remove this edge from the other node as well
+					e.b.getEdges().remove(e);
+					iter.remove();
+				}
+			}
+		}
+		
+		private void onValueChanged() {
+			if(listener != null)
+				listener.onValueChanged(var);
+			for(Edge e : edges)
+				if(e.b.equals(this)) //so e.a depends on this node
+					e.a.onValueChanged();
+		}
+		
+		public void setListener(ValueChangedListener<T> l) {
+			listener = l;
 		}
 		
 		@Override
@@ -136,4 +180,5 @@ public class Graph<T> {
 			return var.hashCode();
 		}
 	}
+
 }

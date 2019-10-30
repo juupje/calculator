@@ -21,7 +21,7 @@ public class Interpreter {
 
 	static int position = -1, ch;
 
-	public static void Interpret(String s)
+	public static void interpret(String s)
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
 		if (s == null || s.length() == 0)
 			return;
@@ -122,10 +122,12 @@ public class Interpreter {
 		try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
 			String line = null;
 			while ((line = reader.readLine()) != null) {
+				if(line.startsWith("#"))
+					continue;
 				Calculator.ioHandler.out(">>> " + line);
-				if (line.equals("exit"))
-					System.exit(0);
-				Interpret(line);
+				if (line.equals("exit") || line.equals("quit"))
+					Calculator.exit();
+				interpret(line);
 			}
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);

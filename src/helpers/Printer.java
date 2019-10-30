@@ -119,7 +119,8 @@ public class Printer {
 			for (Graph<?>.Node n : g.getNodes()) {
 				writer.println(n.hashCode() + "[label=\"" + n.toString() + "\"];");
 				for (Graph<?>.Edge e : n.getEdges())
-					writer.println(n.hashCode() + "->" + e.getB().hashCode());
+					if(e.getA().equals(n))
+						writer.println(e.getA().hashCode() + "->" + e.getB().hashCode());
 			}
 			writer.println("}");
 			writer.close();
