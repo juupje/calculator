@@ -8,6 +8,7 @@ import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterExcept
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Interpreter;
 import com.github.juupje.calculator.main.Parser;
+import com.github.juupje.calculator.settings.Settings;
 
 public class Timer {
 
@@ -15,7 +16,7 @@ public class Timer {
 		String[] args = Parser.getArguments(s);
 		if (args.length > 2)
 			throw new IllegalArgumentException("Expected 1 or 2 arguments, got " + args.length);
-		int repeats = Setting.getInt(Setting.TIMER_DEF_RUNS);
+		int repeats = Settings.getInt(Settings.TIMER_DEF_RUNS);
 		if (args.length == 2)
 			try {
 				repeats = (int) Integer.parseInt(args[1]);

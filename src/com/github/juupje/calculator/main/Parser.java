@@ -4,7 +4,7 @@ import static com.github.juupje.calculator.main.Operator.*;
 
 import java.util.ArrayList;
 
-import com.github.juupje.calculator.algorithms.AlgorithmEnum;
+import com.github.juupje.calculator.algorithms.Algorithms;
 import com.github.juupje.calculator.algorithms.Functions;
 import com.github.juupje.calculator.algorithms.Functions.Function;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
@@ -368,14 +368,14 @@ public class Parser {
 					d = d.evaluate();
 			} else if (MConst.isConstant(letters))
 				d = MConst.get(letters).evaluate();
-			else if(AlgorithmEnum.isAlgorithm(letters)) {
+			else if(Algorithms.isAlgorithm(letters)) {
 				if(!consume('(')) {
 					if(letters.equals("ans"))
 						d = Variables.ans();
 					else
 						throw new UnexpectedCharacterException("Expected '(' after a algorithm name instead of '" + (char) ch + "'.");
 				} else
-					d = AlgorithmEnum.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
+					d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
 				if(Functions.isFunction(letters)) {
 					if(!consume('('))

@@ -1,5 +1,5 @@
 /bin/
-
+/plugins/
 a.exe
 gaussquad.cpp
 *.aux
@@ -11,5 +11,7 @@ gaussquad.cpp
 *.txt
 *.py
 *.png
-script.cal
-Tensor products.xlsx
+*.cal
+*.xlsx
+*.class
+*.jar

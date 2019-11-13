@@ -1,6 +1,5 @@
 package com.github.juupje.calculator.algorithms;
 
-import com.github.juupje.calculator.helpers.Setting;
 import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
@@ -12,6 +11,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.settings.Settings;
 
 public class Functions {
 
@@ -647,7 +647,7 @@ public class Functions {
 	 */
 	public static MScalar sqrt(MScalar m) {
 		if (m instanceof MReal) {
-			if (((MReal) m).getValue() < 0 && (Setting.getBool(Setting.COMPLEX_ENABLED)))
+			if (((MReal) m).getValue() < 0 && (Settings.getBool(Settings.COMPLEX_ENABLED)))
 				return new MComplex(0, Math.sqrt(((MReal) m).getValue() * -1));
 			return new MReal(Math.sqrt(((MReal) m).getValue()));
 		}

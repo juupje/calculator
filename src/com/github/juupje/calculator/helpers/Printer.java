@@ -26,9 +26,9 @@ import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MVectorFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.settings.Settings;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
-import com.sun.scenario.Settings;
 
 public class Printer {
 
@@ -615,7 +615,7 @@ public class Printer {
 			return "NaN";
 		if (scalar.isComplex()) {
 			((MComplex) scalar).fixPhi();
-			if (Setting.getBool(Setting.COMPLEX_IN_POLAR))
+			if (Settings.getBool(Settings.COMPLEX_IN_POLAR))
 				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
 			else {
 				String stra = numToString(scalar.real());
@@ -639,25 +639,25 @@ public class Printer {
 	public static String numToString(double num) {
 		String s = "";
 		if(num==0) return "0";
-		switch(Setting.getInt(Setting.NOTATION)) {
-		case Setting.NORMAL:
+		switch(Settings.getInt(Settings.NOTATION)) {
+		case Settings.NORMAL:
 			if(Math.abs(num) >= 0.001 && Math.abs(num)<100000) {
-				s = String.format("%." + Setting.getInt(Setting.PRECISION) + "f", num);
+				s = String.format("%." + Settings.getInt(Settings.PRECISION) + "f", num);
 				while (s.endsWith("0"))
 					s = s.substring(0, s.length() - 1);
 				if (s.endsWith("."))
 					s = s.substring(0, s.length() - 1);
 				break;
 			}
-		case Setting.SCI:
+		case Settings.SCI:
 			String format = "0.";
-			for (int i = 0; i < Setting.getInt(Setting.PRECISION); i++)
+			for (int i = 0; i < Settings.getInt(Settings.PRECISION); i++)
 				format += "#";
 			if(num<1 || num>=10)
 				format += "E0";
 			s = new DecimalFormat(format).format(num);
 			break;
-		case Setting.ENG:
+		case Settings.ENG:
 			   // If the value is negative, make it positive so the log10 works
 			   double posVal = (num<0) ? -num : num;
 			   double log10 = Math.log10(posVal);
@@ -665,7 +665,7 @@ public class Printer {
 			   int count = (int) Math.floor(log10/3);
 			   // Scale the value into the range 1<=val<1000
 			   num /= Math.pow(10, count * 3);
-			   s = String.format("%." + Setting.getInt(Setting.PRECISION) + "fe%d", num, count * 3);
+			   s = String.format("%." + Settings.getInt(Settings.PRECISION) + "fe%d", num, count * 3);
 			break;
 		}
 		if(s.equals("-0"))

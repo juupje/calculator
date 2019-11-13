@@ -2,7 +2,6 @@ package com.github.juupje.calculator.algorithms.calculus;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.helpers.CSVHandler;
-import com.github.juupje.calculator.helpers.Setting;
 import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
@@ -11,6 +10,7 @@ import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.settings.Settings;
 
 public class Integrator extends Algorithm {
 
@@ -36,7 +36,7 @@ public class Integrator extends Algorithm {
 	}
 
 	public Integrator(MFunction f, MReal[] a, MReal[] b) {
-		this(f, a, b, Setting.getInt(Setting.INT_DEF_STEPS));
+		this(f, a, b, Settings.getInt(Settings.INT_DEF_STEPS));
 	}
 
 	public Integrator(MFunction f, MReal a, MReal b, int steps) {
@@ -44,7 +44,7 @@ public class Integrator extends Algorithm {
 	}
 
 	public Integrator(MFunction f, MReal a, MReal b) {
-		this(f, a, b, Setting.getInt(Setting.INT_DEF_STEPS));
+		this(f, a, b, Settings.getInt(Settings.INT_DEF_STEPS));
 	}
 
 	public MReal execute() {
@@ -160,7 +160,7 @@ public class Integrator extends Algorithm {
 							"Argument 4 has to be an integer valued scalar, got " + args[3].toString());
 			} else
 				// If there is no 4th argument, set steps to the default (10,000).
-				steps = Setting.getInt(Setting.INT_DEF_STEPS);
+				steps = Settings.getInt(Settings.INT_DEF_STEPS);
 		} else
 			throw new IllegalArgumentException("Arguments " + argTypesToString(args)
 					+ " not applicable for Integration algorithm see help for the correct use.");

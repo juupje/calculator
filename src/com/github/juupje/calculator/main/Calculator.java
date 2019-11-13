@@ -5,14 +5,14 @@ import java.io.File;
 import com.github.juupje.calculator.graph.Graph;
 import com.github.juupje.calculator.helpers.ErrorHandler;
 import com.github.juupje.calculator.helpers.IOHandler;
-import com.github.juupje.calculator.helpers.Setting;
-import com.github.juupje.calculator.helpers.SettingsHandler;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.plugins.PluginLoader;
+import com.github.juupje.calculator.settings.Settings;
+import com.github.juupje.calculator.settings.SettingsHandler;
 
 public class Calculator {
 	
@@ -39,9 +39,9 @@ public class Calculator {
 	
 	public static void start(String[] args) {
 		dependencyGraph = new Graph<Variable>();
-		Setting.loadPrefs();
+		Settings.loadPrefs();
 		if(args != null && args.length > 0) {
-			Setting.setArgument(args);
+			Settings.setArgument(args);
 			if(args[0].equals("run"))
 				try {
 					Interpreter.execute(new File(args[1]));

@@ -4,4 +4,5 @@ public interface Plugin {
 	public String getName();
 	public void run();
 	public void exit();
+	public int version();
 }

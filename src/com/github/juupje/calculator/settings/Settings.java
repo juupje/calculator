@@ -1,4 +1,4 @@
-package com.github.juupje.calculator.helpers;
+package com.github.juupje.calculator.settings;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,10 +6,11 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
+import com.github.juupje.calculator.helpers.JSONReader;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Parser;
 
-public enum Setting {
+public enum Settings {
 
 	//Calculation stuff
 	PRECISION(Integer.class),
@@ -30,22 +31,36 @@ public enum Setting {
 	public static final short NORMAL = 1;
 	public static final short ENG = 2;
 	public static final short SCI = 3;
+	
+	public static HashMap<String, Setting> settings = new HashMap<String, Setting>();
+	static {
+		for(Settings s : Settings.values())
+			settings.put(s.toString().toLowerCase(), s.getSetting());
+	}
 
 	public static HashMap<Setting, Object> map = new HashMap<Setting, Object>();
 
 	// Runtime arguments
 	public static ArrayList<String> arguments = new ArrayList<>();
 
-	Class<?> type;
+	Setting setting;
 
-	Setting(Class<?> c) {
-		type = c;
+	Settings(Class<?> c) {
+		setting = new Setting(name(), c);
 	}
 
 	public Class<?> getType() {
-		return type;
+		return setting.type;
+	}
+	
+	public Setting getSetting() {
+		return setting;
 	}
 
+	public static void set(Settings s, Object value) {
+		set(s.getSetting(), value);
+	}
+	
 	/**
 	 * Sets the value of the given setting to given value.
 	 * 
@@ -70,7 +85,7 @@ public enum Setting {
 	 * @param o the new value of that <tt>Setting</tt>.
 	 */
 	public static void set(String s, Object o) {
-		Setting setting = null;
+		Settings setting = null;
 		try {
 			setting = valueOf(s.toUpperCase());
 		} catch (IllegalArgumentException e) {
@@ -79,7 +94,23 @@ public enum Setting {
 		if (setting != null)
 			set(setting, o);
 	}
+	
+	public static int getInt(Settings setting) {
+		return getInt(setting.getSetting());
+	}
 
+	public static double getDouble(Settings setting) {
+		return getDouble(setting.getSetting());
+	}
+
+	public static boolean getBool(Settings setting) {
+		return getBool(setting.getSetting());
+	}
+
+	public static String getString(Settings setting) {
+		return getString(setting.getSetting());
+	}
+	
 	public static int getInt(Setting setting) {
 		Object obj = map.get(setting);
 		return obj == null ? 0 : (Integer) obj;
@@ -101,15 +132,15 @@ public enum Setting {
 	}
 
 	public static void loadPrefs() {
-		System.out.println("Loading preferences...");
+		Calculator.ioHandler.out("Loading preferences...");
 		SettingsHandler sh = Calculator.settingsHandler;
 		if (sh.getBoolean("firstTime", true)) {
 			sh.set("firstTime", false);
-			System.out.println("Couldn't find settings, using defaults.");
+			Calculator.ioHandler.out("Couldn't find settings, using defaults.");
 			resetVariables();
 			return;
 		}
-		for (Setting s : values()) {
+		for (Settings s : values()) {
 			if (s.getType().equals(Integer.class)) {
 				set(s, sh.getInt(s.toString(), getInt(s)));
 			} else if (s.getType().equals(Double.class))
@@ -125,7 +156,7 @@ public enum Setting {
 	public static void resetVariables() {
 		try {
 			JSONObject json = JSONReader.parse("/files/defaultsettings.json");
-			for (Setting setting : values())
+			for (Settings setting : values())
 				set(setting, json.get(setting.toString().toLowerCase()));
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
@@ -168,7 +199,7 @@ public enum Setting {
 			else {
 				try {
 					Calculator.ioHandler.out("Setting " + args[0].toUpperCase() + " is set to "
-							+ map.get(valueOf(args[0].toUpperCase())));
+							+ map.get(settings.get(args[0].toUpperCase())));
 				} catch (IllegalArgumentException e) {
 					Calculator.ioHandler.err("No such setting exists.");
 				}
@@ -191,5 +222,12 @@ public enum Setting {
 			}
 		} else
 			throw new IllegalArgumentException("settings expected 2 arguments, got " + args.length);
+	}
+	
+	public static Setting insertSetting(String name, Object value) {
+		Setting s = new Setting(name, value.getClass());
+		settings.put(name, s);
+		set(s, value);
+		return s;
 	}
 }

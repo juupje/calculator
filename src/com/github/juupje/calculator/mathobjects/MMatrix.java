@@ -5,11 +5,11 @@ import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.linalg.JordanElimination;
 import com.github.juupje.calculator.algorithms.linalg.LUDecomposition;
-import com.github.juupje.calculator.helpers.Setting;
 import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
+import com.github.juupje.calculator.settings.Settings;
 
 public class MMatrix implements MathObject {
 
@@ -555,7 +555,7 @@ public class MMatrix implements MathObject {
 
 	@Override
 	public String toString() {
-		if(Setting.getBool(Setting.MULTILINE_MATRIX)) {
+		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
 			String[][] s = new String[m.length][m[0].length];
 			int[] colmax = new int[m[0].length];
 			for(int i = 0; i < m.length; i++)

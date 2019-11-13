@@ -14,6 +14,7 @@ import com.github.juupje.calculator.main.Calculator;
 public class PluginLoader {
 	
 	private static ArrayList<Plugin> loadedPlugins;
+	private static final int minVersion = 2;
 	
 	public static void load() {
 		File dir = new File(System.getProperty("user.dir")+ File.separator + "plugins");
@@ -38,10 +39,17 @@ public class PluginLoader {
         Iterator<Plugin> apit = sl.iterator();
         while (apit.hasNext()) {
         	Plugin plugin = apit.next();
-            plugin.run();
-            loadedPlugins.add(plugin);
-            Calculator.ioHandler.out("Loaded plugin '" + plugin.getName() + "'");
+        	if(assertVersion(plugin.version())) {
+	            plugin.run();
+	            loadedPlugins.add(plugin);
+	            Calculator.ioHandler.out("Loaded plugin '" + plugin.getName() + "'");
+        	} else
+        		Calculator.ioHandler.out("Can't load plugin of version " + plugin.version() + " at least version " + minVersion + " required.");
         }
+	}
+	
+	private static boolean assertVersion(int v) {
+		return v>=minVersion;
 	}
 	
 	public static void exit() {
