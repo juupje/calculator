@@ -226,6 +226,7 @@ public enum Settings {
 	
 	public static Setting insertSetting(String name, Object value) {
 		Setting s = new Setting(name, value.getClass());
+		if(settings.containsKey(name)) return settings.get(name);
 		settings.put(name, s);
 		set(s, value);
 		return s;

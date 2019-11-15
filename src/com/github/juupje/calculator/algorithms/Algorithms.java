@@ -52,8 +52,9 @@ public enum Algorithms {
 	
 	public static void insertAlgorithm(String name, Algorithm a) {
 		Algorithm old = algorithms.put(name, a);
-		if(old != null)
+		if(old != null) {
+			algorithms.put(name, old);
 			throw new PluginException("Could not assign algorithm '" + name + "' as it already exists.");
-		algorithms.put(name, old);
+		}
 	}
 }

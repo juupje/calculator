@@ -2,6 +2,8 @@ package com.github.juupje.calculator.helpers;
 
 import java.util.Set;
 
+import com.github.juupje.calculator.helpers.exceptions.SyntaxException;
+
 public class Tools {
 
 	public static String join(String s, Object... list) {
@@ -42,6 +44,30 @@ public class Tools {
 		for(String str : list)
 			builder.append(str).append(s);
 		return builder.substring(0, builder.length()-s.length());
+	}
+	
+	public static boolean insideBrackets(String s, int index) {
+		int brBefore = bracketLevel(s, index);
+		if(brBefore == 0) return false;
+		int brAfter = bracketLevel(s.substring(index+1), s.length()-index-1);
+		if(brAfter != 0) {
+			if(brAfter + brBefore == 0)
+				return true;
+			else throw new SyntaxException("Inconsistent brackets in '" + s + "'");
+		} else
+			return false;
+	}
+	
+	private static int bracketLevel(String s, int index) {
+		int count = 0;
+		for(int i = 0;i<index; i++) {
+			char c = s.charAt(i);
+			if(c=='(' || c == '[' || c == '{') {
+				count++;
+			} else if(c==')' || c == ']' || c=='}')
+				count--;
+		}
+		return count;
 	}
 	
 	public static double fact(int n) {

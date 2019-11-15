@@ -10,6 +10,7 @@ import com.github.juupje.calculator.algorithms.Functions;
 import com.github.juupje.calculator.commands.Command;
 import com.github.juupje.calculator.commands.Commands;
 import com.github.juupje.calculator.helpers.Printer;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
@@ -28,7 +29,7 @@ public class Interpreter {
 		if (s == null || s.length() == 0)
 			return;
 		int index = s.indexOf("=");
-		if (index != -1) {
+		if (index != -1 && !Tools.insideBrackets(s, index)) {
 			boolean containsOp = "+-*/:".contains("" + s.charAt(index - 1));
 			assign(s.substring(0, index - (containsOp ? 1 : 0)), containsOp ? s.substring(index - 1, index) : "",
 					s.substring(index + 1));

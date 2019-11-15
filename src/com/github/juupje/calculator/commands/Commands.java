@@ -139,8 +139,9 @@ public enum Commands {
 
 	public static void insertCommand(String name, Command com) {
 		Command old = commands.put(name, com);
-		if(old != null)
+		if(old != null) {
+			commands.put(name, old);
 			throw new PluginException("Could not assign command '" + name + "' as it already exists.");
-		commands.put(name, old);
+		}
 	}
 }

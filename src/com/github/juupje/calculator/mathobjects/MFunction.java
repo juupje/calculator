@@ -25,7 +25,7 @@ public class MFunction extends MExpression {
 	boolean defined;
 	HashMap<String, MathObject> paramMap;
 
-	public MFunction(String[] vars, FunctionTree tr, boolean defined) {
+	public MFunction(String vars[], FunctionTree tr, boolean defined) {
 		super(tr);
 		this.vars = vars;
 		this.defined = defined;
