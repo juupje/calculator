@@ -96,8 +96,8 @@ public class Deriver extends Algorithm {
 	private MFunction derive(MFunction f, String var) {
 		for(String s : f.getParameters())
 			if(s.equals(var))
-				return new MFunction(f.getParameters(), new Tree(derive(f.getTree().getRoot(), var)), f.isDefined());
-		return new MFunction(f.getParameters(), new Tree(new Node<MReal>(new MReal(0))), false);
+				return new MFunction(f.getParameters(), f.getParamShapes(), new Tree(derive(f.getTree().getRoot(), var)), f.isDefined());
+		return new MFunction(f.getParameters(), f.getParamShapes(), new Tree(new Node<MReal>(new MReal(0))), false);
 	}
 	
 	private Node<?> derive(Node<?> n, String var) {
@@ -306,6 +306,11 @@ public class Deriver extends Algorithm {
 			throw new IllegalArgumentException("First argument needs to be a function, got " + obj.getClass().getSimpleName());
 		f = (MFunction) obj;
 		String[] params = f.getParameters();
+		Shape[] paramShapes = f.getParamShapes();
+		for(Shape s : paramShapes) {
+			if(!s.isScalar())
+				throw new IllegalArgumentException("Cannot derive functions with non-scalar arguments.");
+		}
 		if(args.length == 1) {
 			if(params.length==1) {
 				var = new Variable(params[0]);

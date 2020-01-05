@@ -154,7 +154,7 @@ public class Simplifier extends Algorithm {
 	@Override
 	public MathObject execute() {
 		if(!prepared) return null;
-		return func != null ? new MFunction(func.getParameters(), simplify(func.getTree().copy()), func.isDefined()) : new MExpression(simplify(expr.getTree())) ;
+		return func != null ? new MFunction(func.getParameters(), func.getParamShapes(), simplify(func.getTree().copy()), func.isDefined()) : new MExpression(simplify(expr.getTree())) ;
 	}
 
 	@Override

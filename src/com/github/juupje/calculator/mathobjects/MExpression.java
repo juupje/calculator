@@ -55,23 +55,39 @@ public class MExpression implements MathObject {
 		tree.insert(tree.getRoot(), node, dir);
 	}
 	
+	/**
+	 * Inserts {@link Operator#NEGATE} at the root of the tree.
+	 */
 	@Override
 	public MExpression negate() {
 		tree.insert(tree.getRoot(), new Node<Operator>(Operator.NEGATE), Node.LEFT);
 		return this;
 	}
 
+	/**
+	 * Inserts {@link Operator#INVERT} at the root of the tree.
+	 */
 	@Override
 	public MExpression invert() {
 		tree.insert(tree.getRoot(), new Node<Operator>(Operator.INVERT), Node.LEFT);
 		return this;
 	}
 
+	/**
+	 * Copies the tree of this expression and creates a new expression with that tree.
+	 * @return a deep copy of this expression using {@code new MExpression(tree.copy()}
+	 * @see Tree#copy()
+	 */
 	@Override
 	public MExpression copy() {
 		return new MExpression(tree.copy());
 	}
 
+	/**
+	 * Evaluates the tree and returns the (numeric) result.
+	 * @return the result of {@code tree.evaluateTree();}
+	 * @see Tree#evaluateTree()
+	 */
 	@Override
 	public MathObject evaluate() {
 		try {
@@ -82,6 +98,10 @@ public class MExpression implements MathObject {
 		}
 	}
 	
+	/**
+	 * Checks if this object is numeric (which always false for expression)
+	 * @return false
+	 */
 	@Override
 	public boolean isNumeric() {
 		return false;

@@ -1,12 +1,28 @@
 package com.github.juupje.calculator.settings;
 
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import com.github.juupje.calculator.main.Calculator;
 
 public class SettingsHandler {
 
 	private Preferences pref;
 	public SettingsHandler() {
-		pref = Preferences.userRoot().node("/preferences");
+		init();
+	}
+	
+	public void init() {
+		pref = Preferences.userRoot().node("/preferences");		
+	}
+	
+	public boolean exists(String key) {
+		try {
+			return pref.nodeExists(key);
+		} catch (BackingStoreException e) {
+			Calculator.errorHandler.handle(e);
+			return false;
+		}
 	}
 	
 	public void set(Setting setting, Object value) {

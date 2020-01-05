@@ -2,6 +2,7 @@ package com.github.juupje.calculator.mathobjects;
 
 import java.util.HashMap;
 
+import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
@@ -12,17 +13,18 @@ import com.github.juupje.calculator.tree.Tree;
 public class MVectorFunction extends MVector {
 
 	String[] vars;
+	Shape[] varShapes;
 	boolean defined;
 	HashMap<String, MathObject> paramMap;
 	
-	public MVectorFunction(String[] vars, boolean defined, Tree... trees) {
+	public MVectorFunction(String[] vars, Shape[] varShapes, boolean defined, Tree... trees) {
 		super(trees.length);
 		this.defined = defined;
 		this.vars = vars;
-		paramMap = new HashMap<String, MathObject>(MFunction.INIT_PARAM_CAP);
+		paramMap = new HashMap<String, MathObject>(vars.length);
 		v = new MFunction[trees.length];
 		for(int i = 0; i < trees.length; i++) {
-			MFunction func = new MFunction(vars, trees[i], defined);
+			MFunction func = new MFunction(vars, varShapes, trees[i], defined);
 			func.setParamMap(paramMap);
 			v[i] = defined ? func : func.evaluate();
 		}
@@ -32,14 +34,14 @@ public class MVectorFunction extends MVector {
 		super(vector.size());
 		this.defined = defined;
 		this.vars = vars;
-		paramMap = new HashMap<String, MathObject>(MFunction.INIT_PARAM_CAP);
+		paramMap = new HashMap<String, MathObject>(vars.length);
 		v = new MFunction[vector.size()];
 		for(int i = 0; i < vector.size(); i++) {
 			MFunction func = null;
 			if(vector.get(i) instanceof MExpression) {
-				func = new MFunction(vars, ((MExpression) vector.get(i)).getTree(), defined);
+				func = new MFunction(vars, varShapes, ((MExpression) vector.get(i)).getTree(), defined);
 			} else { //vector[i] is a constant
-				func = new MFunction(vars, new Tree(new Node<MathObject>(vector.get(i))), defined);
+				func = new MFunction(vars, varShapes, new Tree(new Node<MathObject>(vector.get(i))), defined);
 			}
 			func.setParamMap(paramMap);
 			v[i] = defined ? func : func.evaluate();

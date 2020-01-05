@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.juupje.calculator.helpers.JSONReader;
@@ -85,9 +86,9 @@ public enum Settings {
 	 * @param o the new value of that <tt>Setting</tt>.
 	 */
 	public static void set(String s, Object o) {
-		Settings setting = null;
+		Setting setting = null;
 		try {
-			setting = valueOf(s.toUpperCase());
+			setting = settings.get(s.toLowerCase());
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("There is no setting with name '" + s + "'.");
 		}
@@ -140,26 +141,26 @@ public enum Settings {
 			resetVariables();
 			return;
 		}
-		for (Settings s : values()) {
+		for (Setting s : settings.values()) {
 			if (s.getType().equals(Integer.class)) {
-				set(s, sh.getInt(s.toString(), getInt(s)));
+				map.put(s, sh.getInt(s.toString(), getInt(s)));
 			} else if (s.getType().equals(Double.class))
-				set(s, sh.getDouble(s.toString(), getDouble(s)));
+				map.put(s, sh.getDouble(s.toString(), getDouble(s)));
 			else if (s.getType().equals(String.class))
-				set(s, sh.getString(s.toString(), getString(s)));
+				map.put(s, sh.getString(s.toString(), getString(s)));
 			else if (s.getType().equals(Boolean.class))
-				set(s, sh.getBoolean(s.toString(), getBool(s)));
+				map.put(s, sh.getBoolean(s.toString(), getBool(s)));
 		}
 		Calculator.ioHandler.out("Settings were (re)loaded.");
 	}
 
 	public static void resetVariables() {
 		try {
-			JSONObject json = JSONReader.parse("/files/defaultsettings.json");
+			JSONObject json = JSONReader.parse(Settings.class.getResourceAsStream("/com/github/juupje/calculator/files/defaultsettings.json"));
 			for (Settings setting : values())
 				set(setting, json.get(setting.toString().toLowerCase()));
-		} catch (IOException e) {
-			Calculator.errorHandler.handle(e);
+		} catch (IOException | JSONException e) {
+			Calculator.errorHandler.handle("Could not retrieve default settings.", e);
 		}
 	}
 
@@ -193,18 +194,20 @@ public enum Settings {
 		String[] args = Parser.getArguments(s);
 
 		if (args.length == 1) {
+			args[0] = args[0].toLowerCase();
 			if (args[0].equals("reset") && Calculator.ioHandler
 					.askYesNo("Are you sure you want to reset all settings to their default values?"))
 				resetVariables();
 			else {
-				try {
-					Calculator.ioHandler.out("Setting " + args[0].toUpperCase() + " is set to "
-							+ map.get(settings.get(args[0].toUpperCase())));
-				} catch (IllegalArgumentException e) {
+				Object result = map.get(settings.get(args[0]));
+				if(result != null)
+					Calculator.ioHandler.out("Setting '" + args[0]+ "' is set to " + result);
+				else
 					Calculator.ioHandler.err("No such setting exists.");
-				}
 			}
 		} else if (args.length == 2) {
+			args[0] = args[0].toLowerCase();
+			args[1] = args[1].toLowerCase();
 			if (args[1].equals("true") || args[1].equals("on"))
 				set(args[0], true);
 			else if (args[1].equals("false") || args[1].equals("off"))
@@ -225,10 +228,33 @@ public enum Settings {
 	}
 	
 	public static Setting insertSetting(String name, Object value) {
+		name = name.toLowerCase();
 		Setting s = new Setting(name, value.getClass());
+		if(!isValidSetting(s))
+			return null;
+		//check if setting already exists in settings map
 		if(settings.containsKey(name)) return settings.get(name);
 		settings.put(name, s);
-		set(s, value);
+		//check if setting already exists in preferences
+		if(Calculator.settingsHandler.exists(name)) {
+			SettingsHandler sh = Calculator.settingsHandler;
+			//set the setting in the map to the stored value
+			if(s.getType().equals(Integer.class))
+				map.put(s, sh.getInt(name, (Integer) value));
+			else if(s.getType().equals(Double.class))
+				map.put(s, sh.getDouble(name, (Double) value));
+			else if(s.getType().equals(Boolean.class))
+				map.put(s, sh.getBoolean(name, (Boolean) value));
+			else if(s.getType().equals(String.class))
+				map.put(s, sh.getString(name, (String) value));
+		}
+		else //set to the given default value
+			set(s, value);
 		return s;
+	}
+	
+	private static boolean isValidSetting(Setting s) {
+		if(!s.getName().matches("[a-zA-Z0-9_.]+")) return false;
+		return s.getType().equals(Integer.class) || s.getType().equals(Double.class) || s.getType().equals(Boolean.class) || s.getType().equals(String.class);
 	}
 }

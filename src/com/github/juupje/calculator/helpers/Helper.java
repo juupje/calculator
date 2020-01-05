@@ -1,20 +1,36 @@
 package com.github.juupje.calculator.helpers;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.juupje.calculator.main.Calculator;
+import com.github.juupje.calculator.main.plugins.PluginLoader;
 
 public class Helper {
 	static JSONObject json = null;
-
+	static final String[] keys = {"commands", "functions", "algorithms", "settings", "constants"};
 	private static void init() {
 		try {
-			json = JSONReader.parse("/files/help.json");
+			json = JSONReader.parse(Helper.class.getResourceAsStream("/com/github/juupje/calculator/files/help.json"));
+			PluginLoader.initHelp();
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
+		}
+	}
+	
+	public static void insertHelpFile(JSONObject jobj) {
+		if(jobj == null) return;
+		for(String key : keys) {
+			if(jobj.has(key)) {
+				JSONObject obj = json.getJSONObject(key);
+				for(Iterator<String> kIter = jobj.getJSONObject(key).keys(); kIter.hasNext();) {
+					String k = kIter.next();
+					obj.append(k, jobj.get(k));
+				}
+			}
 		}
 	}
 
@@ -23,34 +39,20 @@ public class Helper {
 			init();
 		JSONObject jobj = null;
 		String type = "";
-		try {
-			jobj = json.getJSONObject("commands").getJSONObject(command);
-			type = "command";
-		} catch (JSONException e) {
+		for(String s : keys) {
 			try {
-				jobj = json.getJSONObject("functions").getJSONObject(command);
-				type = "function";
-			} catch (JSONException e2) {
-				try {
-					jobj = json.getJSONObject("algorithms").getJSONObject(command);
-					type = "algorithm";
-				} catch(JSONException e3) {
-					try {
-						jobj = json.getJSONObject("settings").getJSONObject(command);
-						type = "setting";
-					} catch(JSONException e4) {
-						try {
-							jobj = json.getJSONObject("constants").getJSONObject(command);
-							type = "constant";
-						} catch(JSONException e5) {							
-							Calculator.ioHandler.err("No known help page for " + command + ", type list for a list of commands/functions/algorithms/settings/constants");
-							return;
-						}
-					}
-				}
-			}
+				jobj = json.getJSONObject(s).getJSONObject(command);
+				type = s.substring(0, s.length()-1); //remove the last 's';
+			} catch(JSONException e) {}
 		}
+		if(jobj == null) {
+			Calculator.ioHandler.err("No known help page for " + command + ", type list for a list of commands/functions/algorithms/settings/constants");
+			return;			
+		}
+		
 		String help = "Help for " + command + " (" + type + "):\n";
+		if(jobj.has("plugin"))
+			help += "\tFrom plugin: " + jobj.getString("plugin") + "\n";
 		if(type.equals("setting"))
 			help += "\tName: " + jobj.getString("name")
 					+ "\n\tType: " + jobj.getString("type")
@@ -71,13 +73,11 @@ public class Helper {
 		String list = null;
 		if(json == null)
 			init();
-		if(args.equals(""))
-			list = "Algorithms:\n\t" + Tools.join("\n\t", json.getJSONObject("algorithms").keySet())
-					+ "\n\nFunctions:\n\t" + Tools.join("\n\t", json.getJSONObject("functions").keySet()) 
-					+ "\n\nCommands:\n\t" + Tools.join("\n\t", json.getJSONObject("commands").keySet())
-					+ "\n\nSettings:\n\t" + Tools.join("\n\t", json.getJSONObject("settings").keySet())
-					+ "\n\nConstantss:\n\t" + Tools.join("\n\t", json.getJSONObject("constants").keySet());
-		else
+		if(args.equals("")) {
+			for(String s : keys)
+				list += "\n\n" + s.substring(0, 1).toUpperCase() + s.substring(1) + ":\n\t" + Tools.join("\n\t", json.getJSONObject(s).keySet());
+			list = list.substring(2); //remove the first two linebreaks
+		} else
 			list = args + ":\n\t" + Tools.join("\n\t", json.getJSONObject(args).keySet());
 		Calculator.ioHandler.out(list);
 	}

@@ -7,11 +7,9 @@ import java.io.InputStreamReader;
 
 import org.json.JSONObject;
 
-import com.github.juupje.calculator.main.Calculator;
-
-public class JSONReader {	
-	public static JSONObject parse(String path) throws IOException {
-		InputStream in = Calculator.class.getResourceAsStream(path);
+public class JSONReader {
+	
+	public static JSONObject parse(InputStream in) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		StringBuffer buf = new StringBuffer();
 		String s;

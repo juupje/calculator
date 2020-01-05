@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 import com.github.juupje.calculator.helpers.Shape;
+import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MExpression;
@@ -11,6 +12,7 @@ import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
+import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.tree.Node;
@@ -368,11 +370,19 @@ public enum Operator {
 			if (a instanceof MVector) {
 				if (b.length != 1)
 					throw new IllegalArgumentException("A vector only has 1 index, got " + (b.length));
-				if (b[0] instanceof MReal)
+				if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())
 					return ((MVector) a).get((int) ((MReal) b[0]).getValue());
 				else
-					throw new IllegalArgumentException(
-							"Vector index needs to be an (integer) scalar value, got " + b[0].toString());
+					throw new IndexException(
+							"Vector index needs to be a positive integer scalar value, got " + b[0].toString());
+			} else if (a instanceof MSequence) {
+				if (b.length != 1)
+					throw new IllegalArgumentException("A sequence only has 1 index, got " + (b.length));
+				if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())
+					return ((MSequence) a).get((int) ((MReal) b[0]).getValue());
+				else
+					throw new IndexException(
+							"Index needs to be a positive integer scalar value, got " + b[0].toString());
 			} else if (a instanceof MMatrix) {
 				if (b.length == 1) {
 					if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())

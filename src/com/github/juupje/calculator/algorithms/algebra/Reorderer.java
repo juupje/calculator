@@ -15,7 +15,7 @@ public class Reorderer extends Algorithm {
 	public MathObject execute() {
 		Tree tr = func.getTree().copy();
 		tr.DFS(Simplifier.sort);
-		return new MFunction(func.getParameters(), tr, func.isDefined());
+		return new MFunction(func.getParameters(), func.getParamShapes(), tr, func.isDefined());
 	}
 
 	@Override

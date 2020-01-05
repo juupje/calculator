@@ -173,15 +173,20 @@ public class Shape {
 		return true;
 	}
 	
+	public boolean isScalar() {
+		return dimension == 0;
+	}
+	
 	@Override
 	public String toString() {
 		return "("+Tools.join(", ", shape)+")";
 	}
 	
+	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj == null || obj instanceof Number)
-			return dim()==0;
+			return isScalar();
 		if(obj instanceof Shape && ((Shape) obj).dim() == dim()) {
 			int[] other = ((Shape) obj).asArray();
 			for(int i = 0; i < shape.length; i++)

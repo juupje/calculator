@@ -39,7 +39,7 @@ public class Divergence extends Algorithm {
 			v.set(i, (value == null ? new Deriver(f, new Variable(params[i])) : new Deriver(f, new Variable(params[i]), value)).execute());
 		}
 		if(value != null)
-			return new MFunction(params, new Tree(new Node<MVectorFunction>(new MVectorFunction(params, v, f.isDefined()))), f.isDefined());
+			return new MFunction(params, f.getParamShapes(), new Tree(new Node<MVectorFunction>(new MVectorFunction(params, v, f.isDefined()))), f.isDefined());
 		return v;
 	}
 
@@ -62,8 +62,11 @@ public class Divergence extends Algorithm {
 		if(obj == null || !(obj instanceof MFunction))
 			throw new IllegalArgumentException("First argument needs to be a function, got " + (obj==null ? args[0] : obj.getClass().getSimpleName()));
 		f = (MFunction) obj;
-		if(f.shape().dim()==0)
-			throw new IllegalArgumentException("Divergence is only defined for vector functions, got function of scalar shape");
+		if(f.shape().dim()!=1)
+			throw new IllegalArgumentException("Divergence is only defined for vector functions, got function of shape " + f.shape());
+		for(Shape s : f.getParamShapes())
+			if(!s.isScalar())
+				throw new IllegalArgumentException("Cannot derive functions with non-scalar arguments.");
 		if(args.length==2) {
 			value = new Parser(args[2]).evaluate();
 		}

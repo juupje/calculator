@@ -21,6 +21,8 @@ public class Calculator {
 	public static SettingsHandler settingsHandler;
 	public static Graph<Variable> dependencyGraph;
 	
+	public static boolean running = false;
+	
 	public Calculator() {
 		ioHandler.startConsoleInput();
 	}
@@ -40,6 +42,7 @@ public class Calculator {
 	public static void start(String[] args) {
 		dependencyGraph = new Graph<Variable>();
 		Settings.loadPrefs();
+		running = true;
 		if(args != null && args.length > 0) {
 			Settings.setArgument(args);
 			if(args[0].equals("run"))
@@ -51,8 +54,17 @@ public class Calculator {
 		}
 	}
 	
+	public static boolean isRunning() {
+		return running;
+	}
+	
+	public static void finish() {
+		running = false;
+		PluginLoader.exit();		
+	}
+	
 	public static void exit() {
-		PluginLoader.exit();
+		finish();
 		System.exit(0);
 	}
 	

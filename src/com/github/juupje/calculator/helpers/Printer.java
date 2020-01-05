@@ -23,6 +23,7 @@ import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
+import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MVectorFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
@@ -403,6 +404,18 @@ public class Printer {
 	}
 
 	/**
+	 * Converts the given <tt>MExpression</tt> to a text format and returns it as a
+	 * <tt>String</tt>. This is done using {@link #nodeToText(Node)}.
+	 * 
+	 * @param mo the {@link MExpression} to be converted to text.
+	 * @return a <tt>String</tt> containing the argument in text format.
+	 */
+	public static String toText(MSequence mo) {
+		return "{" + toText(mo.getFunction()) + " | " + mo.getIndexName() + "=" + 
+				mo.getBegin() + "..." + (mo.getEnd()>= 0 ? mo.getEnd() : "infinity") + "}";
+	}
+	
+	/**
 	 * Converts the given <tt>MathObject</tt> to a text format and returns it as a
 	 * <tt>String</tt>. This is done by simply calling {@code mo.toString()}. Note
 	 * that {@link MExpression#toString()} and {@link MFunction#toString()} use
@@ -560,15 +573,17 @@ public class Printer {
 	 *                 to.
 	 * @param ext	   the extension of the file. 
 	 */
-	private static void printText(String str, String fileName, String ext) {
+	private static File printText(String str, String fileName, String ext) {
 		try {
 			File f = new File(fileName + "." + ext);
 			if (f.exists())
 				Files.write(f.toPath(), (System.lineSeparator() + str).getBytes(), StandardOpenOption.APPEND);
 			else
 				Files.write(f.toPath(), str.getBytes());
+			return f;
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
+			return null;
 		}
 	}
 
@@ -586,7 +601,8 @@ public class Printer {
 		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
 			if(n.start==0)
 				time = DFS(n, time+1, export);
-		printText(export.toString(), name, "cal");
+		File f = printText(export.toString(), name, "cal");
+		Calculator.ioHandler.out("Saved export file to: " + f.getAbsolutePath());
 	}
 	
 	private static int DFS(Graph<Variable>.Node n, int time, StringBuilder s) {

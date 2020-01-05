@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import com.github.juupje.calculator.helpers.Helper;
 import com.github.juupje.calculator.main.Calculator;
 
 public class PluginLoader {
 	
 	private static ArrayList<Plugin> loadedPlugins;
-	private static final int minVersion = 2;
+	private static final int minVersion = 3;
 	
 	public static void load() {
 		File dir = new File(System.getProperty("user.dir")+ File.separator + "plugins");
@@ -52,7 +53,13 @@ public class PluginLoader {
 		return v>=minVersion;
 	}
 	
+	public static void initHelp() {
+		for(Plugin p : loadedPlugins)
+			Helper.insertHelpFile(p.initHelp());
+	}
+	
 	public static void exit() {
+		if(loadedPlugins == null) return;
 		for(Iterator<Plugin> iter = loadedPlugins.iterator(); iter.hasNext();) {
 			iter.next().exit();
 			iter.remove();

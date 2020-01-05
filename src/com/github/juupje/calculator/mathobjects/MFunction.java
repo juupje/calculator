@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.github.juupje.calculator.helpers.Printer;
+import com.github.juupje.calculator.helpers.Shape;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
+import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Parser;
 import com.github.juupje.calculator.main.Variable;
@@ -19,41 +22,45 @@ import com.github.juupje.calculator.tree.TreeFunction;
 
 public class MFunction extends MExpression {
 
-	public static final short INIT_PARAM_CAP = 4;
-
+	public static final int FLAG_INTERNAL = 1;
+	
 	String[] vars;
+	Shape[] varShapes;
 	boolean defined;
 	HashMap<String, MathObject> paramMap;
 
-	public MFunction(String vars[], FunctionTree tr, boolean defined) {
+	public MFunction(String vars[], Shape[] varShapes, FunctionTree tr, boolean defined) {
 		super(tr);
 		this.vars = vars;
 		this.defined = defined;
-		paramMap = new HashMap<String, MathObject>(INIT_PARAM_CAP);
+		paramMap = new HashMap<String, MathObject>(vars.length);
+		for (int i = 0; i < varShapes.length; i++)
+			varShapes[i] = new Shape();
 	}
 
-	public MFunction(String[] vars, Tree tr, boolean defined) {
+	public MFunction(String vars[], Shape[] varShapes, Tree tr, boolean defined) {
 		super(tr);
 		this.vars = vars;
 		this.defined = defined;
+		this.varShapes = varShapes;
 		tree = new FunctionTree(processTree(tr, defined, vars).getRoot());
-		paramMap = new HashMap<String, MathObject>(INIT_PARAM_CAP);
+		paramMap = new HashMap<String, MathObject>(vars.length);
 	}
 
 	@Override
 	public MFunction copy() {
-		return new MFunction(vars, tree.copy(new TreeFunction() {
+		return new MFunction(vars, varShapes, tree.copy(new TreeFunction() {
 			@Override
 			public Node<?> apply(Node<?> n) {
 				return new Node<Object>(n.data);
 			}
 		}), defined);
 	}
-	
+
 	@Override
 	public HashSet<Variable> getDependencies() {
 		HashSet<Variable> dependencies = super.getDependencies();
-		for(String var : vars) {
+		for (String var : vars) {
 			dependencies.remove(new Variable(var));
 		}
 		return dependencies;
@@ -73,7 +80,7 @@ public class MFunction extends MExpression {
 	 */
 	@Override
 	public MFunction evaluate() {
-		return new MFunction(vars, tree.copy(new TreeFunction() {
+		return new MFunction(vars, varShapes, tree.copy(new TreeFunction() {
 			@Override
 			public Node<?> apply(Node<?> n) {
 				if (n.data instanceof Variable) {
@@ -97,7 +104,34 @@ public class MFunction extends MExpression {
 	}
 
 	/**
-	 * Creates a new {@code MFunction} and stores in the Variables list.
+	 * Creates a new {@code MFunction} from an expression. This method extracts the
+	 * names of the function arguments from the first parameter and returns
+	 * {@link #create(String[], String, boolean)} with those names. The example
+	 * <tt>f(x,y)=x^2+a*y^2</tt> will be used in the params section.
+	 * 
+	 * @param s       the part before the "=" or ":=" sign in the declaration, in
+	 *                this case <tt>f(x,y)</tt>. The variables will be
+	 *                {@code ["x", "y"]}, and the name <tt>f</tt>.
+	 * @param expr    the part after the "=" or ":=" sign. In this case "x^2+a*y^2".
+	 *                This will be parsed into a {@code MExpression} using
+	 *                {@link Parser#getTree()}.
+	 * @param defined whether or not the command contains a ":=". If <tt>false</tt>
+	 *                then <tt>a</tt> will be evaluated and its numerical value will
+	 *                be saved instead.
+	 * @return a new {@code MFunction} containing the variables array and the
+	 *         {@code MExpression}.
+	 * @throws UnexpectedCharacterException as thrown by
+	 *                                      {@link #create(String[], String, boolean)}
+	 */
+	public static MFunction create(String s, String expr, boolean defined) throws UnexpectedCharacterException {
+		int brIndex = s.indexOf("(");
+		String[] vars = s.substring(brIndex + 1, s.lastIndexOf(")")).replace(" ", "").split(",");
+		return create(vars, expr, defined);
+	}
+
+	/**
+	 * Creates a new {@code MFunction} from an expression, treating the given
+	 * variable names as its arguments.
 	 * <p>
 	 * If the declaration of the new function contains a := (which means that it's a
 	 * definition), then the expression is simply parsed to a {@link MExpresssion}
@@ -123,36 +157,64 @@ public class MFunction extends MExpression {
 	 * </p>
 	 * The example <tt>f(x,y)=x^2+a*y^2</tt> will be used in the params section.
 	 * 
-	 * @param s       the part before the "=" or ":=" sign in the declaration, in
-	 *                this case <tt>f(x,y)</tt>. The variables will be
-	 *                {@code ["x", "y"]}, and the name <tt>f</tt>.
+	 * @param vars    the array containing the names of the function's arguments. In
+	 *                this case ["x", "y"]
 	 * @param expr    the part after the "=" or ":=" sign. In this case "x^2+a*y^2".
 	 *                This will be parsed into a {@code MExpression} using
 	 *                {@link Parser#getTree()}.
 	 * @param defined whether or not the command contains a ":=". If <tt>false</tt>
 	 *                then <tt>a</tt> will be evaluated and its numerical value will
 	 *                be saved instead.
+	 * @param flags   an integer containing the flags necessary for computing the
+	 *                function.
 	 * @return a new {@code MFunction} containing the variables array and the
-	 *         {@code MExpression}. Note that this {@code MFunction} will
-	 *         automatically be added to {@link Variables}.
+	 *         {@code MExpression}.
 	 * @throws UnexpectedCharacterException as thrown by {@code Parser.getTree()}
 	 */
-	public static MFunction create(String s, String expr, boolean defined) throws UnexpectedCharacterException {
-		int brIndex = s.indexOf("(");
-		String[] vars = s.substring(brIndex + 1, s.lastIndexOf(")")).replace(" ", "").split(",");
+	public static MFunction create(String[] vars, String expr, boolean defined, int flags) {
 		// Add all variables temporary to the Variables list, in order to prevent
 		// warnings in the console.
-		for (String v : vars)
+		String varNames[] = new String[vars.length];
+		Shape varShapes[] = new Shape[vars.length];
+		for (int i = 0; i < vars.length; i++) {
+			String v = vars[i];
+			if (v.matches("\\w+\\[(\\d+|\\d+,\\d+)\\]")) {
+				String[] dims = Tools.extractFirst(v, '[', ']').split(",");
+				try {
+					if (dims.length == 1)
+						varShapes[i] = new Shape(Integer.valueOf(dims[0]));
+					else if (dims.length == 2)
+						varShapes[i] = new Shape(Integer.valueOf(dims[0]), Integer.valueOf(dims[1]));
+					else
+						throw new ShapeException("Functions with more than 2D arguments are not supported.");
+				} catch (NumberFormatException e) {
+					throw new UnexpectedCharacterException("Expected positive integer argument, got "
+							+ (dims.length == 1 ? dims[0] : dims[0] + " and " + dims[1]));
+				}
+				v = v.substring(0, v.indexOf('['));
+			} else
+				varShapes[i] = new Shape();
+			if (!Tools.checkNameValidity(v, (flags & FLAG_INTERNAL)==FLAG_INTERNAL))
+				throw new UnexpectedCharacterException("Invalid name: " + v);
 			if (Variables.get(v) == null)
 				Variables.set(v, null);
+			varNames[i] = v;
+		}
 		Tree tr = new Parser(expr).getTree();
-		tr = processTree(tr, defined, vars);
+		tr = processTree(tr, defined, varNames);
 
 		// Remove the temporary variables.
-		for (String v : vars)
+		for (String v : varNames)
 			if (Variables.get(v) == null)
 				Variables.remove(v);
-		return new MFunction(vars, tr, defined);
+		return new MFunction(varNames, varShapes, tr, defined);
+	}
+	
+	/**
+	 * @see {{@link #create(String[], String, boolean, int)}
+	 */
+	public static MFunction create(String[] vars, String expr, boolean defined) {
+		return create(vars, expr, defined, 0);
 	}
 
 	public static Tree processTree(Tree tree, boolean defined, String[] vars) {
@@ -171,11 +233,12 @@ public class MFunction extends MExpression {
 					}
 				}
 
-				// If the node is not internal and this function is not defined, replace this node
+				// If the node is not internal and this function is not defined, replace this
+				// node
 				// with its evaluated value.
 				if (defined)
 					return;
-				if (n.data instanceof Variable) { //this implies that the node is not internal
+				if (n.data instanceof Variable) { // this implies that the node is not internal
 					for (String var : vars)
 						if (n.data.equals(var))
 							return;
@@ -213,6 +276,10 @@ public class MFunction extends MExpression {
 		if (paramVals.length != vars.length)
 			throw new IllegalArgumentException(
 					"Function expected " + vars.length + " arguments, got " + paramVals.length);
+		for (int i = 0; i < paramVals.length; i++)
+			if (!paramVals[i].shape().equals(varShapes[i]))
+				throw new IllegalArgumentException("Shape of argument " + i + " with name " + vars[i]
+						+ " is not compatible with the function definition: expected shape " + varShapes[i] + ".");
 		paramMap.clear();
 		for (int i = 0; i < paramVals.length; i++)
 			paramMap.put(vars[i], paramVals[i]);
@@ -239,14 +306,10 @@ public class MFunction extends MExpression {
 	 */
 	public MathObject evaluateAt(String s)
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, ShapeException {
-		MathObject[] paramVals = Parser.getArgumentsAsMathObject(s);
-		if (paramVals.length != vars.length)
-			throw new IllegalArgumentException(
-					"Function expected " + vars.length + " arguments, got " + paramVals.length);
-		return evaluateAt(paramVals);
+		return evaluateAt(Parser.getArgumentsAsMathObject(s));
 	}
 
-	public MathObject evaluateAt(HashMap<String, MathObject> map) throws TreeException {
+	private MathObject evaluateAt(HashMap<String, MathObject> map) throws TreeException {
 		setParamMap(map);
 		return evaluateAt();
 	}
@@ -258,7 +321,7 @@ public class MFunction extends MExpression {
 	 * @throws TreeException as thrown by {@link Tree#evaluateTree()}
 	 * @see Tree#evaluateTree()
 	 */
-	public MathObject evaluateAt() throws TreeException {
+	private MathObject evaluateAt() throws TreeException {
 		return ((FunctionTree) tree).evaluateTree();
 	}
 
@@ -277,6 +340,10 @@ public class MFunction extends MExpression {
 
 	public String[] getParameters() {
 		return vars;
+	}
+
+	public Shape[] getParamShapes() {
+		return varShapes;
 	}
 
 	public MFunction add(MathObject other) {
@@ -313,6 +380,27 @@ public class MFunction extends MExpression {
 
 		public FunctionTree(Node<?> root) {
 			super(root);
+		}
+
+		public FunctionTree copy() {
+			return new FunctionTree(super.copy().getRoot());
+		}
+
+		@Override
+		public Shape getShape(Node<?> n) {
+			if (n.data instanceof Variable) {
+				Variable v = (Variable) n.data;
+				for (int i = 0; i < vars.length; i++)
+					if (v.getName().equals(vars[i]))
+						return varShapes[i];
+				if (v.get() != null)
+					return v.get().shape();
+				else {
+					Calculator.ioHandler.err("Variable " + v.getName() + " not defined, assuming scalar shape.");
+					return Shape.SCALAR;
+				}
+			} else
+				return super.getShape(n);
 		}
 
 		@Override

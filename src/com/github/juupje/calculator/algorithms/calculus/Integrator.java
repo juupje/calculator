@@ -74,8 +74,8 @@ public class Integrator extends Algorithm {
 
 	private void loadGaussQuadData(int n) {
 		if (abscissae == null || weights == null || abscissae.length != n || weights.length != n) {
-			abscissae = CSVHandler.readDoubleLine("/files/gaussquad_abscissae.dat", n - 2);
-			weights = CSVHandler.readDoubleLine("/files/gaussquad_weights.dat", n - 2);
+			abscissae = CSVHandler.readDoubleLine("/com/github/juupje/calculator/files/gaussquad_abscissae.dat", n - 2);
+			weights = CSVHandler.readDoubleLine("/com/github/juupje/calculator/files/gaussquad_weights.dat", n - 2);
 		}
 		if(abscissae == null || weights == null)
 			throw new RuntimeException("Could not read abscissae and/or weights from data files.");

@@ -7,7 +7,7 @@ public class Setting {
 	
 	public Setting(String name, Class<?> type) {
 		this.type = type;
-		this.name = name;
+		this.name = name.toLowerCase();
 	}
 		
 	public Class<?> getType() {
@@ -15,6 +15,11 @@ public class Setting {
 	}
 	
 	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public String toString() {
 		return name;
 	}
 }

@@ -3,6 +3,7 @@ package com.github.juupje.calculator.tree;
 import com.github.juupje.calculator.algorithms.Functions.Function;
 import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
+import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.mathobjects.MConst;
@@ -103,9 +104,11 @@ public class Tree {
 			return ((Operator) n.data).shape(getShape(n.left()));
 		} else if(n.data instanceof MathObject)
 			return ((MathObject) n.data).shape();
-		else if(n.data instanceof Variable)
+		else if(n.data instanceof Variable) {
 			if(((Variable) n.data).get()!=null)
 				return ((Variable) n.data).get().shape();
+			Calculator.ioHandler.err("Variable " + n.data + " not defined, assuming scalar shape.");
+		}
 		return Shape.SCALAR; //scalar shape
 	}
 	

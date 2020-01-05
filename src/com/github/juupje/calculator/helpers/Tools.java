@@ -2,6 +2,8 @@ package com.github.juupje.calculator.helpers;
 
 import java.util.Set;
 
+import com.github.juupje.calculator.algorithms.Algorithms;
+import com.github.juupje.calculator.algorithms.Functions;
 import com.github.juupje.calculator.helpers.exceptions.SyntaxException;
 
 public class Tools {
@@ -68,6 +70,31 @@ public class Tools {
 				count--;
 		}
 		return count;
+	}
+	
+	public static boolean checkNameValidity(String name) {
+		return checkNameValidity(name, false);
+	}
+	
+	public static boolean checkNameValidity(String name, boolean internal) {
+		if(((name.startsWith("_") || name.startsWith("$")) && !internal) ||  Character.isDigit(name.codePointAt(0))) return false;
+		if(name.equals("pi") || name.equals("e") || name.equals("i") || Functions.isFunction(name) || Algorithms.isAlgorithm(name)) return false;
+		for(int i = 0; i < name.length(); i++) {
+			int c = name.codePointAt(i);
+			if(c<65 && c>90 && c<97 && c>120 && c<945 && c>969 && c<913 && c>937 && c<30 && c<48 && c>57)
+				return false;
+		}
+		return true;
+	}
+	
+	public static String extractFirst(String s, String begin, String end) {
+		int index = s.indexOf(begin)+begin.length();
+		return s.substring(index, s.indexOf(end, index));
+	}
+	
+	public static String extractFirst(String s, char begin, char end) {
+		int index = s.indexOf(begin)+1;
+		return s.substring(index, s.indexOf(end, index));
 	}
 	
 	public static double fact(int n) {

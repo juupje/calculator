@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.github.juupje.calculator.mathobjects.MExpression;
+import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MathObject;
 public class Variables {
 	private static HashMap<String, MathObject> vars = new HashMap<String, MathObject>();
@@ -21,7 +22,8 @@ public class Variables {
 	public static void set(String key, MathObject value) {
 		if(value instanceof MExpression) {
 			Calculator.dependencyGraph.setConnections(new Variable(key), ((MExpression) value).getDependencies());
-		}
+		} else if(value instanceof MSequence)
+			Calculator.dependencyGraph.setConnections(new Variable(key), ((MSequence) value).getFunction().getDependencies());			
 		vars.put(key.trim(), value);
 		Calculator.dependencyGraph.onValueChanged(new Variable(key));
 	}
@@ -39,6 +41,7 @@ public class Variables {
 	}
 	
 	public static MathObject ans() {
+		if(ans.size()==0) return null;
 		return ans.get(ans.size()-1);
 	}
 	
