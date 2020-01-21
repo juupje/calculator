@@ -13,7 +13,7 @@ public class SettingsHandler {
 	}
 	
 	public void init() {
-		pref = Preferences.userRoot().node("/preferences");		
+		pref = Preferences.userRoot().node("/preferences");
 	}
 	
 	public boolean exists(String key) {

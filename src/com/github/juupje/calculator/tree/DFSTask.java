@@ -6,6 +6,9 @@ public abstract class DFSTask implements Consumer<Node<?>> {
 	protected Object[] obj;
 	protected boolean usesFlags = false;
 	
+	public DFSTask() {
+		this(false);
+	}
 	public DFSTask(boolean usesFlags) {
 		this.usesFlags = usesFlags;
 	}

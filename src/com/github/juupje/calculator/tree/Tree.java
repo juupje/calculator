@@ -41,7 +41,7 @@ public class Tree {
 		return evaluateNode(root);
 	}
 	
-	protected MathObject evaluateNode(Node<?> n) throws TreeException {
+	public MathObject evaluateNode(Node<?> n) throws TreeException {
 		if(n.isInternal()) {
 			if(n.data instanceof Function)
 				return ((Function) n.data).evaluate(evaluateNode(n.left()));

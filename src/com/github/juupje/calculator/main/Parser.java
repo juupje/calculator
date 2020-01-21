@@ -13,6 +13,7 @@ import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MConst;
+import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MMatrix;
@@ -207,9 +208,14 @@ public class Parser {
 					Node<?> m = n;
 					n = new Node<Operator>(ELEMENT);
 					n.left(m);
-					if(v.size() == 1)
-						n.right(new Node<MathObject>(v.get(0)));
-					else
+					if(v.size() == 1) {
+						if(v.get(0) instanceof MExpression && !(v.get(0) instanceof MFunction))
+							n.right(((MExpression) v.get(0)).getTree().getRoot());
+						else if(v.get(0) instanceof MReal)
+							n.right(new Node<MReal>((MReal) v.get(0)));
+						else
+							throw new UnexpectedCharacterException("Expected expression or real number as index, got " + v.get(0));
+					} else
 						n.right(new Node<MVector>(v));
 				}
 				if (!Variables.exists(str))

@@ -37,6 +37,20 @@ public class Shape {
 			if(i!=1) dimension++;
 	}
 	
+	public Shape(int i, Shape s) {
+		if(s.dim()==0) {
+			shape = new int[] {i};
+			dimension = 1;
+		} else {
+			shape = new int[1+s.size()];
+			shape[0] = i;
+			for(int j = 1; j < shape.length; j++)
+				shape[j] = s.get(j-1);
+			dimension = 1+s.dim();
+		}
+		
+	}
+	
 	/**
 	 * Returns the {@code shape} array.
 	 * @return an {@code this.shape}.

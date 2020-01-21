@@ -22,6 +22,7 @@ import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
+import com.github.juupje.calculator.mathobjects.MRecSequence;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
@@ -48,7 +49,7 @@ public class Printer {
 	 * \begin{document}
 	 * </pre>
 	 */
-	private static final String latexPreamble = "\\documentclass[preview]{standalone}\n\\usepackage{amsmath}\n"
+	private static final String latexPreamble = "\\documentclass[preview]{standalone}\n\\usepackage{amsmath}\n\\usepackage{amssymb}"
 			+ "\\author{Calculator - By Joep Geuskens}\n\\newcommand{\\func}[1]{\\mathrm{#1}}\n\\begin{document}";
 	private static final String latexEnd = "\\end{document}";
 
@@ -271,11 +272,12 @@ public class Printer {
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 */
 	public static String toLatex(MVector v) {
-		String latex = "\\begin{pmatrix}";
+		StringBuilder latex = new StringBuilder("\\begin{pmatrix}");
 		String s = v.isTransposed() ? "&" : "\\\\";
 		for (MathObject mo : v.elements())
-			latex += toLatex(mo) + s;
-		return latex.substring(0, latex.length() - s.length()) + "\\end{pmatrix}";
+			latex.append(toLatex(mo)).append(s);
+		latex.setLength(latex.length() - s.length());
+		return latex.append("\\end{pmatrix}").toString();
 	}
 
 	/**
@@ -286,13 +288,30 @@ public class Printer {
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 */
 	public static String toLatex(MMatrix m) {
-		String latex = "\\begin{pmatrix}" + System.lineSeparator();
+		StringBuilder latex = new StringBuilder();
+		latex.append("\\begin{pmatrix}").append(System.lineSeparator());
 		for (MathObject[] row : m.elements()) {
 			for (MathObject mo : row)
-				latex += toLatex(mo) + " & ";
-			latex = latex.substring(0, latex.length() - 2) + "\\\\"; // cut off the last "& " and add line separator.
+				latex.append(toLatex(mo)).append(" & ");
+			//cut off the last "& " and add line separator.
+			latex.setLength(latex.length() - 2);
+			latex.append("\\\\");
 		}
-		return latex + System.lineSeparator() + "\\end{pmatrix}";
+		return latex.append(System.lineSeparator()).append("\\end{pmatrix}").toString();
+	}
+	
+	public static String toLatex(MSequence m) {
+		String name = m.getIndexName()=="a" ? "b" : "a";
+		String indexedName = name + "_" + m.getIndexName();
+		StringBuilder latex = new StringBuilder();
+		latex.append("(").append(indexedName).append(")_{").append(m.getIndexName()).append("\\in\\mathbb{N}}\\qquad ");
+		if(m instanceof MRecSequence) {
+			String fstring = toLatex(m.getFunction());
+			latex.append(indexedName).append("=").append(fstring.replace("__", name + "_"));
+			System.out.println(latex);
+		} else
+			latex.append(indexedName).append("=").append(toLatex(m.getFunction()));
+		return latex.toString();
 	}
 
 	/**
@@ -313,6 +332,8 @@ public class Printer {
 			return mo.toString();
 		else if (mo instanceof MComplex)
 			return mo.toString().replace("(", "{").replace(")", "}");
+		else if(mo instanceof MSequence)
+			return toLatex((MSequence) mo);
 		else
 			throw new IllegalArgumentException("Can't export " + mo.getClass() + " to LaTex");
 	}
@@ -324,7 +345,7 @@ public class Printer {
 	 * @param node the {@link Node} to be converted to text.
 	 * @return a <tt>String</tt> containing the argument in text format.
 	 */
-	private static String nodeToText(Node<?> n) {
+	public static String nodeToText(Node<?> n) {
 		String s = "";
 		if (n.data instanceof MConst)
 			s += ((MConst) n.data).name();
@@ -413,6 +434,19 @@ public class Printer {
 	public static String toText(MSequence mo) {
 		return "{" + toText(mo.getFunction()) + " | " + mo.getIndexName() + "=" + 
 				mo.getBegin() + "..." + (mo.getEnd()>= 0 ? mo.getEnd() : "infinity") + "}";
+	}
+	
+	public static String toText(MRecSequence mo) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("r{[").append(mo.getIndexName()).append("]=").append(toText(mo.getFunction()).replace("_", ""));
+		builder.append(" | ");
+		for(int i = 0; i < mo.getInitalParameterCount(); i++) {
+			if(i>0)
+				builder.append(", "); 
+			builder.append("[").append(i).append("]=").append(mo.get(i).toString());
+		}
+		builder.append("}");
+		return builder.toString();
 	}
 	
 	/**
@@ -632,14 +666,14 @@ public class Printer {
 		if (scalar.isComplex()) {
 			((MComplex) scalar).fixPhi();
 			if (Settings.getBool(Settings.COMPLEX_IN_POLAR))
-				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "í)";
+				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "ï¿½)";
 			else {
 				String stra = numToString(scalar.real());
 				String strb = numToString(scalar.imag());
 				if(stra.equals("0") && strb.equals("0"))
 					return "0";
 				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
-						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "í" : "");
+						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "ï¿½" : "");
 			}
 		}
 		return numToString(scalar.real());

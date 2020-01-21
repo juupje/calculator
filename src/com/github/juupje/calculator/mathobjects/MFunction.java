@@ -234,19 +234,18 @@ public class MFunction extends MExpression {
 				}
 
 				// If the node is not internal and this function is not defined, replace this
-				// node
-				// with its evaluated value.
+				// node with its evaluated value.
 				if (defined)
 					return;
-				if (n.data instanceof Variable) { // this implies that the node is not internal
+				if (n.data instanceof Variable) {
 					for (String var : vars)
 						if (n.data.equals(var))
 							return;
-					MathObject obj = ((Variable) n.data).get();
+					//MathObject obj = ((Variable) n.data).get();
 
-					n.replace(new Node<MathObject>(obj.evaluate()));
+					n.replace(new Node<MathObject>(tree.evaluateNode(n)));//new Node<MathObject>(obj.evaluate()));
 				} else if (n.data instanceof MathObject)
-					n.replace(new Node<MathObject>(((MathObject) n.data).evaluate()));
+					n.replace(new Node<MathObject>(tree.evaluateNode(n)));//n.replace(new Node<MathObject>(((MathObject) n.data).evaluate()));
 			}
 		});
 		return tree;
@@ -404,16 +403,19 @@ public class MFunction extends MExpression {
 		}
 
 		@Override
-		protected MathObject evaluateNode(Node<?> n) throws TreeException {
+		public MathObject evaluateNode(Node<?> n) throws TreeException {
 			if (n.data instanceof Variable) {
 				MathObject var = paramMap.get(((Variable) n.data).getName());
-				if (var instanceof MFunction) {
+				if(var == null)
+					return super.evaluateNode(n);
+				else if (var instanceof MFunction) {
+					System.out.println("YO! Dude, what the hell is this? Please check why this line is executed.");
 					if (n.left() == null)
 						return ((MFunction) var).evaluateAt(paramMap);
 					else
 						return ((MFunction) var).evaluateAt(((MVector) evaluateNode(n.left())).elements());
-				}
-				return var == null ? super.evaluateNode(n) : var;
+				} else
+					return var;
 			} else if (n.data instanceof MVectorFunction) {
 				if (n.left() == null)
 					return ((MVectorFunction) n.data).evaluateAt(paramMap);
