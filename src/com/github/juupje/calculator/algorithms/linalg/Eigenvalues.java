@@ -3,7 +3,6 @@ package com.github.juupje.calculator.algorithms.linalg;
 import static com.github.juupje.calculator.algorithms.linalg.MatrixToolkit.*;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MComplex;
@@ -12,6 +11,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 
 public class Eigenvalues extends Algorithm {
 

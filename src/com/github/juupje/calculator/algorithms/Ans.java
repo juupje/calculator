@@ -1,9 +1,9 @@
 package com.github.juupje.calculator.algorithms;
 
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.main.Variables;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 
 public class Ans extends Algorithm {
 
@@ -46,8 +46,7 @@ public class Ans extends Algorithm {
 
 	@Override
 	public Shape shape(Shape... shapes) {
-		// TODO Auto-generated method stub
-		return null;
+		return new Shape();
 	}
 
 }

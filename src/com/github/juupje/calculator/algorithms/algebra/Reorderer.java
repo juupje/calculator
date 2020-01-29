@@ -1,10 +1,10 @@
 package com.github.juupje.calculator.algorithms.algebra;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 import com.github.juupje.calculator.tree.Tree;
 
 public class Reorderer extends Algorithm {

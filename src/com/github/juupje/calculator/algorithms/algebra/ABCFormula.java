@@ -1,12 +1,12 @@
 package com.github.juupje.calculator.algorithms.algebra;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 import com.github.juupje.calculator.settings.Settings;
 
 public class ABCFormula extends Algorithm {

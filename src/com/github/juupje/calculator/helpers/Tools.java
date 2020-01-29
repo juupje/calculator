@@ -87,6 +87,20 @@ public class Tools {
 		return true;
 	}
 	
+	public static String extractName(String s) {
+		int index = 0;
+		while(index!=-1) {
+			index = s.indexOf("=", index);
+			if (index > 0 && !insideBrackets(s, index)) {
+				if(s.charAt(index-1)==':') index--;
+				int brIndex = s.indexOf('(');
+				if(brIndex>0 && brIndex<index) index = brIndex;
+				return s.substring(0, index);
+			}
+		}
+		return null;
+	}
+	
 	public static String extractFirst(String s, String begin, String end) {
 		int index = s.indexOf(begin)+begin.length();
 		return s.substring(index, s.indexOf(end, index));

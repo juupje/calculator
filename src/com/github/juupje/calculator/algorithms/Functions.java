@@ -1,6 +1,5 @@
 package com.github.juupje.calculator.algorithms;
 
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
@@ -11,6 +10,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 import com.github.juupje.calculator.settings.Settings;
 
 public class Functions {

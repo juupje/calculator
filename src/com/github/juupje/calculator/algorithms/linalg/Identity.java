@@ -1,10 +1,10 @@
 package com.github.juupje.calculator.algorithms.linalg;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 
 public class Identity extends Algorithm {
 

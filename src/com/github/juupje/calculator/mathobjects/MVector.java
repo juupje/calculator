@@ -3,7 +3,6 @@ package com.github.juupje.calculator.mathobjects;
 import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.Norm;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.main.Operator;

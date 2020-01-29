@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.linalg.JordanElimination;
 import com.github.juupje.calculator.algorithms.linalg.LUDecomposition;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;

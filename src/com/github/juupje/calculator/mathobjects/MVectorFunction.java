@@ -2,7 +2,6 @@ package com.github.juupje.calculator.mathobjects;
 
 import java.util.HashMap;
 
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;

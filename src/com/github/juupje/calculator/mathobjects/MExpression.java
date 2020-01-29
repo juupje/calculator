@@ -3,7 +3,6 @@ package com.github.juupje.calculator.mathobjects;
 import java.util.HashSet;
 
 import com.github.juupje.calculator.helpers.Printer;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Calculator;

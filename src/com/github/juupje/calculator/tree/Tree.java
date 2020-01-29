@@ -1,7 +1,6 @@
 package com.github.juupje.calculator.tree;
 
 import com.github.juupje.calculator.algorithms.Functions.Function;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;
@@ -10,6 +9,7 @@ import com.github.juupje.calculator.mathobjects.MConst;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 
 public class Tree {
 	public Node<?> root = null;

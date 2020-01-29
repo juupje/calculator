@@ -1,5 +1,6 @@
-package com.github.juupje.calculator.helpers;
+package com.github.juupje.calculator.mathobjects;
 
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 
 /**
@@ -8,11 +9,11 @@ import com.github.juupje.calculator.helpers.exceptions.ShapeException;
  * A vector of size n will be saves as {@code (n)}, a Matrix of size {@code n x m} will be saved as (n,m) etc.
  * A scalar value will be saved as either {@code (0)} or a {@code null} value.
  */
-public class Shape {
+public final class Shape {
 	public static final Shape SCALAR = new Shape();
 	
-	int[] shape;
-	int dimension;
+	private int[] shape;
+	private int dimension;
 	
 	/**
 	 * Constructs a new shape of the given integers.
@@ -86,7 +87,7 @@ public class Shape {
 	
 	public Shape transpose() {
 		if(shape.length>2)
-			throw new ShapeException("Can't transpose shape rin" + toString());
+			throw new ShapeException("Can't transpose shape " + toString());
 		if(shape.length==2) {
 			int temp = shape[0];
 			shape[0]=shape[1];
@@ -172,11 +173,16 @@ public class Shape {
 	}
 	
 	public int rows() {
-		return shape[0];
+		if(shape.length>0)
+			return shape[0];
+		else
+			return 1;
 	}
 
 	public int cols() {
-		return shape[1];
+		if(shape.length>1)
+			return shape[1];
+		else return 1;
 	}
 	
 	public boolean isSquare() {

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.github.juupje.calculator.helpers.Printer;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;

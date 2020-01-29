@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.algorithms.Functions.Function;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.mathobjects.MComplex;
@@ -17,6 +16,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 import com.github.juupje.calculator.tree.DFSTask;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;

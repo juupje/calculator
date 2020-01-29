@@ -1,7 +1,5 @@
 package com.github.juupje.calculator.mathobjects;
 
-import com.github.juupje.calculator.helpers.Shape;
-
 public interface MathObject {
 	/**
 	 * Changes the current <tt>MathObject</tt> (called <tt>a</tt>) to <tt>b</tt>, such that <tt>a+b</tt>=0.

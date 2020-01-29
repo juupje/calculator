@@ -1,7 +1,6 @@
 package com.github.juupje.calculator.mathobjects;
 
 import com.github.juupje.calculator.helpers.Printer;
-import com.github.juupje.calculator.helpers.Shape;
 
 public abstract class MScalar implements MathObject {
 	

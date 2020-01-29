@@ -1,7 +1,6 @@
 package com.github.juupje.calculator.mathobjects;
 
 import com.github.juupje.calculator.helpers.Printer;
-import com.github.juupje.calculator.helpers.Shape;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;

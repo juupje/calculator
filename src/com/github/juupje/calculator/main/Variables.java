@@ -2,10 +2,11 @@ package com.github.juupje.calculator.main;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MathObject;
-public class Variables {
+public final class Variables {
 	private static HashMap<String, MathObject> vars = new HashMap<String, MathObject>();
 	private static ArrayList<MathObject> ans = new ArrayList<>();
 	
@@ -36,8 +37,9 @@ public class Variables {
 		vars.remove(string);
 	}
 	
-	public static void ans(MathObject mo) {
+	public static int ans(MathObject mo) {
 		ans.add(mo);
+		return ans.size()-1;
 	}
 	
 	public static MathObject ans() {
@@ -46,9 +48,17 @@ public class Variables {
 	}
 	
 	public static MathObject ans(int i) {
+		try {
 		if(i<=0)
 			return ans.get(ans.size()+i-1);
 		return ans.get(i-1);
+		} catch(IndexOutOfBoundsException e) {
+			throw new IndexException("Answer " + (i>=0 ? i : ans.size()+i-1) + " does not exist.");
+		}
+	}
+	
+	public static int getAnswerCount() {
+		return ans.size();
 	}
 
 	public static HashMap<String, MathObject> getAll() {
