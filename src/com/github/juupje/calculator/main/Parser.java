@@ -248,8 +248,8 @@ public class Parser {
 			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
 			p = p.parent;
 			p.right(getFactor());
-			return p.right();
-		} else if (consume('×') || consume('~')) {
+			return p;
+		} else if (consume('i') || consume('~')) {
 			tree.insert(p, new Node<Operator>(CROSS), Node.LEFT);
 			p = p.parent;
 			p.right(getFactor());
@@ -258,7 +258,7 @@ public class Parser {
 			tree.insert(p, new Node<Operator>(DIVIDE), Node.LEFT);
 			p = p.parent;
 			p.right(getFactor());
-			return p.right();
+			return p;
 		} else if (consume('^')) {
 			tree.insert(p, new Node<Operator>(POWER), Node.LEFT);
 			p = p.parent;
@@ -272,7 +272,7 @@ public class Parser {
 			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
 			p = p.parent;
 			p.right(getFactor());
-			return p.right();
+			return p;
 		} else if (consume('(')) {
 			return getSubTree();
 		}
@@ -299,7 +299,7 @@ public class Parser {
 		while (true) {
 			if (consume('*'))
 				d = MULTIPLY.evaluate(d, processFactor());
-			else if (consume('×') || consume('~'))
+			else if (consume('i') || consume('~'))
 				d = CROSS.evaluate(d, processFactor());
 			else if (consume('/'))
 				d = DIVIDE.evaluate(d, processFactor());
