@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.linalg.JordanElimination;
 import com.github.juupje.calculator.algorithms.linalg.LUDecomposition;
+import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
@@ -21,6 +22,14 @@ public class MMatrix implements MathObject {
 	}
 
 	public MMatrix(double[][] m) {
+		this.m = new MathObject[m.length][m[0].length];
+		for (int i = 0; i < m.length; i++)
+			for (int j = 0; j < m[i].length; j++)
+				this.m[i][j] = new MReal(m[i][j]);
+		shape = new Shape(m.length, m[0].length);
+	}
+	
+	public MMatrix(int[][] m) {
 		this.m = new MathObject[m.length][m[0].length];
 		for (int i = 0; i < m.length; i++)
 			for (int j = 0; j < m[i].length; j++)
@@ -156,7 +165,11 @@ public class MMatrix implements MathObject {
 		return shape.cols() == shape.rows();
 	}
 
-	public MMatrix getSubMatrix(int lefttoprow, int lefttopcol, int rightbottomrow, int rightbottomcol) {
+	public MSubMatrix getSubMatrixx(int startrow, int endrow, int startcol, int endcol) {
+		return new MSubMatrix(new Slice(startrow, endrow, startcol, endcol));
+	}
+	
+	public MMatrix extractSubMatrix(int lefttoprow, int lefttopcol, int rightbottomrow, int rightbottomcol) {
 		if (lefttoprow < 0 || lefttopcol < 0 || rightbottomrow >= shape.rows() || rightbottomcol >= shape.cols())
 			throw new IndexOutOfBoundsException("Bounds of submatrix out of bounds! (" + lefttoprow + ", " + lefttopcol
 					+ ", " + rightbottomrow + ", " + rightbottomcol + ") does not fit inside matrix of shape " + shape);
@@ -173,13 +186,14 @@ public class MMatrix implements MathObject {
 	 * using {@link Operator#ADD}
 	 * 
 	 * @param other the {@code MVvector} to be added, this one will not be changed.
-	 * @return {@code this} after the addition. @ if the other matrix's shape does
+	 * @return {@code this} after the addition. 
+	 * @throws ShapeException if the other matrix's shape does
 	 * not equal this one's.
 	 */
 	public MMatrix add(MMatrix other) {
 		if (!other.shape().equals(shape()))
-			throw new InvalidOperationException(
-					"To add two Matrixes, they need to be the same shape! Shape: " + shape() + " and " + other.shape());
+			throw new ShapeException(
+					"To add two matrices, they need to be the same shape! Shape: " + shape() + " and " + other.shape());
 		for (int i = 0; i < m.length; i++)
 			for (int j = 0; j < m[i].length; j++)
 				m[i][j] = Operator.ADD.evaluate(m[i][j], other.get(i, j));
@@ -193,12 +207,13 @@ public class MMatrix implements MathObject {
 	 * 
 	 * @param other the {@code MVvector} to be subtracted, this one will not be
 	 *              changed.
-	 * @return {@code this} after the subtraction. @ if the other matrix's shape
+	 * @return {@code this} after the subtraction. 
+	 * @throws ShapeException if the other matrix's shape
 	 * does not equal this one's.
 	 */
 	public MMatrix subtract(MMatrix other) {
 		if (!other.shape().equals(shape()))
-			throw new InvalidOperationException("To subtract two Matrixes, they need to be the same shape! Shape: "
+			throw new ShapeException("To subtract two matrices, they need to be the same shape! Shape: "
 					+ shape() + " and " + other.shape());
 		for (int i = 0; i < m.length; i++)
 			for (int j = 0; j < m[i].length; j++)
@@ -244,20 +259,18 @@ public class MMatrix implements MathObject {
 		if (shape.cols() != other.shape().rows())
 			throw new ShapeException("Matrix product is only defined for n x m and m x k Matrices. Shapes: " + shape()
 					+ ", " + other.shape());
-		MMatrix C = new MMatrix(new Shape(shape.rows(), other.shape().cols()));
-		for (int i = 0; i < C.shape().rows(); i++) {
-			for (int j = 0; j < C.shape().cols(); j++) {
-				MathObject C_ij = null;
+		MathObject[][] C = new MathObject[shape.rows()][other.shape().cols()];
+		for (int i = 0; i < C.length; i++) {
+			for (int j = 0; j < C[0].length; j++) {
 				for (int k = 0; k < shape().cols(); k++)
-					C_ij = Operator.ADD.evaluate(C_ij, Operator.MULTIPLY.evaluate(get(i, k), other.get(k, j)));
-				C.set(i, j, C_ij);
+					C[i][j] = Operator.ADD.evaluate(C[i][j], Operator.MULTIPLY.evaluate(m[i][k], other.get(k, j)));
 			}
 		}
-		return C;
+		return new MMatrix(C);
 	}
 
 	public MMatrix multiplyRight(MMatrix other) {
-		return other.multiplyLeft(this);
+		return other.multiplyLeft(this); //no need to copy, as multiplyleft creates a new matrix
 	}
 
 	/**
@@ -273,11 +286,11 @@ public class MMatrix implements MathObject {
 	public MathObject multiplyLeft(MVector other) {
 		if (other.isTransposed()) { // Matrix times row vector
 			if (shape.cols() == 1) {
-				MMatrix matrix = empty(shape.rows(), other.size());
-				for (int i = 0; i < matrix.shape.rows(); i++)
-					for (int j = 0; j < matrix.shape.cols(); j++)
-						matrix.set(i, j, Operator.MULTIPLY.evaluate(get(i, 0), other.get(j)));
-				return matrix;
+				MathObject[][] matrix = new MathObject[shape.rows()][other.size()];
+				for (int i = 0; i < matrix.length; i++)
+					for (int j = 0; j < matrix[0].length; j++)
+						matrix[i][j] =  Operator.MULTIPLY.evaluate(m[i][0], other.get(j));
+				return new MMatrix(matrix);
 			} else
 				throw new ShapeException("matrix/row-vector product is only defined for an (n x 1)-matrix and n-vector, got " + shape + " and " + other.shape());
 		} else {
@@ -290,8 +303,8 @@ public class MMatrix implements MathObject {
 				MathObject b_i = null;
 				for (int j = 0; j < shape().cols(); j++) {
 					b_i = Operator.ADD.evaluate(b_i, Operator.MULTIPLY.evaluate(get(i, j), other.get(j)));
-					b.set(i, b_i);
 				}
+				b.set(i, b_i);
 			}
 			return b;
 		}
@@ -300,34 +313,30 @@ public class MMatrix implements MathObject {
 	public MathObject multiplyRight(MVector other) {
 		if (other.isTransposed()) {
 			if (other.size() == shape.rows()) {
-				MVector v = MVector.empty(shape.cols());
+				MathObject[] v = new MathObject[shape.cols()];
 				for (int i = 0; i < shape.cols(); i++) {
 					MathObject mo = null;
 					for (int j = 0; j < shape.rows(); j++)
 						mo = Operator.ADD.evaluate(mo, Operator.MULTIPLY.evaluate(get(j, i), other.get(j)));
-					v.set(i, mo);
+					v[i] = mo;
 				}
-				return v;
+				return new MVector(v).transpose();
 			} else
 				throw new ShapeException(
 						"The row-vector/matrix product is only defined for a n-vector and (n x m)-matrix, got "
 								+ other.shape() + " and " + shape);
 		} else {
 			if (shape.rows() == 1) {
-				MMatrix m = empty(other.size(), shape.cols());
-				for (int i = 0; i < m.shape().rows(); i++)
-					for (int j = 0; j < m.shape.cols(); j++)
-						m.set(i, j, Operator.MULTIPLY.evaluate(other.get(i), get(0, j)));
-				return m;
+				MathObject[][] m = new MathObject[other.size][shape.cols()];
+				for (int i = 0; i < m.length; i++)
+					for (int j = 0; j < m[0].length; j++)
+						m[i][j] = Operator.MULTIPLY.evaluate(other.get(i), m[0][j]);
+				return new MMatrix(m);
 			} else
 				throw new ShapeException(
 						"The column-vector/matrix product is only defined for an n-vector and (1 x m)-matrix, got "
 								+ other.shape + " and " + shape);
 		}
-
-		// throw new ShapeException("The Vector-Matrix product is only defined for an
-		// size n column-vector and (n x 1)-matrix or size n row-vector and (1 x
-		// n)-matrix ")
 	}
 
 	/**
@@ -418,7 +427,14 @@ public class MMatrix implements MathObject {
 		if(!isSquare())
 			throw new ShapeException("Determinant is only defined for square matrices. Shape: " + shape);
 		//Decompose the matrix into LU decomposition and use Det(A)=Det(PLU)=Det(P)Det(L)Det(U)=Det(L)Det(U)
-		MVector lup = new LUDecomposition(this).execute();
+		if(m.length==2) {
+			try {
+				return ((MScalar) m[0][0].evaluate()).multiply((MScalar) m[1][1].evaluate()).subtract(((MScalar)m[0][1].evaluate()).multiply((MScalar)m[1][0].evaluate()));
+			} catch(ClassCastException e) {
+				throw new InvalidOperationException("Cannot calculate determinant of non-numeric matrix");
+			}
+		}
+		MVector lup = new LUDecomposition(evaluate()).execute();
 		MMatrix L = (MMatrix) lup.get(0);
 		MMatrix U = (MMatrix) lup.get(1);
 		MReal det = new MReal(1);
@@ -505,9 +521,9 @@ public class MMatrix implements MathObject {
 	@Override
 	public MMatrix invert() {
 		if (shape.cols() != shape.rows())
-			throw new InvalidOperationException("Only square matrices can be inverted: dimension" + shape);
+			throw new InvalidOperationException("Only square matrices can be inverted: dimension=" + shape);
 		m = new JordanElimination(this, identity(shape.rows())).execute()
-				.getSubMatrix(0, shape.cols(), shape.rows() - 1, shape.cols() * 2 - 1).elements();
+				.extractSubMatrix(0, shape.cols(), shape.rows() - 1, shape.cols() * 2 - 1).elements();
 		return this;
 	}
 
@@ -607,5 +623,18 @@ public class MMatrix implements MathObject {
 
 	public static MMatrix empty(int rows, int cols) {
 		return new MMatrix(new MathObject[rows][cols]);
+	}
+	
+	class Slice {
+		int startrow, endrow, startcol, endcol;
+		private Slice(int startrow, int endrow, int startcol, int endcol) {
+			if(endrow<=startrow || endcol<=startcol)
+				throw new IndexException("End index greater than start index");
+			this.startrow = startrow; this.endrow = endrow; this.startcol = startcol; this.endcol = endcol;
+		}
+		
+		public MMatrix getMatrix() {
+			return MMatrix.this;
+		}
 	}
 }
