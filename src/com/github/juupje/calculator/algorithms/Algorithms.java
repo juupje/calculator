@@ -17,9 +17,14 @@ public enum Algorithms {
 	RREF(new JordanElimination()),
 	LU(new LUDecomposition()),
 	DIAG(new Diagonal()),
-	ID(new Identity()),
+	ID(new MatrixGenerator(MatrixGenerator.Type.ID)),
+	FULL(new MatrixGenerator(MatrixGenerator.Type.FULL)),
+	ZEROS(new MatrixGenerator(MatrixGenerator.Type.ZEROS)),
+	ONES(new MatrixGenerator(MatrixGenerator.Type.ONES)),
 	TRACE(new Trace()),
 	EIG(new Eigenvalues()),
+	
+	NORM(new Norm()),
 	
 	ABC(new ABCFormula()),
 	SIMPLIFY(new Simplifier()),

@@ -6,6 +6,7 @@ import com.github.juupje.calculator.algorithms.Norm;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.main.Operator;
+import com.github.juupje.calculator.settings.Settings;
 
 public class MVector implements MathObject{
 	MathObject[] v;
@@ -327,9 +328,12 @@ public class MVector implements MathObject{
 	@Override
 	public String toString() {
 		String s = "(";
-		for(MathObject element : v)
+		for(MathObject element : v) {
 			s += element.toString() + ", ";
-		return s.substring(0, s.length() - 2) + ")" + (transposed ? "'" : "");
+			if(Settings.getBool(Settings.MULTILINE_MATRIX) && element instanceof MMatrix)
+				s += System.lineSeparator();
+		}
+		return s.substring(0, s.lastIndexOf(',')) + ")" + (transposed ? "'" : "");
 	}
 	
 	//###### static methods #####	

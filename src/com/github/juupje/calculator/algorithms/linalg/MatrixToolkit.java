@@ -7,15 +7,16 @@ import com.github.juupje.calculator.mathobjects.MScalar;
 
 public abstract class MatrixToolkit<T> {
 	
-	public final static int REAL 		= 0b00000001;
-	public final static int SYMMETRIC 	= 0b10000010;
-	public final static int HERMITIAN 	= 0b10000100;
-	public final static int UHESSENBERG = 0b10001000;
-	public final static int LHESSENBERG = 0b10010000;
-	public final static int UTRIANGULAR = 0b10101000;
-	public final static int LTRIANGULAR = 0b11010000;
-	public final static int SQUARE		= 0b10000000;
-	public final static int DIAGONAL	= 0b11111010;
+	public final static int MASKSET		= 0b000000001;
+	public final static int REAL 		= 0b000000010;
+	public final static int SYMMETRIC 	= 0b100000100;
+	public final static int HERMITIAN 	= 0b100001000;
+	public final static int UHESSENBERG = 0b100010000;
+	public final static int LHESSENBERG = 0b100100000;
+	public final static int UTRIANGULAR = 0b101010000;
+	public final static int LTRIANGULAR = 0b110100000;
+	public final static int SQUARE		= 0b100000000;
+	public final static int DIAGONAL	= 0b111110100;
 	
 	T[][] matrix;
 	int rows, cols, augmcols = 0;
@@ -36,16 +37,23 @@ public abstract class MatrixToolkit<T> {
 			if(!complex)
 				break;
 		}
-		if(allReal)
-			return new DoubleMatrixToolkit(m);
+		int rows = m.shape().rows();
+		int cols = m.shape().cols();
+		if(allReal) {
+			Double[][] matrix = new Double[rows][cols];
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++)
+					matrix[i][j] = ((MReal)m.get(i, j)).getValue();
+			return new DoubleMatrixToolkit(matrix);
+			
+		}
 		else if(complex) {
 			MScalar[][] s = new MScalar[m.shape().rows()][m.shape().cols()];
 			for(int i = 0; i < s.length; i++)
 				for(int j = 0; j < s[i].length; j++)
-					s[i][j] = (MScalar) m.get(i, j);
+					s[i][j] = (MScalar) m.get(i, j).copy();
 			return new ScalarMatrixToolkit(s);
-		}
-		else
+		} else
 			throw new IllegalArgumentException("Matrix operations are only supported for scalar valued matrices.");
 	}
 	
@@ -103,15 +111,15 @@ public abstract class MatrixToolkit<T> {
 	 */
 	public abstract void reorder(int maxRow);
 	
-	public boolean isSquare() {
+	private boolean isSquare() {
 		return rows==cols;
 	}
 	
-	public boolean isSymmetric() {
+	/*private boolean isSymmetric() {
 		return isSymmetric(isSquare() ? SQUARE : 0);
-	}
+	}*/
 	
-	public boolean isSymmetric(int mask) {
+	private boolean isSymmetric(int mask) {
 		if((mask & SQUARE) != SQUARE)
 			return false;
 		for(int i = 0; i < rows; i++)
@@ -121,11 +129,11 @@ public abstract class MatrixToolkit<T> {
 		return true;
 	}
 	
-	public boolean isUTriangular() {
+	/*private boolean isUTriangular() {
 		return isUTriangular(isUHessenberg() ? UHESSENBERG : 0);
-	}
+	}*/
 	
-	public boolean isUTriangular(int mask) {
+	private boolean isUTriangular(int mask) {
 		if((mask & UHESSENBERG) != UHESSENBERG) return false;
 		//because the matrix is upper hessenberg,
 		//only the first negative subdiagonal needs to contain no non-zero elements.
@@ -134,11 +142,11 @@ public abstract class MatrixToolkit<T> {
 		return true;				
 	}
 	
-	public boolean isLTriangular() {
+	/*private boolean isLTriangular() {
 		return isLTriangular(isLHessenberg() ? LHESSENBERG : 0);
-	}
+	}*/
 	
-	public boolean isLTriangular(int mask) {
+	private boolean isLTriangular(int mask) {
 		if((mask & LHESSENBERG) != LHESSENBERG) return false;
 		//because the matrix is lower hessenberg,
 		//only the first positive subdiagonal needs to contain no non-zero elements.
@@ -147,11 +155,11 @@ public abstract class MatrixToolkit<T> {
 		return true;				
 	}
 	
-	public boolean isUHessenberg() {
+	/*private boolean isUHessenberg() {
 		return isUHessenberg(isSquare() ? SQUARE : 0);
-	}
+	}*/
 	
-	public boolean isUHessenberg(int mask) {
+	private boolean isUHessenberg(int mask) {
 		if((mask & SQUARE) != SQUARE) return false;
 		for(int i = 0; i < rows; i++)
 			for(int j = 0; j < i-1; j++)
@@ -159,11 +167,11 @@ public abstract class MatrixToolkit<T> {
 		return true;				
 	}
 	
-	public boolean isLHessenberg() {
+	/*private boolean isLHessenberg() {
 		return isLHessenberg(isSquare() ? SQUARE : 0);
-	}
+	}*/
 	
-	public boolean isLHessenberg(int mask) {
+	private boolean isLHessenberg(int mask) {
 		if((mask & SQUARE) != SQUARE) return false;
 		for(int i = 0; i < rows; i++)
 			for(int j = i+2; j < cols; j++)
@@ -171,14 +179,14 @@ public abstract class MatrixToolkit<T> {
 		return true;				
 	}
 	
-	public boolean isHermitian() {
+	/*private boolean isHermitian() {
 		return isHermitian((0 | (isReal() ? REAL : 0)) | (isSymmetric() ? SYMMETRIC : 0));
-	}
+	}*/
 	
-	public abstract boolean isHermitian(int mask);
+	protected abstract boolean isHermitian(int mask);
 	
 	public int classify() {
-		int mask = 0;
+		int mask = MASKSET;
 		if(isSquare()) mask |= SQUARE;
 		else return mask;
 		if(rows < 2) return mask;
@@ -199,6 +207,8 @@ public abstract class MatrixToolkit<T> {
 	
 	public String maskAsString(int mask) {
 		String s = "";
+		if((mask & MASKSET) != MASKSET)
+			return "Mask unset";
 		if((mask & REAL)==REAL)
 			s += " real";
 		if((mask & SQUARE) == SQUARE)

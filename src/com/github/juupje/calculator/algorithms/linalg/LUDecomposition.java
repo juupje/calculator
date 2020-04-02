@@ -33,26 +33,42 @@ public class LUDecomposition extends Algorithm {
 	protected MVector lu() {
 		int n = mtk.cols;
 		double[][] L = new double[n][n];
-		double[][] U = new double[n][n];
-		Double[][] P = mtk.getPivotMatrix();
-		mtk.matrix = DoubleMatrixToolkit.multiply(P, mtk.matrix);
+		int[][] P = new int[n][n];
+		int[] order = {0,1,2};
+		
 		for(int col = 0; col < n; col++) {
-			L[col][col]=1;
-			for(int row = 0; row < col+1; row++) {
-				double s = 0;
-				for(int k = 0; k < row; k++) {
-					s += U[k][col]*L[row][k];
-				}
-				U[row][col] = mtk.matrix[row][col]-s;
+			int pivotIndex = pivotColumn(col);
+			if(pivotIndex != col) {
+				int temp = order[col]; order[col] = order[pivotIndex]; order[pivotIndex] = temp;			
 			}
-			for(int row = col; row < n; row++) {
-				double s = 0;
-				for(int k = 0; k < col; k++)
-					s += U[k][col] * L[row][k];
-				L[row][col] = (mtk.matrix[row][col] - s)/U[col][col];
+			L[col][col]=1;
+			for(int row = col+1; row < mtk.rows; row++) {
+				L[row][col] = mtk.matrix[row][col]/mtk.matrix[col][col];
+				mtk.matrix[row][col] = 0d;
+				for(int i = col+1; i < mtk.cols; i++)
+					mtk.matrix[row][i] -= L[row][col]*mtk.matrix[col][i];
 			}
 		}
-		return new MVector(new MMatrix(L), new MMatrix(U), new DoubleMatrixToolkit(P).toMMatrix());
+		for(int row = 0; row < mtk.rows; row++) {
+			P[row][order[row]] = 1;
+		}
+		return new MVector(new MMatrix(L), new MMatrix(mtk.matrix), new MMatrix(P));
+	}
+	
+	/**
+	 * Switches the current row (and index {@code col}) with the row containing the absolute highest entry in the same column below it.
+	 * @return the index of the row with which the row at index {@code col} was switched.
+	 */
+	private int pivotColumn(int col) {
+		double max = Math.abs(mtk.matrix[col][col]);
+		int indexMax = col;
+		for(int i = col+1; i < mtk.rows; i++)
+			if(Math.abs(mtk.matrix[i][col])>max) {
+				max = Math.abs(mtk.matrix[i][col]);
+				indexMax = i;
+			}
+		mtk.switchRows(col, indexMax);
+		return indexMax;
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Interpreter;
+import com.github.juupje.calculator.settings.Settings;
 
 public class IOHandler {
 	
@@ -32,6 +33,11 @@ public class IOHandler {
 	public void out(Object obj) {
 		if(enabled)
 			out(obj.toString());
+	}
+	
+	public void debug(String str) {
+		if(enabled && Settings.getBool(Settings.DEBUG))
+			out("DEBUG: " + str);
 	}
 	
 	public void outNoLine(String str) {

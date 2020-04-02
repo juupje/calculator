@@ -81,8 +81,10 @@ public class Tools {
 		if(name.equals("pi") || name.equals("e") || name.equals("i") || Functions.isFunction(name) || Algorithms.isAlgorithm(name)) return false;
 		for(int i = 0; i < name.length(); i++) {
 			int c = name.codePointAt(i);
-			if(c<65 && c>90 && c<97 && c>120 && c<945 && c>969 && c<913 && c>937 && c<30 && c<48 && c>57)
+			if(!((c>='0' && c<='9') || (c>='A' && c<='Z') || (c>='a' && c<='z') || c=='_'))
 				return false;
+			//if(c<65 && c>90 && c<97 && c>120 && c<945 && c>969 && c<913 && c>937 && c<30 && c<48 && c>57)
+				//return false;
 		}
 		return true;
 	}

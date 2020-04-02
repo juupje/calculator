@@ -7,5 +7,6 @@
 	"complex_in_polar": false,
 	"complex_enabled": false,
 	"show_stacktrace": false,
-	"multiline_matrix": true
+	"multiline_matrix": true,
+	"debug": false
 }

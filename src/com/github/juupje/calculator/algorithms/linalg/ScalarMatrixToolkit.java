@@ -12,6 +12,18 @@ public class ScalarMatrixToolkit extends MatrixToolkit<MScalar> {
 		cols = matrix[0].length;
 	}
 
+	public ScalarMatrixToolkit(MMatrix m) {
+		
+	}
+
+	public MScalar get(int i, int j) {
+		return matrix[i][j];
+	}
+	
+	public void set(MScalar scalar, int i, int j) {
+		matrix[i][j] = scalar;
+	}
+
 	/**
 	 * Adds the i-th row multiplied with c to the n-th row. Like so: <br/>
 	 * <tt>M_nj -> M_nj+c*M_ij   with   j=1....m</tt>
@@ -80,7 +92,7 @@ public class ScalarMatrixToolkit extends MatrixToolkit<MScalar> {
 	 * @return {@code true} if A_ij=A_ji* for every element A_ij in the matrix, {@code false} otherwise.
 	 */
 	@Override
-	public boolean isHermitian(int mask) {
+	protected final boolean isHermitian(int mask) {
 		if((mask & REAL) == REAL)
 			return (mask & SYMMETRIC) == SYMMETRIC;
 		for(int i = 0; i < rows; i++) {

@@ -179,7 +179,7 @@ public class MComplex extends MScalar {
 	 */
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
-	public MScalar add(MScalar other) {
+	public MComplex add(MScalar other) {
 		if(!cartesian)
 			updateCartesian();
 		if(other.isComplex()) {
@@ -410,9 +410,10 @@ public class MComplex extends MScalar {
 	 */
 	@Override
 	public double abs() {
-		if(!polar)
-			updatePolar();
-		return r;
+		if(polar)
+			return r;
+		else
+			return Math.sqrt(a*a+b*b);
 	}
 
 	/**
@@ -455,7 +456,8 @@ public class MComplex extends MScalar {
 	 */
 	@Override
 	public MComplex invert() {
-		return conjugate().divide(abs()*abs());
+		double r = abs();
+		return conjugate().divide(r*r);
 	}
 	
 	/**

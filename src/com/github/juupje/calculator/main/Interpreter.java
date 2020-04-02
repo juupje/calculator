@@ -34,6 +34,7 @@ public class Interpreter {
 					s.substring(index + 1));
 			return;
 		}
+		
 		Command c = Commands.findCommand(s);
 		if(c!=null) {
 			c.process(argsFromString(s));

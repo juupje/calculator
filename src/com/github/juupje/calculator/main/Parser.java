@@ -196,6 +196,8 @@ public class Parser {
 			else if (Functions.isFunction(str)) {
 				n = new Node<Function>(Functions.getFunction(str));
 				n.left(getFactor());
+			}else if(str.equals("inf")) {
+				n = new Node<MReal>(new MReal(Double.POSITIVE_INFINITY));
 			} else {
 				n = new Node<Variable>(new Variable(str));
 				if(((Variable) n.data).get() instanceof MFunction)
@@ -375,6 +377,8 @@ public class Parser {
 					d = d.evaluate();
 			} else if (MConst.isConstant(letters))
 				d = MConst.get(letters).evaluate();
+			else if(letters.equals("inf"))
+				d = new MReal(Double.POSITIVE_INFINITY);
 			else if(Algorithms.isAlgorithm(letters)) {
 				if(!consume('(')) {
 					if(letters.equals("ans"))

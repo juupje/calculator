@@ -26,6 +26,7 @@ public enum Settings {
 	NOTATION(Integer.class),
 	COMPLEX_IN_POLAR(Boolean.class),
 	SHOW_STACKTRACE(Boolean.class),
+	DEBUG(Boolean.class),
 	MULTILINE_MATRIX(Boolean.class);
 	
 	// Constants

@@ -1,7 +1,6 @@
 package com.github.juupje.calculator.algorithms.linalg;
 
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
-import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 
@@ -22,7 +21,7 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		cols = matrix[0].length;
 	}
 	
-	public DoubleMatrixToolkit(MMatrix m) {
+	/*public DoubleMatrixToolkit(MMatrix m) {
 		rows = m.shape().rows();
 		cols = m.shape().cols();
 		matrix = new Double[rows][cols];
@@ -30,13 +29,17 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 			for(int j = 0; j < cols; j++) {
 				if(m.get(i, j) instanceof MReal)
 					matrix[i][j] = ((MReal) m.get(i, j)).getValue();
-				else if(m.get(i, j) instanceof MExpression)
-					matrix[i][j] = ((MReal) m.get(i,j).evaluate()).getValue();
-				else
+				else if(m.get(i, j) instanceof MExpression) {
+					try {
+						matrix[i][j] = ((MReal) m.get(i,j).evaluate()).getValue();
+					} catch(ClassCastException e) {
+						throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + m.getClass());
+					}
+				} else
 					throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + m.getClass());
 			}
 		}
-	}
+	}*/
 
 	/**
 	 * Adds the i-th row multiplied with c to the n-th row. Like so: <br/>
@@ -106,13 +109,26 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 				prevZeros = curZeros;
 		}
 		reorder(maxRow-1);
-	}	
+	}
 	
-	public Double[][] getPivotMatrix() {
-		Double[][] P = new Double[rows][cols];
+	public double[] equalize() {
+		double[] s = new double[rows];
+		for(int i = 0; i < rows; i++) {
+			s[i] = 0;
+			for(int j = 0; j < cols; j++)
+				s[i] += Math.abs(matrix[i][j]);
+			s[i] = 1/s[i];
+			for(int j = 0; j < cols; j++)
+				matrix[i][j]*=s[i];
+		}
+		return s;
+	}
+	
+	public int[][] getPivotMatrix() {
+		int[][] P = new int[rows][cols];
 		for(int i = 0; i < P.length; i++)
 			for(int j = 0; j < P[i].length; j++)
-				P[i][j] = i==j ? 1d : 0d;
+				P[i][j] = i==j ? 1 : 0;
 		for(int col = 0; col < rows; col++) {
 			double colmax = matrix[col][col]; //max element in this column
 			int max_row = col;
@@ -123,12 +139,21 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 				}
 			}
 			if(max_row != col) {
-				Double[] tmp = P[col];
+				int[] tmp = P[col];
 				P[col] = P[max_row];
 				P[max_row] = tmp;
 			}
 		}
 		return P;
+	}
+	
+	public void applyPivot(int[][] pivot) {
+		Double[][] m = new Double[rows][cols];
+		for(int i = 0; i < rows; i++)
+			for(int j = 0; j < cols; j++)
+				if(pivot[i][j]==1)
+					m[i] = matrix[j];
+		matrix = m;
 	}
 	
 	@Override
@@ -152,7 +177,7 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	 * @return {@code true} if the flag SYMMETRIC is on, {@code false} otherwise.
 	 */
 	@Override
-	public boolean isHermitian(int mask) {
+	protected final boolean isHermitian(int mask) {
 		return (mask & SYMMETRIC) == SYMMETRIC;
 	}
 	
