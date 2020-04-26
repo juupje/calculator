@@ -5,6 +5,7 @@ import java.util.function.Function;
 import com.github.juupje.calculator.algorithms.Norm;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
+import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.settings.Settings;
 
@@ -150,14 +151,26 @@ public class MVector implements MathObject{
 		return divide(new MReal(d));
 	}
 	
+	/**
+	 * Multiplies this vector with another. Both vectors are left unchanged.
+	 * If the vectors are both column or both row vectors, the scalar product ({@link #dot(MVector)}) is returned.
+	 * Let {@code this} be a and the other vector be b.<br/>
+	 * If a is a row vector with shape (1 x m) and b is a column vector with shape (m x 1), the product ab is again the dot product.
+	 * If, however, a is a column vector of shape (n x 1) and b is a row vector with shape (1 x m), the product ab is <br/>
+	 * {@code (ab)_ij = a_i*b_j for i=1,...,n and j=1,...,m}
+	 * where ab is a matrix (also called a dyadic) the shape (n x m)
+	 * @param other the vector b
+	 * @return the dyadic product if a is a column vector and b is a row vector. Otherwise the dot product.
+	 * @see #dot(MVector)
+	 */
 	public MathObject multiply(MVector other) {
 		if(!transposed && other.isTransposed()) {//column times row vector
-			MMatrix m = MMatrix.empty(size, other.size);
-			for(int i = 0; i < m.shape().rows(); i++) {
-				for(int j = 0; j < m.shape.cols(); j++)
-					m.set(i, j, Operator.MULTIPLY.evaluate(get(i), other.get(j)));
+			MathObject[][] m = new MathObject[size][other.size];
+			for(int i = 0; i < size; i++) {
+				for(int j = 0; j < other.size; j++)
+					m[i][j] = Operator.MULTIPLY.evaluate(v[i], other.get(j));
 			}
-			return m;
+			return new MMatrix(m);
 		} else
 			return dot(other); //row times column vector
 	}
@@ -180,10 +193,11 @@ public class MVector implements MathObject{
 	 * Builds the dot product of {@code this} and the given {@code MVector} and returns it.
 	 * @param other the vector that needs to be dot-multiplied with {@code this}.
 	 * @return the resulting dot product.
+	 * @throws ShapeException if the size of {@code other} does not match the size of {@code this}.
 	 */
 	public MathObject dot(MVector other) {
 		if(other.size() != size)
-			throw new InvalidOperationException("The dot product is only defined for vectors of the same size. Sizes: " + size + ", " + other.size());
+			throw new ShapeException("The dot product is only defined for vectors of the same length. Lengths: " + size + ", " + other.size());
 		MathObject mo = null;
 		for(int i = 0; i < size; i++)
 			if(i == 0)

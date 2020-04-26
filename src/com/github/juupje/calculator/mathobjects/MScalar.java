@@ -88,6 +88,8 @@ public abstract class MScalar implements MathObject {
 	 */
 	public abstract MScalar power(double d);
 	
+	public abstract MScalar sqrt();
+	
 	@Override
 	public abstract MScalar invert();
 	@Override
@@ -103,6 +105,11 @@ public abstract class MScalar implements MathObject {
 	public abstract MScalar conjugate();
 
 	public abstract double abs();
+	
+	/**
+	 * @return the square of the absolute value.
+	 */
+	public abstract double abs2();
 	
 	public abstract boolean isComplex();
 	
@@ -123,5 +130,11 @@ public abstract class MScalar implements MathObject {
 	public Shape shape() {
 		return Shape.SCALAR;
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends MScalar> T conj(T z) {
+		if(z instanceof MReal)
+			return (T)z.copy();
+		return (T) new MComplex(z.real(),-z.imag());
+	}
 }

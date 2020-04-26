@@ -34,7 +34,8 @@ public class LUDecomposition extends Algorithm {
 		int n = mtk.cols;
 		double[][] L = new double[n][n];
 		int[][] P = new int[n][n];
-		int[] order = {0,1,2};
+		int[] order = new int[n];
+		for(int i = 0; i < n; i++) order[i] = i;
 		
 		for(int col = 0; col < n; col++) {
 			int pivotIndex = pivotColumn(col);

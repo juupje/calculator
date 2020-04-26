@@ -112,7 +112,7 @@ public class ABCFormula extends Algorithm {
 	public MVector ABC() {
 		D = B.copy().multiply(B).subtract(C.multiply(A).multiply(4));
 		B.negate();
-		D.power(0.5d);
+		D=D.sqrt();
 		A.multiply(2);
 		return new MVector(B.copy().add(D).divide(A), B.add(D).divide(A));
 	}
@@ -122,25 +122,30 @@ public class ABCFormula extends Algorithm {
 		double delta1 = 2*b*b*b-9*a*b*c+27*a*a*d;
 		double D = delta1*delta1-4*delta0*delta0*delta0;
 		MComplex ksi = new MComplex(-0.5, Math.sqrt(3)*0.5);
+		MScalar x2, x3;
+		MReal x1;
 		if(D<0) {
 			double absD = Math.abs(D);
-			double r2 = delta1*delta1/4+D/4;
+			double r2 = delta1*delta1/4+absD/4;
 			//there is always one real root
-			MReal x1 = new MReal((b+Math.pow(r2, 1./6)*2*Math.cos(Math.atan2(Math.sqrt(absD), delta1)/3))/-3/a);
+			x1 = new MReal((b+Math.pow(r2, 1./6)*2*Math.cos(Math.atan2(Math.sqrt(absD), delta1)/3))/-3/a);
 			MComplex C = new MComplex(delta1/2, Math.sqrt(absD)/2).power(1/3.);
 			MComplex C1 = C.multiply(ksi); //C1==C
 			MComplex C2 = ksi.multiply(C1); //C2==ksi
-			MComplex x2 = C1.add(new MReal(delta0).divide(C1)).add(b).divide(-3*a);
-			MComplex x3 = C2.add(new MReal(delta0).divide(C2)).add(b).divide(-3*a);
-			return new MVector(x1,x2, x3);
+			x2 = C1.add(new MReal(delta0).divide(C1)).add(b).divide(-3*a);
+			x3 = C2.add(new MReal(delta0).divide(C2)).add(b).divide(-3*a);
 		} else {
 			double C = Math.pow((delta1+Math.signum(delta1)*Math.sqrt(D))/2, 1./6);
-			MReal x1 = new MReal((b+C+delta0/C)/-3/a);
+			x1 = new MReal((b+C+delta0/C)/-3/a);
 			MComplex C1 = new MComplex(C,0).multiply(ksi);
-			MComplex x2 = C1.copy().add(new MReal(delta0).divide(C1)).add(b).divide(-3*a);
-			MComplex x3 = C1.multiply(ksi).add(new MReal(delta0).divide(C1)).add(b).divide(-3*a);
-			return new MVector(x1, x2, x3);
+			x2 = C1.copy().add(new MReal(delta0).divide(C1)).add(b).divide(-3*a);
+			x3 = C1.multiply(ksi).add(new MReal(delta0).divide(C1)).add(b).divide(-3*a);
 		}
+		if(x2.imag()==0)//because sometimes it is apparently?
+			x2 = new MReal(x2.real());
+		if(x3.imag()==0)
+			x3 = new MReal(x3.real());
+		return new MVector(x1, x2, x3);
 	}
 	
 	public MVector ABCD() {
@@ -152,7 +157,8 @@ public class ABCFormula extends Algorithm {
 		D = delta1.copy().multiply(delta1).subtract(delta0.copy().power(3).multiply(4));
 		
 		MComplex ksi = new MComplex(-0.5, 0.5*Math.sqrt(3));
-		MScalar C = delta1.add(D.power(0.5d)).divide(2).power(1./3);
+		D = D.sqrt();
+		MScalar C = delta1.add(D).divide(2).power(1./3);
 		A.multiply(-3).invert(); //A -> -1/3A
 		MScalar x1 = C.copy().add(B).add(delta0.divide(C)).multiply(A); //delta0->delta0/C
 		C.multiply(ksi);

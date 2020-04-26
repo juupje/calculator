@@ -182,11 +182,8 @@ public class MComplex extends MScalar {
 	public MComplex add(MScalar other) {
 		if(!cartesian)
 			updateCartesian();
-		if(other.isComplex()) {
-			a += ((MComplex) other).real();
-			b += ((MComplex) other).imag();
-		} else
-			a += ((MReal) other).getValue();
+		a += other.real();
+		b += other.imag();
 		polar = polar && other.equals(0);
 		return this;
 	}
@@ -403,9 +400,19 @@ public class MComplex extends MScalar {
 		return this;
 	}
 	
+	public MComplex sqrt() {
+		if(!polar)
+			updatePolar();
+		phi /= 2;
+		fixPhi();
+		r = Math.sqrt(r);
+		polar = true;
+		cartesian = false;
+		return this;
+	}
+	
 	/**
 	 * Returns the absolute value of this number, defined as {@code abs(z)=sqrt(a^2+b^2)} in Cartesian form or {@code abs(z)=r} in polar form.
-	 * This recalculates the polar form.
 	 * @return {@code abs(z)} where z is this number.
 	 */
 	@Override
@@ -414,6 +421,19 @@ public class MComplex extends MScalar {
 			return r;
 		else
 			return Math.sqrt(a*a+b*b);
+	}
+	
+	/**
+	 * Returns the square of the absolute value of this number, that is 
+	 * {@code abs(z)^2=a^2+b^2} in cathesian form, or {@code r^2} in polar form.
+	 * @return {@code abs(z)^2}
+	 */
+	@Override
+	public double abs2() {
+		if(polar)
+			return r*r;
+		else
+			return a*a+b*b;
 	}
 
 	/**

@@ -38,16 +38,16 @@ public class VectorParser extends Parser {
 	}
 	
 	@SuppressWarnings("serial")
-	public MathObject parse() throws UnexpectedCharacterException {
+	public MathObject parse(boolean defined) throws UnexpectedCharacterException {
 		nextChar();
 		if(exprContainsNotInVector(';')) { //trying to create a matrix.
 			ArrayList<String> rows = toElements(expr, ';');
 			if(rows.size()==2 && rows.get(1).equals("")) {
-				return new MMatrix(new ArrayList<MVector>() {{ add((MVector) new VectorParser("[" + rows.get(0) + "]").parse());}});
+				return new MMatrix(new ArrayList<MVector>() {{ add((MVector) new VectorParser("[" + rows.get(0) + "]").parse(defined));}});
 			}
 			return new MMatrix(rows.stream().map(s -> {
 				try {
-					return (MVector) new VectorParser("[" + s + "]").parse();
+					return (MVector) new VectorParser("[" + s + "]").parse(defined);
 				} catch (UnexpectedCharacterException e) {
 					Calculator.errorHandler.handle(e);
 					return null;
@@ -60,10 +60,14 @@ public class VectorParser extends Parser {
 				try {
 					v[i] = new MReal(Double.parseDouble(elements.get(i)));
 				} catch(NumberFormatException e) {
-					MExpression me =  new MExpression(elements.get(i));
-					if(!me.getTree().getRoot().isInternal() && me.getTree().getRoot().getData() instanceof MathObject)
-						v[i] = (MathObject) me.getTree().getRoot().data;
-					else v[i] = me;
+					if(defined) {
+						MExpression me =  new MExpression(elements.get(i));
+						if(!me.getTree().getRoot().isInternal() && me.getTree().getRoot().getData() instanceof MathObject)
+							v[i] = (MathObject) me.getTree().getRoot().data;
+						else v[i] = me;
+					} else {
+						v[i] = new Parser(elements.get(i)).evaluate();
+					}
 				}
 			}
 			return new MVector(v);

@@ -13,7 +13,7 @@ public class MReal extends MScalar {
 	
 	@Override
 	public double real() { 
-		return getValue();
+		return value;
 	}
 	
 	@Override
@@ -127,8 +127,16 @@ public class MReal extends MScalar {
 		return this;
 	}
 	
+	@Override
+	public MScalar sqrt() {
+		if(value<0)
+			return new MComplex(0, Math.sqrt(-value));
+		value = Math.sqrt(value);
+		return this;
+	}
+	
 	/**
-	 * Raises the value of this {@code MScalar} to the power the given {@code double}.
+	 * Raises the value of this {@code MReal} to the power the given {@code double}.
 	 * @param d the exponent.
 	 * @return {@code this}
 	 */
@@ -171,6 +179,10 @@ public class MReal extends MScalar {
 
 	public boolean isPosInteger() {
 		return isInteger() && getValue()>=0;
+	}
+	
+	public int signum() {
+		return value>0 ? 1 : (value<0 ? -1 : 0);
 	}
 	
 	/**
@@ -220,7 +232,16 @@ public class MReal extends MScalar {
 
 	@Override
 	public double abs() {
-		return getValue() < 0 ? -1*getValue() : getValue();
+		return value < 0 ? -1*value : value;
+	}
+	
+	/**
+	 * Calculates the square of the absolute value of this number (for the real case, that is just the number squared)
+	 * @return {@code value^2}
+	 */
+	@Override
+	public double abs2() {
+		return value*value;
 	}
 	
 	

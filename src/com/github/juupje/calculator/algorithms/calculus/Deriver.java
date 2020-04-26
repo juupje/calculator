@@ -321,8 +321,8 @@ public class Deriver extends Algorithm {
 		} else {
 			if(args[1].trim().startsWith("[")) {
 				try {
-					dir = (MVector) new VectorParser(args[1]).parse();
-					dir = dir.evaluate();
+					dir = (MVector) new VectorParser(args[1]).parse(false);
+					//no need to evaluate dir, as the parameter false ensures that there are no expressions in the vector
 				} catch(ClassCastException e) {
 					throw new RuntimeException("Got a matrix as argument for directional derivative, expected a vector.");
 				}

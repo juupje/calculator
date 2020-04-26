@@ -5,11 +5,11 @@ import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.linalg.JordanElimination;
 import com.github.juupje.calculator.algorithms.linalg.LUDecomposition;
+import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
-import com.github.juupje.calculator.settings.Settings;
 
 public class MMatrix implements MathObject {
 
@@ -165,7 +165,16 @@ public class MMatrix implements MathObject {
 		return shape.cols() == shape.rows();
 	}
 
-	public MSubMatrix getSubMatrixx(int startrow, int endrow, int startcol, int endcol) {
+	/**
+	 * extracts a submatrix from this matrix.
+	 * The submatrix is a {@code MathObject} and is linked to this matrix: all changes in either of them will affect the other.
+	 * @param startrow the first row of the submatrix (inclusive)
+	 * @param endrow the last row of the submatrix (exclusive)
+	 * @param startcol the first column of the submatrix (inclusive)
+	 * @param endcol the last column of the submatrix (exclusive)
+	 * @return A {@code MSubMatrix} defined as {@code A[startrow:endrow+1, startcol:endcol+1]} in a NumPy context.
+	 */
+	public MSubMatrix getSubMatrix(int startrow, int endrow, int startcol, int endcol) {
 		return new MSubMatrix(new Slice(startrow, endrow, startcol, endcol));
 	}
 	
@@ -274,14 +283,22 @@ public class MMatrix implements MathObject {
 	}
 
 	/**
-	 * Builds the matrix-vector product of {@code this} and the given
-	 * {@code MVector} and returns it. The matrix-vector product of matrix A (m x n)
-	 * and Vector b (size n) is defined as:
-	 * {@code v_i = (Ab)_i = Sum(j=1 to n, A_ij*b_j), i=1,..,m}
+	 * Multiplies this matrix with the vector on the left and returns the result.
+	 * 'Left' indicates the location of the matrix in the notation below.
+	 * The left matrix-vector product of matrix A (m x 1)
+	 * and the row vector b (size 1 x n) is defined as:<br/>
+	 * {@code v_ij = (Ab)_ij = A_i1*b_j, i=1,..,m, j=1,...,n}<br/>
+	 * where v has the shape (m x n)<br/>
 	 * 
-	 * @param other the matrix B, that will be multiplied with <tt>this</tt> (=A).
-	 * @return the resulting (m)-vector. @ if the columncount of A does not equal
-	 * the rowcount of B.
+	 * The left matrix-vector product of matrix A (m x n)
+	 * and the column vector b (size n) is defined as:<br/>
+	 * {@code v_i = (Ab)_ij = Sum(j=1 to n | A_ij*b_j), i=1,..,m}<br/>
+	 * where v has the shape (m)
+	 * @param other the vector b, that will be multiplied with <tt>this</tt> (=A).
+	 * @return the resulting vector v 
+	 * @throws ShapeException if the columncount of A does not equal
+	 * the rowcount of b.
+	 * @see MSubMatrix#multiplyRight(MVector)
 	 */
 	public MathObject multiplyLeft(MVector other) {
 		if (other.isTransposed()) { // Matrix times row vector
@@ -310,6 +327,24 @@ public class MMatrix implements MathObject {
 		}
 	}
 
+	/**
+	 * Multiplies this matrix with the vector on the right and returns the result.
+	 * 'Right' indicates the location of the matrix in the notation below.
+	 * The right matrix-vector product of matrix A (n x m)
+	 * and row vector b (size 1 x n) is defined as:<br/>
+	 * {@code v_j = (bA)_j = Sum(i=1 to n, b_i*A_ij), j=1,..,m}<br/>
+	 * where v has the shape (1 x m) <br/>
+	 * 
+	 * The right matrix-vector product of matrix A (1 x m)
+	 * and column vector b (size n x 1) is defined as:<br/>
+	 * {@code v_ij = (bA)_ij = b_i*A_1j, i=1,..,n, j=1,..,m}<br/>
+	 * where v has the shape (n x m)
+	 * 
+	 * @param other the vector b, that will be multiplied with <tt>this</tt> (=A).
+	 * @return the resulting vector v. 
+	 * @throws ShapeException if the columncount of b does not equal
+	 * the rowcount of A.
+	 */
 	public MathObject multiplyRight(MVector other) {
 		if (other.isTransposed()) {
 			if (other.size() == shape.rows()) {
@@ -570,39 +605,7 @@ public class MMatrix implements MathObject {
 
 	@Override
 	public String toString() {
-		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
-			String[][] s = new String[m.length][m[0].length];
-			int[] colmax = new int[m[0].length];
-			for(int i = 0; i < m.length; i++)
-				for(int j = 0; j < m[0].length; j++) {
-					s[i][j] = m[i][j].toString();
-					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
-				}
-			String str = "";
-			for(int i = 0; i < m.length; i++) {
-				String row = "  ";
-				for(int j = 0; j < m[0].length; j++) {
-					row += s[i][j];
-					for(int k = s[i][j].length(); k < colmax[j]; k++)
-						row += " ";
-				}
-				if(i==0)
-					str = "/" + row + "\\\n";
-				else if(i==m.length-1)
-					str += "\\" + row + "/";
-				else
-					str += "|" + row + "|\n";
-			}
-			return str;
-		} else {
-			String s = "[";
-			for (MathObject[] row : m) {
-				for (MathObject mo : row)
-					s += mo.toString() + ", ";
-				s = s.substring(0, s.length() - 2) + ";";
-			}
-			return s.substring(0, s.length() - 1) + "]";
-		}
+		return Printer.toText(m);
 	}
 
 	public static MMatrix identity(int size) {

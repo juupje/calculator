@@ -461,6 +461,48 @@ public class Printer {
 	public static String toText(MathObject mo) {
 		return mo.toString();
 	}
+	
+	public static String toText(MathObject[][] m) {
+		return toText(m, 0, m.length-1, 0, m[0].length-1);
+	}
+	
+	public static String toText(MathObject[][] m, int rstart, int rend, int cstart, int cend) {
+		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
+			int rows = rend-rstart+1;
+			int cols = cend-cstart+1;
+			String[][] s = new String[rows][cols];
+			int[] colmax = new int[cols];
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++) {
+					s[i][j] = m[i+rstart][j+cstart].toString();
+					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
+				}
+			String str = "";
+			for(int i = 0; i < rows; i++) {
+				String row = "  ";
+				for(int j = 0; j < cols; j++) {
+					row += s[i][j];
+					for(int k = s[i][j].length(); k < colmax[j]; k++)
+						row += " ";
+				}
+				if(i==0)
+					str = "/" + row + "\\\n";
+				else if(i==rows-1)
+					str += "\\" + row + "/";
+				else
+					str += "|" + row + "|\n";
+			}
+			return str;
+		} else {
+			String s = "[";
+			for(int i = rstart; i <= rend; i++) {
+				for (int j = cstart; j <= cend; j++)
+					s += m[i][j].toString() + ", ";
+				s = s.substring(0, s.length() - 2) + ";";
+			}
+			return s.substring(0, s.length() - 1) + "]";
+		}
+	}
 
 	/**
 	 * Evaluates the argument given and acts accordingly. <tt>args</tt> will be
@@ -666,14 +708,14 @@ public class Printer {
 		if (scalar.isComplex()) {
 			((MComplex) scalar).fixPhi();
 			if (Settings.getBool(Settings.COMPLEX_IN_POLAR))
-				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "�)";
+				return numToString(((MComplex) scalar).getR()) + "e^(" + numToString(((MComplex) scalar).arg()) + "i)";
 			else {
 				String stra = numToString(scalar.real());
 				String strb = numToString(scalar.imag());
 				if(stra.equals("0") && strb.equals("0"))
 					return "0";
 				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
-						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "�" : "");
+						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "i" : "");
 			}
 		}
 		return numToString(scalar.real());

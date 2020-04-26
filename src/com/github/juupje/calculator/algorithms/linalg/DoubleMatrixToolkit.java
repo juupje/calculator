@@ -7,8 +7,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 
 	public DoubleMatrixToolkit(double[][] matrix) {
-		rows = matrix.length;
-		cols = matrix[0].length;
+		super(matrix.length, matrix[0].length);
 		this.matrix = new Double[rows][cols];
 		for(int i = 0; i < rows; i++)
 			for(int j = 0; j < cols; j++)
@@ -16,9 +15,11 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	}
 	
 	public DoubleMatrixToolkit(Double[][] matrix) {
-		this.matrix = matrix;
-		rows = matrix.length;
-		cols = matrix[0].length;
+		super(matrix);
+	}
+	
+	public DoubleMatrixToolkit(Double[][] matrix, int rstart, int rend, int cstart, int cend) {
+		super(matrix, rstart, rend, cstart, cend);
 	}
 	
 	/*public DoubleMatrixToolkit(MMatrix m) {
@@ -49,8 +50,9 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	 * @param c a constant with which the i-th row will be multiplied before being added to the <tt>n</tt>-th row.
 	 */
 	@Override
-	public void addToRow(int n, int i, Double c) { 
-		for(int j = 0; j < matrix[n].length; j++)
+	public void addToRow(int n, int i, Double c) {
+		n += rstart; i += rstart;
+		for(int j = cstart; j <= cend; j++)
 			matrix[n][j] += c*matrix[i][j];
 	}
 	
@@ -61,7 +63,8 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	 */
 	@Override
 	public void multiplyRow(int n, Double c) {
-		for(int j = 0; j < matrix[n].length; j++)
+		n += rstart;
+		for(int j = cstart; j <= cend; j++)
 			matrix[n][j] *= c;
 	}
 	
@@ -69,24 +72,60 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	 * Multiplies the matrix (from the right) with the given matrix using a matrix product.
 	 * In Einstein notation: M_ij=A_ik*B_kj
 	 * Note that this method does not take the augmented columns into account.
-	 * @param M
+	 * @param M the matrix B
 	 */
-	@Override
-	public void multiply(Double[][] M) {
+	public void multiplyRight(double[][] M) {
 		if(cols != M.length)
 			throw new ShapeException("Can't multiply matrices of size ("
 					+ rows + "x" + cols + ") and (" + M.length + "x" + M[0].length + ")");
+		if(isSubMatrix && M[0].length != cols)
+			throw new ShapeException("Cannot multiply submatrix with non-square matrix! Shape (" + M.length + ", "  +M[0].length + ")");
 		Double[][] result = new Double[rows][M[0].length];
 		for(int i = 0; i < result.length; i++) {
 			for(int j = 0; j < result[0].length; j++) {
 				result[i][j] = 0d;
 				for(int k = 0; k < cols; k++)
-					result[i][j] += matrix[i][k]*M[k][j];
+					result[i][j] += matrix[i+rstart][k+cstart]*M[k][j];
 			}
 		}
 		rows = result.length;
 		cols = result[0].length;
-		matrix = result;
+		if(isSubMatrix) {
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++)
+					matrix[i+rstart][j+cstart] = result[i][j];
+		} else			
+			matrix = result;
+	}
+	
+	/**
+	 * Multiplies the matrix (from the left) with the given matrix using a matrix product.
+	 * In Einstein notation: M_ij=B_ik*A_kj
+	 * Note that this method does not take the augmented columns into account.
+	 * @param M the matrix B
+	 */
+	public void multiplyLeft(double[][] M) {
+		if(M[0].length != rows)
+			throw new ShapeException("Can't multiply matrices of size ("
+					+ M.length + "x" + M[0].length + ") and (" + rows + "x" + cols + ")");
+		if(isSubMatrix && M.length != rows)
+			throw new ShapeException("Cannot multiply submatrix with non-square matrix! Shape (" + M.length + ", "  +M[0].length + ")");
+		Double[][] result = new Double[M.length][cols];
+		for(int i = 0; i < result.length; i++) {
+			for(int j = 0; j < result[0].length; j++) {
+				result[i][j] = 0d;
+				for(int k = 0; k < rows; k++)
+					result[i][j] += M[i][k]*matrix[k+rstart][j+cstart];
+			}
+		}
+		rows = result.length;
+		cols = result[0].length;
+		if(isSubMatrix) {
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++)
+					matrix[i+rstart][j+cstart] = result[i][j];
+		} else			
+			matrix = result;
 	}
 	
 	/**
@@ -98,13 +137,15 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	 */
 	@Override
 	public void reorder(int maxRow) {
-		if(maxRow == 0) return;
+		if(maxRow <= rstart) return;
+		maxRow = Math.min(maxRow, rows);
 		int prevZeros = 0, curZeros = 0;
-		for(int i = 0; i < maxRow; i++) {
-			int j = curZeros = 0;
+		for(int i = rstart; i < maxRow; i++) {
+			int j = cstart;
+			curZeros = 0;
 			while(j < cols-augmcols && matrix[i][j] == 0) { j++; curZeros++;}
 			if(curZeros < prevZeros)
-				switchRows(i, i-1);
+				switchRows(i-rstart, i-rstart-1);
 			else
 				prevZeros = curZeros;
 		}
@@ -115,26 +156,27 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		double[] s = new double[rows];
 		for(int i = 0; i < rows; i++) {
 			s[i] = 0;
-			for(int j = 0; j < cols; j++)
-				s[i] += Math.abs(matrix[i][j]);
+			for(int j = cstart; j <= cend; j++)
+				s[i] += Math.abs(matrix[i+rstart][j]);
 			s[i] = 1/s[i];
-			for(int j = 0; j < cols; j++)
-				matrix[i][j]*=s[i];
+			for(int j = cstart; j <= cend; j++)
+				matrix[i+rstart][j]*=s[i];
 		}
 		return s;
 	}
 	
 	public int[][] getPivotMatrix() {
 		int[][] P = new int[rows][cols];
-		for(int i = 0; i < P.length; i++)
-			for(int j = 0; j < P[i].length; j++)
+		for(int i = 0; i < rows; i++)
+			for(int j = 0; j < cols; j++)
 				P[i][j] = i==j ? 1 : 0;
+		//P=identity
 		for(int col = 0; col < rows; col++) {
-			double colmax = matrix[col][col]; //max element in this column
+			double colmax = matrix[col+rstart][col+cstart]; //max element in this column
 			int max_row = col;
 			for(int i = col; i < rows; i++) {
-				if(matrix[i][col]>colmax) {
-					colmax = matrix[i][col];
+				if(matrix[i+rstart][col+cstart]>colmax) {
+					colmax = matrix[i+rstart][col+cstart];
 					max_row = i;
 				}
 			}
@@ -152,8 +194,13 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		for(int i = 0; i < rows; i++)
 			for(int j = 0; j < cols; j++)
 				if(pivot[i][j]==1)
-					m[i] = matrix[j];
-		matrix = m;
+					m[i] = matrix[j+rstart];
+		if(!isSubMatrix)
+			matrix = m;
+		else {
+			for(int row = rstart; row<= rend; row++)
+				matrix[row] = m[row-rstart];
+		}
 	}
 	
 	@Override
@@ -161,7 +208,7 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		MReal[][] m = new MReal[rows][cols];
 		for(int i = 0; i < rows; i++)
 			for(int j = 0; j < cols; j++)
-				m[i][j]= new MReal(matrix[i][j]);
+				m[i][j]= new MReal(matrix[i+rstart][j+cstart]);
 		return new MMatrix(m);
 	}
 	
@@ -179,6 +226,10 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	@Override
 	protected final boolean isHermitian(int mask) {
 		return (mask & SYMMETRIC) == SYMMETRIC;
+	}
+	
+	public DoubleMatrixToolkit sub(int rstart, int rend, int cstart, int cend) {
+		return new DoubleMatrixToolkit(matrix, rstart+this.rstart, rend+this.rstart, cstart+this.cstart, cend+this.cstart);
 	}
 	
 	/**

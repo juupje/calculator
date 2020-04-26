@@ -130,7 +130,7 @@ public class Parser {
 	 * </ul>
 	 * @throws UnexpectedCharacterException 
 	 */
-	protected MathObject getVector() throws UnexpectedCharacterException {
+	protected MathObject getVector(boolean defined) throws UnexpectedCharacterException {
 		int count = 1;
 		int position = pos;
 		while(count != 0 && ch > 0) {
@@ -138,7 +138,7 @@ public class Parser {
 			if(ch == ']') count--;
 			nextChar();
 		}	
-		return new VectorParser("[" + expr.substring(position, pos)).parse();
+		return new VectorParser("[" + expr.substring(position, pos)).parse(defined);
 	}
 	
 
@@ -150,7 +150,7 @@ public class Parser {
 			if(ch == ')') count--;
 			nextChar();
 		}	
-		return (MVector) new VectorParser("[" + expr.substring(position, pos-1) + "]").parse();
+		return (MVector) new VectorParser("[" + expr.substring(position, pos-1) + "]").parse(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -163,7 +163,7 @@ public class Parser {
 			return null;
 		else if (ch == '[') {
 			consume('[');
-			return new Node<MathObject>(getVector());
+			return new Node<MathObject>(getVector(true));
 		} else if (ch == ']')
 			return null;
 		else if(consume('&')) {
@@ -196,7 +196,7 @@ public class Parser {
 			else if (Functions.isFunction(str)) {
 				n = new Node<Function>(Functions.getFunction(str));
 				n.left(getFactor());
-			}else if(str.equals("inf")) {
+			} else if(str.equals("inf")) {
 				n = new Node<MReal>(new MReal(Double.POSITIVE_INFINITY));
 			} else {
 				n = new Node<Variable>(new Variable(str));
@@ -204,7 +204,7 @@ public class Parser {
 					if(consume('('))
 						n.left(new Node<MVector>(getParameters()));
 				if(consume('[')) {
-					MathObject mo = getVector();
+					MathObject mo = getVector(true);
 					if(!(mo instanceof MVector)) throw new UnexpectedCharacterException(expr, expr.indexOf(";", pos));
 					MVector v = (MVector) mo;
 					Node<?> m = n;
@@ -330,7 +330,7 @@ public class Parser {
 			d = processExpression();
 			consume(')');
 		} else if(consume('[')) {
-			d = getVector().evaluate();
+			d = getVector(false); //no need to evaluate, as the parameter false ensures that no expressions are in the vector
 		} else if (consume('|')) {
 			d = Functions.Function.ABS.evaluate(processExpression());
 			consume('|');
