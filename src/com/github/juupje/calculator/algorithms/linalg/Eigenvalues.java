@@ -358,7 +358,7 @@ public class Eigenvalues extends Algorithm {
 	}*/
 	
 	@Override
-	protected MathObject execute(MathObject... args) {
+	public MVector execute(MathObject... args) {
 		prepare(args);
 		return execute();
 	}

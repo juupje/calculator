@@ -608,6 +608,25 @@ public class MMatrix implements MathObject {
 		return Printer.toText(m);
 	}
 
+	/**
+	 * Returns the hermitian transpose A* of this matrix. Note that this does not modify this matrix.
+	 * {@code (A*)_ij=(A^H)_ij=conj(A_ji)}
+	 * @return A*
+	 */
+	public MMatrix getHermitian() {
+		MathObject[][] matrix = new MathObject[shape.cols()][shape.rows()];
+		for (int i = 0; i < shape.rows(); i++)
+			for(int j = 0; j < shape.cols(); j++) {
+				if(m[i][j] instanceof MScalar)
+					matrix[j][i] = MScalar.conj((MScalar)m[i][j]);
+				else if (m[i][j] instanceof MExpression) {
+					matrix[j][i] = ((MExpression) m[i][j]).copy().addOperation(Operator.CONJUGATE);
+				} else 
+					throw new InvalidOperationException("Cannot calculate conjungate of " + m[i][j].toString());
+			}
+		return new MMatrix(matrix);
+	}
+	
 	public static MMatrix identity(int size) {
 		MMatrix matrix = new MMatrix(new Shape(size, size));
 		for (int i = 0; i < size; i++)

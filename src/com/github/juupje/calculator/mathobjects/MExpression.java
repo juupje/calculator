@@ -45,6 +45,11 @@ public class MExpression implements MathObject {
 		return this;
 	}
 	
+	public MExpression addOperation(Operator op) {
+		tree.insert(tree.getRoot(), new Node<Operator>(op), Node.LEFT);
+		return this;
+	}
+	
 	private void join(Operator op, Node<?> n, byte dir) {
 		Node<Operator> node = new Node<Operator>(op);
 		if(dir == Node.LEFT)

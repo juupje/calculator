@@ -26,6 +26,8 @@ public enum Algorithms {
 	
 	NORM(new Norm()),
 	
+	SUM(new Sum()),
+	
 	ABC(new ABCFormula()),
 	SIMPLIFY(new Simplifier()),
 	REORDER(new Reorderer()),

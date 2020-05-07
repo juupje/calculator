@@ -53,38 +53,41 @@ public class Interpreter {
 			throws UnexpectedCharacterException, InvalidFunctionException, TreeException, CircularDefinitionException, ShapeException {
 		name = name.trim();
 		expr = expr.trim();
-		if(!Tools.checkNameValidity(name))
-			throw new UnexpectedCharacterException(name + " is not a valid name.");
+		
 		Operator operator = null;
 		MathObject result = null;
 		if (name.contains("(")) {
 			result = MFunction.create(name, expr, op.equals(":"));
 			name = name.substring(0, name.indexOf("("));
-		} else if(expr.startsWith("{") || expr.startsWith("r{")) {
-			result = MSequence.parse(expr, op.equals(":"));
-		} else {		
-			switch (op) {
-			case ":":
-				result = new MExpression(expr);
-				break;
-			case "+":
-				operator = Operator.ADD;
-				break;
-			case "-":
-				operator = Operator.SUBTRACT;
-				break;
-			case "*":
-				operator = Operator.MULTIPLY;
-				break;
-			case "/":
-				operator = Operator.DIVIDE;
-				break;
-			default:
-				result = new Parser(expr).evaluate();
-				break;
+		} else {
+			if(!Tools.checkNameValidity(name))
+				throw new UnexpectedCharacterException(name + " is not a valid name.");
+			if(expr.startsWith("{") || expr.startsWith("r{"))
+				result = MSequence.parse(expr, op.equals(":"));
+			else {
+				switch (op) {
+				case ":":
+					result = new MExpression(expr);
+					break;
+				case "+":
+					operator = Operator.ADD;
+					break;
+				case "-":
+					operator = Operator.SUBTRACT;
+					break;
+				case "*":
+					operator = Operator.MULTIPLY;
+					break;
+				case "/":
+					operator = Operator.DIVIDE;
+					break;
+				default:
+					result = new Parser(expr).evaluate();
+					break;
+				}
+				if (operator != null)
+					result = operator.evaluate(Variables.get(name), new Parser(expr).evaluate());
 			}
-			if (operator != null)
-				result = operator.evaluate(Variables.get(name), new Parser(expr).evaluate());
 		}
 		if(result != null) {
 			if(result instanceof MExpression || result instanceof MSequence) {

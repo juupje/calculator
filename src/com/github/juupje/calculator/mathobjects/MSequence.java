@@ -34,7 +34,7 @@ public class MSequence implements MathObject {
 	}
 	
 	public MathObject get(int index) {
-		this.index.setValue(index);
+		this.index = new MReal(index);
 		if(end<0) {
 			if(index>=begin)
 				return func.evaluateAt(this.index);

@@ -257,7 +257,7 @@ public class MFunction extends MExpression {
 	 * the evaluation is complete, the original values for the parameters in
 	 * {@code Variables} are restored (if there was no entry in {@code Variables}
 	 * with the same name as a parameter, the created entry will be removed from
-	 * {@code Variables}.
+	 * {@code Variables}. Note that evaluating the tree can change the inputs.
 	 * 
 	 * @param paramVals an array of {@link MathObject}s containing the values at
 	 *                  which the function should be evaluated. Note that the order
@@ -267,7 +267,7 @@ public class MFunction extends MExpression {
 	 * @return A {@link MathObject} containing the result of the evaluation.
 	 * @throws TreeException
 	 * @throws IllegalArgumentException if
-	 *                                  {@code paramVals.length != vars.length = true}.
+	 *                 {@code paramVals.length != vars.length = true}.
 	 * @see #evaluateAt()
 	 */
 	public MathObject evaluateAt(MathObject... paramVals) throws TreeException {
@@ -313,13 +313,15 @@ public class MFunction extends MExpression {
 	}
 
 	/**
-	 * Evaluates the {@link Tree} defined by this {@code MFunction}
+	 * Evaluates the {@link Tree} defined by this {@code MFunction}.
+	 * Note that the parameters map needs to be set before calling this method.
+	 * In nearly all cases, {@link #evaluateAt(MathObject...)} or {@link #evaluateAt(HashMap)} is what you'd want to use.
 	 * 
 	 * @return A {@link MathObject} containing the result of the evaluation.
 	 * @throws TreeException as thrown by {@link Tree#evaluateTree()}
 	 * @see Tree#evaluateTree()
 	 */
-	private MathObject evaluateAt() throws TreeException {
+	public MathObject evaluateAt() throws TreeException {
 		return ((FunctionTree) tree).evaluateTree();
 	}
 

@@ -21,7 +21,7 @@ public class MRecSequence extends MSequence {
 	private int initialParameterCount = 0;
 	
 	public MRecSequence(String index, MFunction func, LinkedList<MScalar> startParams, int initialParameterCount) {
-		super(index, 0, Integer.MAX_VALUE, func);
+		super(index, 0, -1, func);
 		this.items = startParams;
 		shape = new Shape(Integer.MAX_VALUE);
 		this.initialParameterCount = initialParameterCount;

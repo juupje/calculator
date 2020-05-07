@@ -1,5 +1,6 @@
 package com.github.juupje.calculator.algorithms;
 
+import com.github.juupje.calculator.algorithms.linalg.Eigenvalues;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
@@ -71,13 +72,17 @@ public class Norm extends Algorithm {
 			MMatrix m = (MMatrix) mo;
 			switch(type) {
 			case NORM2:
-				throw new RuntimeException("2-Norm of matrices is not yet implemented.");
+				MVector eigs = new Eigenvalues().execute(m.getHermitian().multiplyLeft(m));
+				double max = 0;
+				for(MathObject eig : eigs.elements())
+					max = Math.max(max, ((MScalar) eig).real());
+				return new MReal(Math.sqrt(max));
 			case NORM_FRO:
-				return eucl(m);
+				return eucl(m); 
 			case NORM1:
 				int rows = m.shape().rows();
 				int cols = m.shape().cols();
-				double max = 0;
+				max = 0;
 				for(int j = 0; j < cols; j++) {
 					double d = 0;
 					for(int i = 0; i < rows; i++)
@@ -147,7 +152,6 @@ public class Norm extends Algorithm {
 
 	@Override
 	public Shape shape(Shape... shapes) {
-		// TODO Auto-generated method stub
-		return null;
+		return new Shape();
 	}
 }

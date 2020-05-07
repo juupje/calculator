@@ -59,4 +59,8 @@ public abstract class Algorithm {
 			s += args[i].getClass().getSimpleName() + (i == args.length-1 ? "" : ", ");
 		return s + ")";
 	}
+	
+	public final String argTypeToString(MathObject arg) {
+		return arg.getClass().getSimpleName();
+	}
 }
