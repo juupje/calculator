@@ -169,7 +169,13 @@ public class Functions {
 			
 			@Override
 			public MScalar evaluate(MVector m) {
-				return root((MScalar) m.elements()[0], (MScalar) m.elements()[1]);
+				if(m.size()!=2)
+					throw new IllegalArgumentException("Expected two elements, got " + m.size());
+				try {
+					return root((MScalar) m.elements()[0], (MScalar) m.elements()[1]);
+				} catch(ClassCastException e) {
+					throw new IllegalArgumentException("Expected two scalar values, got " + m.get(0) + " and " + m.get(1));
+				}
 			}
 			
 			@Override
@@ -617,7 +623,7 @@ public class Functions {
 	/**
 	 * returns the value of the exponential function evaluated at the given
 	 * <tt>MScalar</tt>. If the argument is complex
-	 * {@code exp(Re(m))*(cos(Im(m))+ísin(Im(m)))} (according to the definition) is
+	 * {@code exp(Re(m))*(cos(Im(m))+ï¿½sin(Im(m)))} (according to the definition) is
 	 * returned.
 	 * 
 	 * @param m the argument, an {@code MScalar}

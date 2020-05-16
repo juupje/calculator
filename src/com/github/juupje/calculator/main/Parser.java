@@ -73,6 +73,8 @@ public class Parser {
 
 	// Method to process string to number value
 	public Tree getTree() throws UnexpectedCharacterException {
+		if(expr.length()==0)
+			throw new UnexpectedCharacterException("Got empty expression");
 		tree = new Tree();
 		nextChar();
 		tree.root = p = getFactor();
@@ -82,7 +84,7 @@ public class Parser {
 		return tree;
 	}
 
-	public Node<?> getSubTree() throws UnexpectedCharacterException {
+	private Node<?> getSubTree() throws UnexpectedCharacterException {
 		//save variables into temporary ones.
 		Tree oldTree = tree;
 		Node<?> oldP = p;
@@ -110,6 +112,8 @@ public class Parser {
 	 * @ 
 	 */
 	public MathObject evaluate() throws UnexpectedCharacterException, InvalidFunctionException, TreeException, ShapeException {
+		if(expr.length()==0)
+			throw new UnexpectedCharacterException("Got empty expression");
 		nextChar();
 		MathObject val = processExpression();
 		if (pos < expr.length())

@@ -466,6 +466,44 @@ public class Printer {
 		return toText(m, 0, m.length-1, 0, m[0].length-1);
 	}
 	
+	public static String toText(Double[][] m, int rstart, int rend, int cstart, int cend) {
+		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
+			int rows = rend-rstart+1;
+			int cols = cend-cstart+1;
+			String[][] s = new String[rows][cols];
+			int[] colmax = new int[cols];
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++) {
+					s[i][j] = numToString(m[i+rstart][j+cstart]);
+					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
+				}
+			String str = "";
+			for(int i = 0; i < rows; i++) {
+				String row = "  ";
+				for(int j = 0; j < cols; j++) {
+					row += s[i][j];
+					for(int k = s[i][j].length(); k < colmax[j]; k++)
+						row += " ";
+				}
+				if(i==0)
+					str = "/" + row + "\\\n";
+				else if(i==rows-1)
+					str += "\\" + row + "/";
+				else
+					str += "|" + row + "|\n";
+			}
+			return str;
+		} else {
+			String s = "[";
+			for(int i = rstart; i <= rend; i++) {
+				for (int j = cstart; j <= cend; j++)
+					s += numToString(m[i][j]) + ", ";
+				s = s.substring(0, s.length() - 2) + ";";
+			}
+			return s.substring(0, s.length() - 1) + "]";
+		}
+	}
+	
 	public static String toText(MathObject[][] m, int rstart, int rend, int cstart, int cend) {
 		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
 			int rows = rend-rstart+1;

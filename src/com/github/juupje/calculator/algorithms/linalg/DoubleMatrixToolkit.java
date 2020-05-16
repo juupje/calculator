@@ -1,5 +1,6 @@
 package com.github.juupje.calculator.algorithms.linalg;
 
+import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
@@ -18,6 +19,14 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		super(matrix);
 	}
 	
+	/**
+	 * Constructs a submatrix from the given matrix
+	 * @param matrix
+	 * @param rstart the index of the first row (inclusive)
+	 * @param rend the index of the last row (inclusive)
+	 * @param cstart the index of the first column (inclusive)
+	 * @param cend the index of the last column (inclusive)
+	 */
 	public DoubleMatrixToolkit(Double[][] matrix, int rstart, int rend, int cstart, int cend) {
 		super(matrix, rstart, rend, cstart, cend);
 	}
@@ -126,6 +135,48 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 					matrix[i+rstart][j+cstart] = result[i][j];
 		} else			
 			matrix = result;
+	}
+	
+	/**
+	 * Multiplies the matrix (from the right) with the given vector using a matrix product.
+	 * In Einstein notation: w_i=A_ij*v_j
+	 * Note that this method does not take the augmented columns into account.
+	 * @param M the matrix B
+	 */
+	public double[] multiplyRight(double[] v) {
+		if(v.length != cols)
+			throw new ShapeException("Can't multiply matrix of size ("
+					+ rows + "x" + cols + ") with vector of size (" + v.length + ") on the right");
+		double[] w = new double[rows];
+		for(int i = 0; i < rows; i++)
+			for(int j = 0; j < cols; j++)
+				w[i] += matrix[i+rstart][j+cstart]*v[j];
+		return w;
+	}
+	
+	/**
+	 * Multiplies the matrix (from the left) with the given vector using a matrix product.
+	 * In Einstein notation: w_i=v_j*A_ji
+	 * Note that this method does not take the augmented columns into account.
+	 * @param M the matrix B
+	 */
+	public double[] multiplyLeft(double[] v) {
+		if(v.length != rows)
+			throw new ShapeException("Can't multiply matrix of size ("
+					+ rows + "x" + cols + ") with vector of size (" + v.length + ") on the left");
+		double[] w = new double[cols];
+		for(int i = 0; i < cols; i++)
+			for(int j = 0; j < rows; j++)
+				w[i] += v[j]*matrix[j+rstart][i+cstart];
+		return w;
+	}
+	
+	public void add(double[][] A) {
+		if(A.length != rows || A[0].length != cols)
+			throw new ShapeException("Cannot add matrices with different shapes: (" + rows + "x" + cols + ") and (" + A.length + "x" + A[0].length + ")");
+		for(int i = 0; i < rows; i++)
+			for(int j = 0; j < cols; j++)
+				matrix[i+rstart][j+cstart] += A[i][j];
 	}
 	
 	/**
@@ -291,5 +342,10 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 			for(int j = 0; j < n; j++)
 				A[i][j] = (i==j ? 1d : 0d);
 		return A;
+	}
+	
+	@Override
+	public String toString() {
+		return Printer.toText(matrix, rstart, rend, cstart, cend);
 	}
 }
