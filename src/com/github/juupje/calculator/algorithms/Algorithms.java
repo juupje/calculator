@@ -33,6 +33,7 @@ public enum Algorithms {
 	SIMPLIFY(new Simplifier()),
 	REORDER(new Reorderer()),
 	COM(new Commutator()),
+	ACOM(new Anticommutator()),
 	ANS(new Ans());
 	
 	Algorithm a;

@@ -704,19 +704,25 @@ public class Printer {
 	public static void export(String name) {
 		if(name.trim().length() == 0)
 			name = findAvailableName("export", "cal");
-		StringBuilder export = new StringBuilder();
-		for(Entry<String, MathObject> entry : Variables.getAll().entrySet()) {
-			if(!(entry.getValue() instanceof MExpression))
-				export.append(entry.getKey() + "=" + entry.getValue().toString() + System.lineSeparator());
+		boolean temp = Settings.getBool(Settings.MULTILINE_MATRIX);
+		Settings.set(Settings.MULTILINE_MATRIX, false);
+		try {
+			StringBuilder export = new StringBuilder();
+			for(Entry<String, MathObject> entry : Variables.getAll().entrySet()) {
+				if(!(entry.getValue() instanceof MExpression))
+					export.append(entry.getKey() + "=" + entry.getValue().toString() + System.lineSeparator());
+			}
+			for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
+				n.start = n.finish = 0;
+			int time = 0;
+			for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
+				if(n.start==0)
+					time = DFS(n, time+1, export);
+			File f = printText(export.toString(), name, "cal");
+			Calculator.ioHandler.out("Saved export file to: " + f.getAbsolutePath());
+		} finally {
+			Settings.set(Settings.MULTILINE_MATRIX, temp);
 		}
-		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
-			n.start = n.finish = 0;
-		int time = 0;
-		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
-			if(n.start==0)
-				time = DFS(n, time+1, export);
-		File f = printText(export.toString(), name, "cal");
-		Calculator.ioHandler.out("Saved export file to: " + f.getAbsolutePath());
 	}
 	
 	private static int DFS(Graph<Variable>.Node n, int time, StringBuilder s) {
