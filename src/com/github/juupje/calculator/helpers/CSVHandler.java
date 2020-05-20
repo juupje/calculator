@@ -94,43 +94,51 @@ public class CSVHandler {
 	}
 	
 	public static CSVData<?> read(String path, short type) throws IOException {
-		InputStream in = Calculator.class.getResourceAsStream(path.replace("/", fsep));
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		String line;
-		List<String> lines = new ArrayList<String>();
-		if(in != null) {
-			while((line = reader.readLine()) != null) {
-				lines.add(line);
+		BufferedReader reader = null;
+		InputStream in = null;
+		try {
+			in = Calculator.class.getResourceAsStream(path.replace("/", fsep));
+			reader = new BufferedReader(new InputStreamReader(in));
+			String line;
+			List<String> lines = new ArrayList<String>();
+			if(in != null) {
+				while((line = reader.readLine()) != null) {
+					lines.add(line);
+				}
 			}
-		}
-		in.close();
-		int rows = lines.size();
-		int cols = lines.get(0).split(",").length;
-		switch(type) {
-		case TYPE_INT:
-			return parse(lines, s -> {
-				Integer[] d = new Integer[s.length];
-				for(int i = 0; i < s.length; i++)
-					d[i] = Integer.parseInt(s[i]);
-				return d;
-			}, new Integer[rows][cols]);
-		case TYPE_LONG:
-			return parse(lines, s -> {
-				Long[] d = new Long[s.length];
-				for(int i = 0; i < s.length; i++)
-					d[i] = Long.parseLong(s[i]);
-				return d;
-			}, new Long[rows][cols]);
-		case TYPE_STRING:
-			return parse(lines, s -> s, new Double[rows][cols]);
-		case TYPE_DOUBLE:
-		default:
-			return parse(lines, s -> {
-				Double[] d = new Double[s.length];
-				for(int i = 0; i < s.length; i++)
-					d[i] = Double.parseDouble(s[i]);
-				return d;
-			}, new Double[rows][cols]);
+			int rows = lines.size();
+			int cols = lines.get(0).split(",").length;
+			switch(type) {
+			case TYPE_INT:
+				return parse(lines, s -> {
+					Integer[] d = new Integer[s.length];
+					for(int i = 0; i < s.length; i++)
+						d[i] = Integer.parseInt(s[i]);
+					return d;
+				}, new Integer[rows][cols]);
+			case TYPE_LONG:
+				return parse(lines, s -> {
+					Long[] d = new Long[s.length];
+					for(int i = 0; i < s.length; i++)
+						d[i] = Long.parseLong(s[i]);
+					return d;
+				}, new Long[rows][cols]);
+			case TYPE_STRING:
+				return parse(lines, s -> s, new Double[rows][cols]);
+			case TYPE_DOUBLE:
+			default:
+				return parse(lines, s -> {
+					Double[] d = new Double[s.length];
+					for(int i = 0; i < s.length; i++)
+						d[i] = Double.parseDouble(s[i]);
+					return d;
+				}, new Double[rows][cols]);
+			}
+		} finally {
+			if(in != null)
+				in.close();
+			if(reader != null)
+				reader.close();
 		}
 	}
 	

@@ -443,6 +443,13 @@ public class Parser {
 		return moArgs;
 	}
 	
+	/**
+	 * Splits a string containing substrings separated by commas into those substrings. This method respects brackets.
+	 * <br>
+	 * The string {@code "1,(3+4), f(x,y)=[x^2,y^2]"} will be split into {@code ["1", "(3+4)", "f(x,y)=[x^2,y^2]"]}
+	 * @param s the string to be split
+	 * @return the individual arguments in the string.
+	 */
 	public static String[] getArguments(String s) {
 		int brCount = 0;
 		int lastPos = 0;

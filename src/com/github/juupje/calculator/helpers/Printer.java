@@ -6,14 +6,23 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.github.juupje.calculator.algorithms.Functions.Function;
 import com.github.juupje.calculator.graph.Graph;
+import com.github.juupje.calculator.helpers.exceptions.UndefinedException;
+import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;
+import com.github.juupje.calculator.main.Parser;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.main.Variables;
 import com.github.juupje.calculator.mathobjects.MComplex;
@@ -695,48 +704,102 @@ public class Printer {
 			else
 				Files.write(f.toPath(), str.getBytes());
 			return f;
-		} catch (IOException e) {
+		} catch (IOException | InvalidPathException e) {
 			Calculator.errorHandler.handle(e);
 			return null;
 		}
 	}
 
-	public static void export(String name) {
-		if(name.trim().length() == 0)
-			name = findAvailableName("export", "cal");
+	public static void export(String arg) {
+		String[] args = Parser.getArguments(arg);
 		boolean temp = Settings.getBool(Settings.MULTILINE_MATRIX);
 		Settings.set(Settings.MULTILINE_MATRIX, false);
 		try {
-			StringBuilder export = new StringBuilder();
-			for(Entry<String, MathObject> entry : Variables.getAll().entrySet()) {
-				if(!(entry.getValue() instanceof MExpression))
-					export.append(entry.getKey() + "=" + entry.getValue().toString() + System.lineSeparator());
+			File f;
+			if(args.length==1 && args[0].length() != 0) {
+				f = printText(exportAll(), args[0], "cal");
+			} if(args.length==0 || (args.length==1 && args[0].length() == 0)) {
+				String name = findAvailableName("export", "cal");
+				f = printText(exportAll(), name, "cal");
+			} else {
+				String filename = args[args.length-1];
+				ArrayList<Variable> toBeExported = new ArrayList<>(args.length-1);
+				for(int i = 0; i < args.length-1; i++) {
+					if(!Variables.exists(args[i]))
+						Calculator.ioHandler.err("Variable with name '" + args[i] + "' was not defined.");
+					else
+						toBeExported.add(new Variable(args[i]));
+				}
+				if(toBeExported.size()==0) return;
+				
+				StringBuilder export = new StringBuilder();
+				HashSet<String> exported = new HashSet<String>();
+				for(Iterator<Variable> iter = toBeExported.iterator(); iter.hasNext();) {
+					Variable var = iter.next();
+					if(!(var.get() instanceof MExpression)) {
+						export.append(var.getName() + "=" + var.get().toString() + System.lineSeparator());
+						iter.remove();
+						exported.add(var.getName());
+					}
+				}
+				if(toBeExported.size()>0) { //there are still expressions (which might depend on other variables) to be exported
+					//reset the dfs
+					Set<Graph<Variable>.Node> nodes = Calculator.dependencyGraph.getNodes();
+					for(Graph<Variable>.Node n : nodes)
+						n.start = n.finish = 0;
+					int time = 0;
+					for(Graph<Variable>.Node n : nodes)
+						if(n.start==0 && toBeExported.contains(n.getData()))
+							time = DFS(n, time+1, export, exported);
+				}
+				f = printText(export.toString(), filename, "cal");
 			}
-			for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
-				n.start = n.finish = 0;
-			int time = 0;
-			for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
-				if(n.start==0)
-					time = DFS(n, time+1, export);
-			File f = printText(export.toString(), name, "cal");
-			Calculator.ioHandler.out("Saved export file to: " + f.getAbsolutePath());
+			if(f != null)
+				Calculator.ioHandler.out("Saved export file to: " + f.getAbsolutePath());
+			else
+				Calculator.ioHandler.out("Export file could not be saved");
+		} catch(Exception e) {
+			Calculator.errorHandler.handle(e);
 		} finally {
 			Settings.set(Settings.MULTILINE_MATRIX, temp);
 		}
 	}
 	
-	private static int DFS(Graph<Variable>.Node n, int time, StringBuilder s) {
+	private static String exportAll() {		
+		StringBuilder export = new StringBuilder();
+		HashSet<String> exported = new HashSet<String>();
+		for(Entry<String, MathObject> entry : Variables.getAll().entrySet()) {
+			if(!(entry.getValue() instanceof MExpression)) {
+				export.append(entry.getKey() + "=" + entry.getValue().toString() + System.lineSeparator());
+				exported.add(entry.getKey());
+			}
+		}
+		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
+			n.start = n.finish = 0;
+		int time = 0;
+		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
+			if(n.start==0)
+				time = DFS(n, time+1, export, exported);
+		return export.toString();
+	}
+	
+	private static int DFS(Graph<Variable>.Node n, int time, StringBuilder s, HashSet<String> exported) {
 		n.start = time;
 		for(Graph<Variable>.Edge e : n.getEdges()) {
 			if(e.getB().start == 0)
-				time = DFS(e.getB(), time+1, s);
+				time = DFS(e.getB(), time+1, s, exported);
 		}
 		n.finish = ++time;
+		if(exported.contains(n.getData().getName())) // already exported so we can skip this one
+			return time;
 		if(n.getData().get() instanceof MFunction) {
 			MFunction f = (MFunction) n.getData().get();
 			s.append(n.getData().getName() + "(" + Tools.join(", ", f.getParameters()) + ")" + (f.isDefined() ? ":=" : "=") + ((MExpression) n.getData().get()).toString() + System.lineSeparator());
-		} else if(n.getData().get() instanceof MExpression)
+		} else if(n.getData().get() instanceof MExpression) {
 			s.append(n.getData().getName() + ":=" + ((MExpression) n.getData().get()).toString() + System.lineSeparator());
+		} else
+			s.append(n.getData().getName() + "=" + n.getData().get().toString() + System.lineSeparator());
+		exported.add(n.getData().getName());
 		return time;
 	}
 	
@@ -820,9 +883,21 @@ public class Printer {
 	public static String findAvailableName(String name, String ext) {
 		int num = 0;
 		File file;
+		if(name.length()==0 || !isPathValid(name + "." + ext)) {
+			throw new UnexpectedCharacterException(name + "." + ext + " is not a valid filename.");
+		}
 		do {
 			file = new File(name + num++ + "." + ext);
 		} while (file.exists());
 		return file.getName().substring(0, file.getName().lastIndexOf("."));
 	}
+
+	public static boolean isPathValid(String path) {
+        try {
+            Paths.get(path);
+        } catch (InvalidPathException ex) {
+            return false;
+        }
+        return true;
+    }
 }
