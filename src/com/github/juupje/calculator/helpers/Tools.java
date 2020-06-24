@@ -4,7 +4,12 @@ import java.util.Set;
 
 import com.github.juupje.calculator.algorithms.Algorithms;
 import com.github.juupje.calculator.algorithms.Functions;
+import com.github.juupje.calculator.commands.Commands;
 import com.github.juupje.calculator.helpers.exceptions.SyntaxException;
+import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
+import com.github.juupje.calculator.main.Parser;
+import com.github.juupje.calculator.mathobjects.MReal;
+import com.github.juupje.calculator.mathobjects.MathObject;
 
 public class Tools {
 
@@ -72,19 +77,52 @@ public class Tools {
 		return count;
 	}
 	
+	/**
+	 * Finds the index of the next closing bracket at the same level, that is: all pairs of open+close bracket in between are ignored.
+	 * For example, if we start at index 5 (or 4) in {@code "-(2+(2*(4+[1,1]*[3,4]))+3"}, the index 21 will be returned.
+	 * If the start index points to the character of the opening bracket, the found closing bracket will be checked to correspond to the opening bracket.
+	 * When that is not the case, an {@link UnexpectedCharacterException} is thrown.
+	 * @param s the String in which the next closing bracket should be sought.
+	 * @param begin the index at which the search starts
+	 * @return the index of the closing bracket.
+	 * @throws UnexpectedCharacterException when the closing bracket does not correspond to the opening bracket (if there is one).
+	 */
+	public static int findEndOfBrackets(String s, int begin) throws UnexpectedCharacterException {
+		int pos = begin;
+		char ch = s.charAt(begin);
+		int count=0;
+		char openBr = 0;
+		if(ch == '(' || ch == '{' || ch == '[')
+			openBr = ch;
+		else if(ch == ')' || ch == '}' || ch == ']')
+			return pos;
+		while(count >= 0) {
+			pos += 1;
+			ch = s.charAt(pos);
+			if(ch == -1)
+				throw new UnexpectedCharacterException("Reached end while searching for end of brackets.");
+			count += (ch == '(' || ch == '{' || ch == '[' ? 1 : (ch == ')' || ch == '}' || ch == ']' ? -1 : 0));
+		}
+		if(openBr != 0) {//check if the found closing bracket matches the opening bracket.
+			if((openBr == '(' && ch == ')') || (openBr == '[' && ch == ']') || (openBr=='{' && ch=='}'))
+				return pos;
+			else
+				throw new UnexpectedCharacterException("Mismatched closing bracket: " + ch);
+		}
+		return pos;
+	}
+	
 	public static boolean checkNameValidity(String name) {
 		return checkNameValidity(name, false);
 	}
 	
 	public static boolean checkNameValidity(String name, boolean internal) {
 		if(((name.startsWith("_") || name.startsWith("$")) && !internal) ||  Character.isDigit(name.codePointAt(0))) return false;
-		if(name.equals("pi") || name.equals("e") || name.equals("i") || Functions.isFunction(name) || Algorithms.isAlgorithm(name)) return false;
+		if(name.equals("pi") || name.equals("e") || name.equals("i") || Functions.isFunction(name) || Algorithms.isAlgorithm(name) || Commands.isCommand(name)) return false;
 		for(int i = 0; i < name.length(); i++) {
 			int c = name.codePointAt(i);
 			if(!((c>='0' && c<='9') || (c>='A' && c<='Z') || (c>='a' && c<='z') || c=='_'))
 				return false;
-			//if(c<65 && c>90 && c<97 && c>120 && c<945 && c>969 && c<913 && c>937 && c<30 && c<48 && c>57)
-				//return false;
 		}
 		return true;
 	}
@@ -101,6 +139,21 @@ public class Tools {
 			}
 		}
 		return null;
+	}
+	
+	public static int extractInteger(String s) {
+		int i;
+		try {
+			//find the index
+			i = Integer.parseInt(s);
+		} catch(NumberFormatException e) {
+			MathObject mo = new Parser(s).evaluate();
+			if(mo instanceof MReal && ((MReal) mo).isPosInteger())
+				i = (int) ((MReal) mo).getValue();
+			else
+				throw new UnexpectedCharacterException(mo.toString() + " is not a valid integer.");
+		}
+		return i;
 	}
 	
 	public static String extractFirst(String s, String begin, String end) {

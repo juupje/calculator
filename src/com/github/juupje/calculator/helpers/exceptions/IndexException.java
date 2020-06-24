@@ -11,4 +11,7 @@ public class IndexException extends RuntimeException {
 	public IndexException(String index, String min, String max) {
 		super("Index " + index + " out of bounds: min=" + min + ", max="+ max);
 	}
+	public IndexException(int index, int min, int max) {
+		super("Index " + index + " out of bounds: min=" + min + ", max="+ max);
+	}
 }

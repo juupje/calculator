@@ -144,4 +144,8 @@ public enum Commands {
 			throw new PluginException("Could not assign command '" + name + "' as it already exists.");
 		}
 	}
+	
+	public static boolean isCommand(String name) {
+		return commands.containsKey(name);
+	}
 }
