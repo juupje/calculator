@@ -23,6 +23,8 @@ public class MSequence implements MathObject {
 		this.func = func;
 		this.index = new MReal(begin);
 		Shape fshape = func.shape();
+		if(end < 0)
+			end = Integer.MAX_VALUE;
 		if(fshape.isScalar())
 			shape = new Shape(end-begin);
 		else

@@ -133,7 +133,7 @@ public class Interpreter {
 	 * @return an 2D int array, the first row containing the slice of the 
 	 * first dimension and the second row the slice of the second dimension (if present).
 	 */
-	private static int[][] extractIndex(String name, int brIndex) {
+	static int[][] extractIndex(String name, int brIndex) {
 		//find the closing bracket
 		int brEnd = Tools.findEndOfBrackets(name, brIndex);
 		String indexStr = name.substring(brIndex+1,brEnd);

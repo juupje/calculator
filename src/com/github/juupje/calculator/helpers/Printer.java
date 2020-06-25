@@ -18,7 +18,6 @@ import java.util.Set;
 
 import com.github.juupje.calculator.algorithms.Functions.Function;
 import com.github.juupje.calculator.graph.Graph;
-import com.github.juupje.calculator.helpers.exceptions.UndefinedException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.github.juupje.calculator.algorithms.Algorithms;
 import com.github.juupje.calculator.algorithms.Functions;
 import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
@@ -22,6 +23,7 @@ import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
 
@@ -323,7 +325,7 @@ public class Parser {
 		if (consume('+'))
 			return processFactor();
 		if (consume('-'))
-			return processFactor().negate();
+			return NEGATE.evaluate(processFactor());
 		if(consume('&'))
 			return CONJUGATE.evaluate(processFactor());
 
@@ -373,8 +375,10 @@ public class Parser {
 				} //No 'else if' because if the result from the MFunction is a matrix or vector, it the following if-statement can be applied as well.
 				if(d instanceof MVector || d instanceof MMatrix || d instanceof MSequence) {
 					do {
-						if(consume('['))
-							d = ELEMENT.evaluate(d, getArgumentsAsMathObject(findEndOfBrackets()));
+						if(consume('[')) {
+							d = ELEMENT.evaluate(d, toSliceObject(Interpreter.extractIndex(expr,pos-1), d.shape()));
+							findEndOfBrackets();
+						}
 						else break;
 					} while(d instanceof MVector || d instanceof MMatrix);
 				} else
@@ -469,5 +473,37 @@ public class Parser {
 		arguments.add(s.substring(lastPos).trim());
 		String[] args = new String[arguments.size()];
 		return arguments.toArray(args);
+	}
+	
+	private static MathObject[] toSliceObject(int[][] indices, Shape shape) {
+		if(shape.dim()==1) {
+			if(indices[1].length==0) {
+				if(indices[0].length==1)
+					return new MReal[] {new MReal(indices[0][0])};
+				else
+					return new MVector[] {new MVector(indices[0][0], indices[0][1] == 0 ? shape.get(0) : indices[0][1])};
+			} else
+				throw new IndexException("Got 2 indices for object with dimension 1");
+		}
+		if(shape.dim() == 2) {
+			MathObject a, b;
+			if(indices[1].length==0)
+				throw new IndexException("Got 1 index for object with dimension 2");
+			if(indices[0].length == 1)
+				a = new MReal(indices[0][0]);
+			else if(indices[0][1]==0)
+				a = new MVector(indices[0][0], shape.get(0));
+			else
+				a = new MVector(indices[0][0], indices[0][1]);
+			
+			if(indices[1].length == 1)
+				b = new MReal(indices[1][0]);
+			else if(indices[1][1]==0)
+				b = new MVector(indices[1][0], shape.get(1));
+			else 
+				b = new MVector(indices[1][0], indices[1][1]);
+			return new MathObject[] {a, b};
+		}
+		return null;
 	}
 }

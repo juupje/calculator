@@ -98,9 +98,9 @@ public class Tools {
 			return pos;
 		while(count >= 0) {
 			pos += 1;
-			ch = s.charAt(pos);
-			if(ch == -1)
+			if(pos >= s.length())
 				throw new UnexpectedCharacterException("Reached end while searching for end of brackets.");
+			ch = s.charAt(pos);
 			count += (ch == '(' || ch == '{' || ch == '[' ? 1 : (ch == ')' || ch == '}' || ch == ']' ? -1 : 0));
 		}
 		if(openBr != 0) {//check if the found closing bracket matches the opening bracket.

@@ -284,4 +284,8 @@ public class MReal extends MScalar {
 	public static boolean isInteger(double d) {
 		return Math.floor(d) == d;
 	}
+	
+	public static boolean isPosInteger(MathObject m) {
+		return (m instanceof MReal && ((MReal) m).isPosInteger());
+	}
 }

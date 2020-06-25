@@ -368,24 +368,42 @@ public enum Operator {
 		@Override
 		public MathObject evaluate(MathObject a, MathObject... b) {
 			if (a instanceof MVector) {
+				MVector v = (MVector) a;
 				if (b.length != 1)
 					throw new IllegalArgumentException("A vector only has 1 index, got " + (b.length));
-				if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())
-					return ((MVector) a).get((int) ((MReal) b[0]).getValue());
-				else
+				if (MReal.isPosInteger(b[0]))
+					return v.get((int) ((MReal) b[0]).getValue());
+				else if(b[0] instanceof MVector) { //b[0] is a slice
+					MVector slice = (MVector) b[0];
+					int[] beginEnd = getBeginEnd(slice);
+					MathObject[] result = new MathObject[beginEnd[1]-beginEnd[0]];
+					for(int k = 0, j = beginEnd[0]; j < beginEnd[1]; j++, k++)
+						result[k] = v.get(j);
+					return new MVector(result);
+				} else
 					throw new IndexException(
-							"Vector index needs to be a positive integer scalar value, got " + b[0].toString());
+							"Vector index needs to be a positive integer scalar value or a slice, got " + b[0].toString());
 			} else if (a instanceof MSequence) {
 				if (b.length != 1)
 					throw new IllegalArgumentException("A sequence only has 1 index, got " + (b.length));
-				if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())
+				if (MReal.isPosInteger(b[0]))
 					return ((MSequence) a).get((int) ((MReal) b[0]).getValue());
-				else
+				else if(b[0] instanceof MVector) {
+					MVector slice = (MVector) b[0];
+					int[] beginEnd = getBeginEnd(slice);
+					if(beginEnd[1] == Integer.MAX_VALUE)
+						throw new IndexException("Cannot create infinite slice.");
+					MathObject[] result = new MathObject[beginEnd[1]-beginEnd[0]];
+					MSequence s = (MSequence) a;
+					for(int k = 0, j = beginEnd[0]; j < beginEnd[1]; j++, k++)
+						result[k] = s.get(j);
+					return new MVector(result);
+				} else
 					throw new IndexException(
-							"Index needs to be a positive integer scalar value, got " + b[0].toString());
+							"Index needs to be a positive integer scalar value or a slice, got " + b[0].toString());
 			} else if (a instanceof MMatrix) {
 				if (b.length == 1) {
-					if (b[0] instanceof MReal && ((MReal) b[0]).isPosInteger())
+					if (MReal.isPosInteger(b[0]))
 						return ((MMatrix) a).getRow((int) ((MReal) b[0]).getValue());
 					else if(b[0] instanceof MVector && ((MVector) b[0]).size()==2) {
 						MathObject c = ((MVector) b[0]).get(0);
@@ -399,19 +417,57 @@ public enum Operator {
 						throw new IllegalArgumentException(
 								"Matrix index needs to be an (integer) scalar value or a size 2 vector, got " + b[0].toString());
 				} else if (b.length == 2) {
-					if (b[0] == null && b[1] instanceof MReal)
+					if (b[0] == null && MReal.isPosInteger(b[1]))
 						return ((MMatrix) a).getColumn((int) ((MReal) b[1]).getValue());
-					else if (b[0] instanceof MReal && b[1] instanceof MReal)
-						return ((MMatrix) a).get((int) ((MReal) b[0]).getValue(), (int) ((MReal) b[1]).getValue());
-					else
+					else if (MReal.isPosInteger(b[0])) {
+						if(MReal.isPosInteger(b[1]))
+							return ((MMatrix) a).get((int) ((MReal) b[0]).getValue(), (int) ((MReal) b[1]).getValue());
+						else if(b[1] instanceof MVector) {
+							MVector slice = (MVector) b[1];
+							int[] beginEnd = getBeginEnd(slice);
+							int row = (int) ((MReal) b[0]).getValue();
+							MathObject[] result = new MathObject[beginEnd[1]-beginEnd[0]];
+							MMatrix m = (MMatrix) a;
+							for(int k = 0, j = beginEnd[0]; j < beginEnd[1]; j++, k++)
+								result[k] = m.get(row, j);
+							return new MVector(result);	
+						} else
+							throw new IllegalArgumentException("Expected 2nd argument to be positive integer or vector/slice, got " + b[1]);
+					} else if(b[0] instanceof MVector) {
+						int[] beginEnd = getBeginEnd((MVector) b[0]);
+						MMatrix m = (MMatrix) a;
+						if(MReal.isPosInteger(b[1])) {
+							int col = (int) ((MReal) b[1]).getValue();
+							MathObject[] result = new MathObject[beginEnd[1]-beginEnd[0]];
+							for(int k = 0, j = beginEnd[0]; j < beginEnd[1]; j++, k++)
+								result[k] = m.get(j, col);
+							return new MVector(result).transpose();	
+						} else if(b[1] instanceof MVector) {
+							int[] beginEndCol = getBeginEnd((MVector) b[1]);
+							MathObject[][] result = new MathObject[beginEnd[1]-beginEnd[0]][beginEndCol[1]-beginEndCol[0]];
+							for(int k = 0, i = beginEnd[0]; i < beginEnd[1]; i++, k++)
+								for(int l = 0, j = beginEndCol[0]; j < beginEndCol[1]; l++, j++)
+									result[k][l] = m.get(i,j);
+							return new MMatrix(result);
+						} else {
+							throw new IllegalArgumentException("Expected second index to be positive integer or vector/slice, got " + b[1]);
+						}
+					} else 
 						throw new IllegalArgumentException(
-								"Matrix indices need to be one or two (integer) scalar value(s) (first one may be null/empty), got "
-										+ (b[0] == null ? "null" : b[0].getClass()) + " and " + b[1].getClass());
+								"Unexpected index arguments, see the help for syntax.");
 				}
 			}else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new IllegalArgumentException(
 					"Only matrices and vectors have indexed components, got " + a.getClass());
+		}
+		
+		private int[] getBeginEnd(MVector slice) {
+			if(slice.size()!=2)
+				throw new IndexException("Expected slice to have 2 values, got " + slice.size());
+			if(!MReal.isPosInteger(slice.get(0)) || !MReal.isPosInteger(slice.get(1)))
+				throw new IndexException("Expected slice to have 2 positive integers, got " + slice);
+			return new int[] {(int)((MReal)slice.get(0)).getValue(), (int) ((MReal)slice.get(1)).getValue()};
 		}
 		
 		@Override
