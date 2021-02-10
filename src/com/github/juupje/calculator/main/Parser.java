@@ -3,6 +3,7 @@ package com.github.juupje.calculator.main;
 import static com.github.juupje.calculator.main.Operator.*;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import com.github.juupje.calculator.algorithms.Algorithms;
 import com.github.juupje.calculator.algorithms.Functions;
@@ -33,9 +34,22 @@ public class Parser {
 	String expr;
 	Tree tree;
 	Node<?> p;
-
+	Map<String, Class<? extends MathObject>> extraVariables;
+	
 	public Parser(String s) {
 		expr = s;
+	}
+	
+	/**
+	 * Initializes a new parser based on a given string representing the expression and a map containing the names 
+	 * of variables and their types which are treated the same as variables stored in the Variables class.
+	 * @param s the expression
+	 * @param extraVariables a map of variable names and types which are treated as if they were stored in Variables.
+	 * Note that this only applies to expression parses with the {@link #getTree()} method.
+	 */
+	public Parser(String s, Map<String, Class<? extends MathObject>> extraVariables) {
+		expr = s;
+		this.extraVariables = extraVariables;
 	}
 
 	/**
@@ -58,7 +72,7 @@ public class Parser {
 	 * Compares the given character with the current character. The current
 	 * character is consumed if it's the same.
 	 * 
-	 * @param chToCheck
+	 * @param c
 	 *            The character to compare the current character to.
 	 * @return <code>true</code> if the characters match, otherwise
 	 *         <code>false</code>.
@@ -144,7 +158,7 @@ public class Parser {
 			if(ch == ']') count--;
 			nextChar();
 		}	
-		return new VectorParser("[" + expr.substring(position, pos)).parse(defined);
+		return new VectorParser(expr.substring(position, pos-1), extraVariables).parse(defined);
 	}
 	
 
@@ -156,7 +170,7 @@ public class Parser {
 			if(ch == ')') count--;
 			nextChar();
 		}	
-		return (MVector) new VectorParser("[" + expr.substring(position, pos-1) + "]").parse(false);
+		return (MVector) new VectorParser(expr.substring(position, pos-1), extraVariables).parse(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -164,12 +178,12 @@ public class Parser {
 		Node<?> n = null;
 		int position = pos;
 		if (ch == '(')
-			return getSubTree();
+			n =  getSubTree();
 		else if (ch == ')')
 			return null;
 		else if (ch == '[') {
 			consume('[');
-			return new Node<MathObject>(getVector(true));
+			n = new Node<MathObject>(getVector(true));
 		} else if (ch == ']')
 			return null;
 		else if(consume('&')) {
@@ -188,7 +202,8 @@ public class Parser {
 					p = new Node<Operator>(MULTIPLY);
 				p.left(n = new Node<MScalar>(new MReal(-1.0)));
 				p.right(getFactor());
-				return p.right();
+				n = p;
+				//return p.right();
 			} else
 				n = new Node<MScalar>(new MReal(Double.valueOf(s1)));
 			if(consume('i'))
@@ -205,34 +220,53 @@ public class Parser {
 			} else if(str.equals("inf")) {
 				n = new Node<MReal>(new MReal(Double.POSITIVE_INFINITY));
 			} else {
-				n = new Node<Variable>(new Variable(str));
-				if(((Variable) n.data).get() instanceof MFunction)
-					if(consume('('))
+				boolean isExtra = (extraVariables != null && extraVariables.containsKey(str));
+				if (!Variables.exists(str) && !isExtra)
+					Calculator.ioHandler.err("The variable " + str + " is undefined. Statement was parsed regardless.");
+				Variable v = new Variable(str);
+				n = new Node<Variable>(v);
+				if((!isExtra && v.get() instanceof MFunction) || (isExtra && MFunction.class.isAssignableFrom(extraVariables.get(str))))
+					if(consume('(')) 
 						n.left(new Node<MVector>(getParameters()));
 				if(consume('[')) {
 					MathObject mo = getVector(true);
 					if(!(mo instanceof MVector)) throw new UnexpectedCharacterException(expr, expr.indexOf(";", pos));
-					MVector v = (MVector) mo;
+					MVector vec = (MVector) mo;
 					Node<?> m = n;
 					n = new Node<Operator>(ELEMENT);
 					n.left(m);
-					if(v.size() == 1) {
-						if(v.get(0) instanceof MExpression && !(v.get(0) instanceof MFunction))
-							n.right(((MExpression) v.get(0)).getTree().getRoot());
-						else if(v.get(0) instanceof MReal)
-							n.right(new Node<MReal>((MReal) v.get(0)));
+					if(vec.size() == 1) {
+						if(vec.get(0) instanceof MExpression && !(vec.get(0) instanceof MFunction))
+							n.right(((MExpression) vec.get(0)).getTree().getRoot());
+						else if(vec.get(0) instanceof MReal)
+							n.right(new Node<MReal>((MReal) vec.get(0)));
 						else
-							throw new UnexpectedCharacterException("Expected expression or real number as index, got " + v.get(0));
+							throw new UnexpectedCharacterException("Expected expression or real number as index, got " + vec.get(0));
 					} else
-						n.right(new Node<MVector>(v));
+						n.right(new Node<MVector>(vec));
 				}
-				if (!Variables.exists(str))
-					Calculator.ioHandler.err("The variable " + str + " is undefined. Statement was parsed regardless.");
 			}
 		} else if(consume('i'))
 			n = new Node<MConst>(MConst.i);
 		else
 			throw new UnexpectedCharacterException(expr, pos);
+		
+		// Operators which work immediately on this factor (e.q. they don't connect terms)
+		if (consume('^')) {
+			Node<Operator> op = new Node<>(Operator.POWER);
+			op.left(n);
+			op.right(getFactor());
+			n = op;
+		} else if (consume('%')) {
+			Node<Operator> op = new Node<>(Operator.MOD);
+			op.left(n);
+			op.right(getFactor());
+			n = op;
+		} else if(consume('\'')) {
+			Node<Operator> op = new Node<>(Operator.TRANSPOSE);
+			op.left(n);
+			n = op;
+		}
 		return n;
 	}
 
@@ -257,7 +291,7 @@ public class Parser {
 			p = p.parent;
 			p.right(getFactor());
 			return p;
-		} else if (consume('i') || consume('~')) {
+		} else if (consume('\u00D7') || consume('~')) {
 			tree.insert(p, new Node<Operator>(CROSS), Node.LEFT);
 			p = p.parent;
 			p.right(getFactor());
@@ -267,7 +301,7 @@ public class Parser {
 			p = p.parent;
 			p.right(getFactor());
 			return p;
-		} else if (consume('^')) {
+		/*} else if (consume('^')) {
 			tree.insert(p, new Node<Operator>(POWER), Node.LEFT);
 			p = p.parent;
 			p.right(getFactor());
@@ -275,7 +309,7 @@ public class Parser {
 		} else if(consume('\'')) {
 			tree.insert(p, new Node<Operator>(TRANSPOSE), Node.LEFT);
 			p = p.parent;
-			return p;
+			return p; */
 		} else if (!Character.isDigit(ch)) { // Does the same as consume('*')
 			tree.insert(p, new Node<Operator>(MULTIPLY), Node.LEFT);
 			p = p.parent;
@@ -307,12 +341,17 @@ public class Parser {
 		while (true) {
 			if (consume('*'))
 				d = MULTIPLY.evaluate(d, processFactor());
-			else if (consume('i') || consume('~'))
+			else if (consume('\u00d7') || consume('~'))
 				d = CROSS.evaluate(d, processFactor());
 			else if (consume('/'))
 				d = DIVIDE.evaluate(d, processFactor());
 			else if (pos < expr.length() && Character.isLetter(ch))
 				d = MULTIPLY.evaluate(d, processFactor());
+			else if (consume('[')) {
+				// we want to get an element of the current object
+				d = ELEMENT.evaluate(d, toSliceObject(Interpreter.extractIndex(expr,pos-1), d.shape()));
+				findEndOfBrackets();
+			}
 			else
 				return d;
 		}
@@ -412,7 +451,7 @@ public class Parser {
 			throw new UnexpectedCharacterException(expr, pos);
 		}
 
-		// If the factor has to be risen to a power
+		// Operators which work immediately on this factor (e.q. they don't connect terms)
 		if (consume('^'))
 			d = POWER.evaluate(d, processFactor());
 		if (consume('%'))

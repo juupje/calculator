@@ -9,10 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -41,7 +41,7 @@ import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
 
 public class Printer {
-
+	private static final Locale locale = Locale.ROOT;
 	private static String lastLatexFileName = null;
 	private static String lastTextFileName = null;
 	private static PrintWriter writer;
@@ -95,17 +95,16 @@ public class Printer {
 	}
 
 	/**
-	 * Prints the given <tt>MExpression</tt> in a Dot format to a file with the
+	 * Prints the given <tt>Tree</tt> in a Dot format to a file with the
 	 * given name. The method uses {@link #printNodeDot(Node)} to print the nodes.
 	 * 
 	 * @param tree the {@link Tree} to be printed.
 	 * @param name the name of the Dot file (excluding the .dot extension).
 	 * @see #printDot(Node)
 	 */
-	public static void printDot(MExpression expr, String name) {
+	public static void printDot(Tree tree, String name) {
 		try {
 			writer = new PrintWriter(name + ".dot", "UTF-8");
-			Tree tree = expr.getTree();
 			writer.println("digraph tree {");
 			writer.println("node [fontname=\"Arial\"];");
 			if (tree.root == null)
@@ -119,6 +118,18 @@ public class Printer {
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			Calculator.errorHandler.handle(e);
 		}
+	}
+	
+	/**
+	 * Prints the given <tt>MExpression</tt> in a Dot format to a file with the
+	 * given name. The method uses {@link #printNodeDot(Node)} to print the nodes.
+	 * 
+	 * @param expr the {@link MExpression} to be printed.
+	 * @param name the name of the Dot file (excluding the .dot extension).
+	 * @see #printDot(Node)
+	 */
+	public static void printDot(MExpression expr, String name) {
+		printDot(expr.getTree(), name);
 	}
 
 	public static void printDot(Graph<?> g, String name) {
@@ -596,6 +607,8 @@ public class Printer {
 	 */
 	public static void dot(String args) {
 		String[] params = args.split(",");
+		for(int i = 0; i < params.length; i++)
+			params[i] = params[i].trim();
 		MathObject mo;
 		String name;
 		if (params.length == 2)
@@ -840,7 +853,7 @@ public class Printer {
 		switch(Settings.getInt(Settings.NOTATION)) {
 		case Settings.NORMAL:
 			if(Math.abs(num) >= 0.001 && Math.abs(num)<100000) {
-				s = String.format("%." + Settings.getInt(Settings.PRECISION) + "f", num);
+				s = String.format(locale, "%." + Settings.getInt(Settings.PRECISION) + "f", num);
 				while (s.endsWith("0"))
 					s = s.substring(0, s.length() - 1);
 				if (s.endsWith("."))
@@ -848,23 +861,18 @@ public class Printer {
 				break;
 			}
 		case Settings.SCI:
-			String format = "0.";
-			for (int i = 0; i < Settings.getInt(Settings.PRECISION); i++)
-				format += "#";
-			if(num<1 || num>=10)
-				format += "E0";
-			s = new DecimalFormat(format).format(num);
+			s = String.format(locale, "%." + Settings.getInt(Settings.PRECISION) +"e",num);
 			break;
 		case Settings.ENG:
-			   // If the value is negative, make it positive so the log10 works
-			   double posVal = (num<0) ? -num : num;
-			   double log10 = Math.log10(posVal);
-			   // Determine how many orders of 3 magnitudes the value is
-			   int count = (int) Math.floor(log10/3);
-			   // Scale the value into the range 1<=val<1000
-			   num /= Math.pow(10, count * 3);
-			   s = String.format("%." + Settings.getInt(Settings.PRECISION) + "fe%d", num, count * 3);
-			break;
+		   // If the value is negative, make it positive so the log10 works
+		   double posVal = (num<0) ? -num : num;
+		   double log10 = Math.log10(posVal);
+		   // Determine how many orders of 3 magnitudes the value is
+		   int count = (int) Math.floor(log10/3);
+		   // Scale the value into the range 1<=val<1000
+		   num /= Math.pow(10, count * 3);
+		   s = String.format(locale, "%." + Settings.getInt(Settings.PRECISION) + "fe%d", num, count * 3);
+		   break;
 		}
 		if(s.equals("-0"))
 			return "0";
