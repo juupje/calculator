@@ -7,7 +7,6 @@ import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.algorithms.Functions.Function;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Variable;
-import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MConst;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFunction;
@@ -60,7 +59,7 @@ public class Simplifier extends Algorithm {
 						n.replace(new Node<MathObject>(((Operator) n.data).evaluate(n.left.asMathObject())));
 					break;
 				case CONJUGATE:
-					if(n.left.data instanceof MReal || (n.left.data instanceof MComplex && ((MComplex) n.left.data).imag()==0))
+					if(n.left.data instanceof MScalar && !((MScalar) n.left.data).isComplex())
 						n.left.shiftUp();
 				default:
 					break;					
@@ -91,7 +90,9 @@ public class Simplifier extends Algorithm {
 					else if(n.right.data.equals(1)) n.left.shiftUp();
 					break;
 				case POWER:
+					//0^x=0, 1^x=1, x^1=x -> replace parent by left
 					if(n.left.data.equals(0) || n.left.data.equals(1) || n.right.data.equals(1)) n.left.shiftUp();
+					//x^0=1 -> replace parent by 1
 					else if(n.right.data.equals(0)) n.replace(new Node<MReal>(new MReal(1)));
 					break;
 				case TRANSPOSE:
@@ -134,6 +135,66 @@ public class Simplifier extends Algorithm {
 				n.switchChildren();
 		}
 		
+	};
+	
+	/**
+	 * Distributes all factors using {@code A*(B+C)=A*B+A*C}.
+	 */
+	public static DFSTask distribute = new DFSTask(false) {
+		private boolean isMultiply(Object obj) {
+			if(obj instanceof Operator)
+				return obj.equals(Operator.MULTIPLY);
+			return false;
+		}
+		
+		public boolean isAdd(Object obj) {
+			if(obj instanceof Operator)
+				return obj.equals(Operator.ADD) || obj.equals(Operator.SUBTRACT);
+			return false;
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public void accept(Node<?> n) {
+			//when editing this, take commutation into account!
+			if(isMultiply(n.data)) {
+				if(isAdd(n.right.data)) { //A*(B+C)=A*B+A*C
+					Node<Operator> add = (Node<Operator>) n; // the new add
+					add.setData((Operator) n.right.data); //change multiply to add or subtract
+					Node<?> A = n.left;
+					Node<?> B = n.right.left;
+					Node<?> C = n.right.right;
+					Node<Operator> prod1 = new Node<>(Operator.MULTIPLY);
+					Node<Operator> prod2 = new Node<>(Operator.MULTIPLY);
+					prod1.left(A);
+					prod1.right(B);
+					prod2.left(A.copy());
+					prod2.right(C);
+					add.left(prod1);
+					add.right(prod2);
+					//propagate the multiplication through consecutive additions/subtractions
+					accept(prod1);
+					accept(prod2);
+				} else if(isAdd(n.left.data)) { //(B+C)*A=B*A+C*A
+					Node<Operator> add = (Node<Operator>) n; //the new add
+					add.setData((Operator) n.left.data); //change multiply to add or subtract
+					Node<?> A = n.right;
+					Node<?> B = n.left.left;
+					Node<?> C = n.left.right;
+					Node<Operator> prod1 = new Node<>(Operator.MULTIPLY);
+					Node<Operator> prod2 = new Node<>(Operator.MULTIPLY);
+					prod1.left(B);
+					prod1.right(A);
+					prod2.left(C);
+					prod2.right(A.copy());
+					add.left(prod1);
+					add.right(prod2);
+					//propagate the multiplication through consecutive additions/subtractions
+					accept(prod1);
+					accept(prod2);
+				}
+			}
+		}
 	};
 
 	public Tree simplify(Tree tr) {
@@ -185,7 +246,6 @@ public class Simplifier extends Algorithm {
 	}
 	
 	static class OrderComperator implements Comparator<Object> {
-
 		/*
 		 * possible entries are:
 		 * -MConst 0
@@ -198,11 +258,11 @@ public class Simplifier extends Algorithm {
 		public static void init() {
 			if(importance!=null) return;
 			importance = new HashMap<Class<?>, Integer>(8);
-			importance.put(MConst.class, new Integer(4));
-			importance.put(MScalar.class, new Integer(3));
-			importance.put(Operator.class, new Integer(2));
-			importance.put(Variable.class, new Integer(1));
-			importance.put(Function.class, new Integer(0));
+			importance.put(MConst.class, 4);
+			importance.put(MScalar.class, 3);
+			importance.put(Operator.class, 2);
+			importance.put(Variable.class, 1);
+			importance.put(Function.class, 0);
 		}
 		
 		private static int getImportance(Object obj) {
@@ -221,6 +281,5 @@ public class Simplifier extends Algorithm {
 		public int compare(Object a, Object b) {
 			return getImportance(a) - getImportance(b);
 		}
-		
 	}
 }
