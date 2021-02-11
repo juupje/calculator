@@ -28,10 +28,12 @@ public enum Algorithms {
 	NORM(new Norm()),
 	
 	SUM(new Sum()),
+	EINSUM(new EinSum()),
 	
 	ABC(new ABCFormula()),
 	SIMPLIFY(new Simplifier()),
 	REORDER(new Reorderer()),
+	DISTRIBUTE(new Distribute()),
 	COM(new Commutator()),
 	ACOM(new Anticommutator()),
 	ANS(new Ans());

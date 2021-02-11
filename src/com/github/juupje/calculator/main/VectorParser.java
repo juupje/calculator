@@ -1,6 +1,7 @@
 package com.github.juupje.calculator.main;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
@@ -9,14 +10,28 @@ import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.tree.Tree;
 
 public class VectorParser extends Parser {
 	ArrayList<MathObject> v;
 	
 	public VectorParser(String s) {
 		super(s);
-		expr = expr.substring(1, expr.length()-1);
 		expr = expr.replace(" ",  "");
+		if(expr.charAt(0)=='[')
+			expr.substring(1);
+		if(expr.charAt(expr.length()-1)==']')
+			expr.substring(0,expr.length()-1);
+		v = new ArrayList<>();
+	}
+	
+	public VectorParser(String s, Map<String, Class<? extends MathObject>> extraVariables) {
+		super(s, extraVariables);
+		expr = expr.replace(" ",  "");
+		if(expr.charAt(0)=='[')
+			expr.substring(1);
+		if(expr.charAt(expr.length()-1)==']')
+			expr.substring(0,expr.length()-1);
 		v = new ArrayList<>();
 	}
 	
@@ -43,11 +58,11 @@ public class VectorParser extends Parser {
 		if(exprContainsNotInVector(';')) { //trying to create a matrix.
 			ArrayList<String> rows = toElements(expr, ';');
 			if(rows.size()==2 && rows.get(1).equals("")) {
-				return new MMatrix(new ArrayList<MVector>() {{ add((MVector) new VectorParser("[" + rows.get(0) + "]").parse(defined));}});
+				return new MMatrix(new ArrayList<MVector>() {{ add((MVector) new VectorParser(rows.get(0), extraVariables).parse(defined));}});
 			}
 			return new MMatrix(rows.stream().map(s -> {
 				try {
-					return (MVector) new VectorParser("[" + s + "]").parse(defined);
+					return (MVector) new VectorParser(s, extraVariables).parse(defined);
 				} catch (UnexpectedCharacterException e) {
 					Calculator.errorHandler.handle(e);
 					return null;
@@ -61,10 +76,10 @@ public class VectorParser extends Parser {
 					v[i] = new MReal(Double.parseDouble(elements.get(i)));
 				} catch(NumberFormatException e) {
 					if(defined) {
-						MExpression me =  new MExpression(elements.get(i));
-						if(!me.getTree().getRoot().isInternal() && me.getTree().getRoot().getData() instanceof MathObject)
-							v[i] = (MathObject) me.getTree().getRoot().data;
-						else v[i] = me;
+						Tree tree = new Parser(elements.get(i), extraVariables).getTree();
+						if(!tree.getRoot().isInternal() && tree.getRoot().getData() instanceof MathObject)
+							v[i] = (MathObject) tree.getRoot().data;
+						else v[i] = new MExpression(tree);
 					} else {
 						v[i] = new Parser(elements.get(i)).evaluate();
 					}

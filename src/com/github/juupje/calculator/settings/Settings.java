@@ -217,7 +217,7 @@ public enum Settings {
 				try {
 					double num = Double.parseDouble(args[1]);
 					if ((int) num - num == 0)
-						set(args[0], new Integer((int) num));
+						set(args[0], (int) num);
 					else
 						set(args[0], num);
 				} catch (NumberFormatException e) {

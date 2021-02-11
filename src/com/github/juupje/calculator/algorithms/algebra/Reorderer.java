@@ -39,5 +39,4 @@ public class Reorderer extends Algorithm {
 			return shapes[0];
 		throw new ShapeException("Only functions (shape=0) can be sorted.");
 	}
-
 }

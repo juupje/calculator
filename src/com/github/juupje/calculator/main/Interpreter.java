@@ -44,8 +44,10 @@ public class Interpreter {
 			c.process(argsFromString(s));
 		} else {
 			MathObject result = new Parser(s).evaluate();
-			Variables.ans(result.copy());
-			Calculator.ioHandler.out(Printer.toText(result));
+			if(result != null) {
+				Variables.ans(result.copy());
+				Calculator.ioHandler.out(Printer.toText(result));
+			}
 		}
 	}
 	
@@ -163,14 +165,15 @@ public class Interpreter {
 					v.set(index[0][0], obj);
 				else
 					v.set(index[0][0], oper.evaluate(v.get(index[0][0]), obj));
-			}
-			MVector v2 = (MVector) obj;
-			if(oper == null) {
-				for(int i = index[0][0]; i < index[0][1]; i++)
-					v.set(i, v2.get(i));
 			} else {
-				for(int i = index[0][0]; i < index[0][1]; i++)
-					v.set(i, oper.evaluate(v.get(i), v2.get(i)));
+				MVector v2 = (MVector) obj;
+				if(oper == null) {
+					for(int i = index[0][0]; i < index[0][1]; i++)
+						v.set(i, v2.get(i));
+				} else {
+					for(int i = index[0][0]; i < index[0][1]; i++)
+						v.set(i, oper.evaluate(v.get(i), v2.get(i)));
+				}
 			}
 		} else if(mo instanceof MMatrix) {
 			MMatrix m = (MMatrix) mo;
