@@ -329,6 +329,17 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 		return result;
 	}
 	
+	public static double[][] dyadic(double[] v) {
+		double[][] A = new double[v.length][v.length];
+		for(int i = 0; i < v.length; i++) {
+			A[i][i] = v[i]*v[i];
+			for(int j = i+1; j < v.length; j++) {
+				A[j][i] = A[i][j] = v[i]*v[j];
+			}
+		}
+		return A;
+	}
+	
 	public static Double[][] multiply(Double[][] A, double d) {
 		for(int i = 0; i < A.length; i++)
 			for(int j = 0; j < A[0].length; j++)

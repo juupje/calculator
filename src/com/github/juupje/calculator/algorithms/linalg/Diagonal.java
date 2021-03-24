@@ -106,7 +106,7 @@ public class Diagonal extends Algorithm {
 		} else if ((args.length == 3 || args.length == 4) && args[0] instanceof MScalar && args[1] instanceof MReal
 				&& args[2] instanceof MReal) {
 			MReal a = (MReal) args[1], b = (MReal) args[2];
-			if (a.isInteger() && a.getValue() > 0 && b.isInteger() && b.getValue() > 0) {
+			if (a.isPosInteger() && b.isPosInteger()) {
 				obj = (MScalar) args[0];
 				s = new Shape((int) ((MReal) args[1]).getValue(), (int) ((MReal) args[2]).getValue());
 			} else

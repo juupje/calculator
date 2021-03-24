@@ -1,6 +1,7 @@
 package com.github.juupje.calculator.algorithms.linalg;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
+import com.github.juupje.calculator.helpers.exceptions.UndefinedException;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
@@ -43,7 +44,7 @@ public class QRDecomposition extends Algorithm {
 	}
 	
 	private MVector qr(ScalarMatrixToolkit tk) {
-		return null;
+		throw new UndefinedException("QR-decomposition of complex matrices is not yet implemented.");
 	}
 	
 	private double[] cmultiply(double[] v, double d) {
@@ -54,24 +55,12 @@ public class QRDecomposition extends Algorithm {
 	}
 	
 	private double[][] dyadic(double[] v, double[] w) {
-		if(v.length==w.length) {
-			double[][] A = new double[v.length][v.length];
-			for(int i = 0; i < v.length; i++) {
-				A[i][i] = v[i]*w[i];
-				for(int j = i+1; j < v.length; j++) {
-					A[j][i] = v[i]*w[j];
-					A[i][j] = v[j]*w[i];
-				}
-			}
-			return A;
-		} else {
-			double[][] A = new double[v.length][w.length];
-			for(int i = 0; i < v.length; i++) {
-				for(int j = 0; j < w.length; j++)
-					A[i][j] = v[i]*w[j];
-			}
-			return A;
+		double[][] A = new double[v.length][w.length];
+		for(int i = 0; i < v.length; i++) {
+			for(int j = 0; j < w.length; j++)
+				A[i][j] = v[i]*w[j];
 		}
+		return A;
 	}
 
 	@Override

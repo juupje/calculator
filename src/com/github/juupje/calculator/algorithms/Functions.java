@@ -46,24 +46,6 @@ public class Functions {
 				return tan(m);
 			}
 		},
-		SINH {
-			@Override
-			public MScalar evaluate(MScalar m) {
-				return sinh(m);
-			}
-		},
-		COSH {
-			@Override
-			public MScalar evaluate(MScalar m) {
-				return cosh(m);
-			}
-		},
-		TANH {
-			@Override
-			public MScalar evaluate(MScalar m) {
-				return tanh(m);
-			}
-		},
 		SIND {
 			@Override
 			public MScalar evaluate(MScalar m) {
@@ -80,6 +62,24 @@ public class Functions {
 			@Override
 			public MScalar evaluate(MScalar m) {
 				return tand(m);
+			}
+		},
+		SINH {
+			@Override
+			public MScalar evaluate(MScalar m) {
+				return sinh(m);
+			}
+		},
+		COSH {
+			@Override
+			public MScalar evaluate(MScalar m) {
+				return cosh(m);
+			}
+		},
+		TANH {
+			@Override
+			public MScalar evaluate(MScalar m) {
+				return tanh(m);
 			}
 		},
 		ASIN {
@@ -124,6 +124,30 @@ public class Functions {
 				return sqrt(m);
 			}
 		},
+		ROOT {
+			@Override
+			public MScalar evaluate(MScalar m) {
+				throw new IllegalArgumentException(
+						"This method should be called with an MVector, please contact the developer.");
+			}
+			
+			@Override
+			public MScalar evaluate(MVector m) {
+				if(m.size()!=2)
+					throw new IllegalArgumentException("Expected two elements, got " + m.size());
+				try {
+					return root((MScalar) m.elements()[0], (MScalar) m.elements()[1]);
+				} catch(ClassCastException e) {
+					throw new IllegalArgumentException("Expected two scalar values, got " + m.get(0) + " and " + m.get(1));
+				}
+			}
+			
+			@Override
+			public MMatrix evaluate(MMatrix m) {
+				throw new IllegalArgumentException(
+						"This method should be called with an MVector, please contact the developer.");
+			}
+		},
 		ABS {
 			@Override
 			public MScalar evaluate(MScalar m) {
@@ -158,30 +182,6 @@ public class Functions {
 			@Override
 			public MScalar evaluate(MScalar m) {
 				return exp(m);
-			}
-		},
-		ROOT {
-			@Override
-			public MScalar evaluate(MScalar m) {
-				throw new IllegalArgumentException(
-						"This method should be called with an MVector, please contact the developer.");
-			}
-			
-			@Override
-			public MScalar evaluate(MVector m) {
-				if(m.size()!=2)
-					throw new IllegalArgumentException("Expected two elements, got " + m.size());
-				try {
-					return root((MScalar) m.elements()[0], (MScalar) m.elements()[1]);
-				} catch(ClassCastException e) {
-					throw new IllegalArgumentException("Expected two scalar values, got " + m.get(0) + " and " + m.get(1));
-				}
-			}
-			
-			@Override
-			public MMatrix evaluate(MMatrix m) {
-				throw new IllegalArgumentException(
-						"This method should be called with an MVector, please contact the developer.");
 			}
 		},
 		FACT {

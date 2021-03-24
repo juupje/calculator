@@ -118,7 +118,7 @@ public class Eigenvalues extends Algorithm {
 	private MVector eig3(ScalarMatrixToolkit m) {
 		MScalar[][] matrix = m.matrix;
 		MScalar B = matrix[0][0].copy().add(matrix[1][1]).add(matrix[2][2]);
-		MScalar C = matrix[1][0].copy().multiply(matrix[0][1]).copy().add(matrix[1][2].copy().multiply(matrix[2][1])).add(matrix[2][0].copy().multiply(matrix[0][2]))
+		MScalar C = matrix[1][0].copy().multiply(matrix[0][1]).add(matrix[1][2].copy().multiply(matrix[2][1])).add(matrix[2][0].copy().multiply(matrix[0][2]))
 				.subtract(matrix[0][0].copy().multiply(matrix[1][1])).subtract(matrix[1][1].copy().multiply(matrix[2][2])).subtract(matrix[0][0].copy().multiply(matrix[2][2]));
 		MScalar D = matrix[0][0].copy().multiply(matrix[1][1]).multiply(matrix[2][2]).add(matrix[2][0].copy().multiply(matrix[0][1]).multiply(matrix[1][2]))
 				.add(matrix[0][2].copy().multiply(matrix[1][0]).multiply(matrix[2][1]))

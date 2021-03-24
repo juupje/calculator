@@ -43,13 +43,14 @@ public class MatrixGenerator extends Algorithm {
 				((args.length==2 || args.length==1) && type != Type.FULL)))
 			throw new IllegalArgumentException(type.name().toLowerCase() + " expected " + (type==Type.FULL ? "3" : "2 or 1") + " arguments, got " + args.length);
 		
-		if(args[0] instanceof MReal && ((MReal) args[0]).isInteger() 
+		if(args[0] instanceof MReal && ((MReal) args[0]).isPosInteger() 
 				&& (args.length==1 || args[1] instanceof MReal && ((MReal) args[1]) instanceof MReal)) {
 			int rows = (int) ((MReal) args[0]).getValue();
 			if(type == Type.FULL) {
 				if(!args[2].isNumeric())
 					throw new IllegalArgumentException("Cannot fill a matrix with non-numeric value " + args[2].toString());
-				
+				if(!((MReal) args[1]).isPosInteger())
+					throw new IllegalArgumentException("Expected second argument to be a positive integer, got " + args[1]);
 				int cols = (int) ((MReal) args[1]).getValue();
 				
 				if(rows<=0 || cols<=0)

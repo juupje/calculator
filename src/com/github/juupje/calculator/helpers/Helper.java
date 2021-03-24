@@ -26,9 +26,10 @@ public class Helper {
 		for(String key : keys) {
 			if(jobj.has(key)) {
 				JSONObject obj = json.getJSONObject(key);
-				for(Iterator<String> kIter = jobj.getJSONObject(key).keys(); kIter.hasNext();) {
+				JSONObject jobjkey = jobj.getJSONObject(key);
+				for(Iterator<String> kIter = jobjkey.keys(); kIter.hasNext();) {
 					String k = kIter.next();
-					obj.append(k, jobj.get(k));
+					obj.append(k, jobjkey.get(k));
 				}
 			}
 		}
