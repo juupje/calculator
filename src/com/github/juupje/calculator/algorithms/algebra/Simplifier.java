@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.mathobjects.MConst;
@@ -233,7 +234,7 @@ public class Simplifier extends Algorithm {
 		else if(args[0] instanceof MExpression)
 			expr = (MExpression) args[0];
 		else 
-			throw new IllegalArgumentException("First argument needs to be a function or an expression, got " + args[0].getClass().getSimpleName());
+			throw new IllegalArgumentException("First argument needs to be a function or an expression, got " + Tools.type(args[0]));
 		prepared = true;
 		
 	}

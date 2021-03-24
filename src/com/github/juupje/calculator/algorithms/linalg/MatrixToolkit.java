@@ -240,11 +240,11 @@ public abstract class MatrixToolkit<T> {
 	
 	public int classify() {
 		int mask = MASKSET;
+		if(isReal()) mask |= REAL;
+		
 		if(isSquare()) mask |= SQUARE;
 		else return mask;
 		if(rows < 2) return mask;
-		
-		if(isReal()) mask |= REAL;
 		
 		if(isSymmetric(mask)) mask |= SYMMETRIC;
 		if(isHermitian(mask)) mask |= HERMITIAN;

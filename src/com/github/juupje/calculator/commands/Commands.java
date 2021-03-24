@@ -8,6 +8,7 @@ import com.github.juupje.calculator.algorithms.linalg.MatrixToolkit;
 import com.github.juupje.calculator.helpers.Helper;
 import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Timer;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.PluginException;
@@ -102,10 +103,11 @@ public enum Commands {
 				throw new IllegalArgumentException("There exists no variable with the name " + args);
 			if (mo instanceof MMatrix) {
 				MatrixToolkit<?> mtk = MatrixToolkit.getToolkit((MMatrix) mo);
+				String maskString = mtk.maskAsString(mtk.classify());
 				Calculator.ioHandler
-						.out(mo.getClass().getSimpleName() + "\nThis matrix is" + mtk.maskAsString(mtk.classify()));
+						.out(Tools.type(mo) + "\nThis matrix is" + (maskString.length()>0 ? maskString : " no special type"));
 			} else
-				Calculator.ioHandler.out(mo.getClass().getSimpleName());
+				Calculator.ioHandler.out(Tools.type(mo));
 		}
 	});
 

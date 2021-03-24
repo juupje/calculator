@@ -33,6 +33,7 @@ public class Reorderer extends Algorithm {
 			throw new IllegalArgumentException("Only functions can be reordered. Got " + argTypesToString(args));
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public Shape shape(Shape... shapes) {
 		if(shapes.length == 1 && shapes[0].equals(0))

@@ -43,10 +43,10 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 					try {
 						matrix[i][j] = ((MReal) m.get(i,j).evaluate()).getValue();
 					} catch(ClassCastException e) {
-						throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + m.getClass());
+						throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + Tools.type(m));
 					}
 				} else
-					throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + m.getClass());
+					throw new IllegalArgumentException("This toolkit only supports scalar-valued matrices, got " + Tools.type(m));
 			}
 		}
 	}*/

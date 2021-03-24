@@ -1,5 +1,6 @@
 package com.github.juupje.calculator.algorithms;
 
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
@@ -56,11 +57,11 @@ public abstract class Algorithm {
 	public final String argTypesToString(MathObject[] args) {
 		String s = "(";
 		for (int i = 0; i < args.length; i++)
-			s += args[i].getClass().getSimpleName() + (i == args.length-1 ? "" : ", ");
+			s += Tools.type(args[i]) + (i == args.length-1 ? "" : ", ");
 		return s + ")";
 	}
 	
 	public final String argTypeToString(MathObject arg) {
-		return arg.getClass().getSimpleName();
+		return Tools.type(arg);
 	}
 }

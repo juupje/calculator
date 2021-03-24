@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.github.juupje.calculator.helpers.JSONReader;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Parser;
 
@@ -77,7 +78,7 @@ public enum Settings {
 			map.put(setting, value);
 		} else
 			throw new IllegalArgumentException("Setting " + setting.toString().toLowerCase() + " expects value of type "
-					+ setting.getType() + ", got " + value.getClass());
+					+ setting.getType() + ", got " + Tools.type(value));
 	}
 
 	/**

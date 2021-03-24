@@ -43,12 +43,14 @@ public class Eigenvalues extends Algorithm {
 		}
 		
 		if(mtk instanceof DoubleMatrixToolkit) {
-			Double[][] U = null;
+			//Double[][] U = null;
 			DoubleMatrixToolkit dmtk = (DoubleMatrixToolkit) mtk;
 			if((matrixType & UHESSENBERG) != UHESSENBERG)
-				U = hessenberg(dmtk);
+				//U = hessenberg(dmtk);
+				hessenberg(dmtk);
 			//Matrix is now tri-diagonal (as only symmetric matrices have guaranteed real eigenvalues)
-			Double[][] Q = eig_francis(dmtk);
+			//Double[][] Q = eig_francis(dmtk);
+			eig_francis(dmtk);
 			//if(U != null)
 			//	Q = DoubleMatrixToolkit.multiply(U, Q);
 			double[] d = new double[n];

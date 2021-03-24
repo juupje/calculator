@@ -7,6 +7,7 @@ import com.github.juupje.calculator.algorithms.algebra.range.ArrayRange;
 import com.github.juupje.calculator.algorithms.algebra.range.IndexRange;
 import com.github.juupje.calculator.algorithms.algebra.range.RangeIterator;
 import com.github.juupje.calculator.algorithms.algebra.range.SimpleRange;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
@@ -59,25 +60,25 @@ public enum Operator {
 					return ((MVector) a.copy()).add((MVector) b[0]);
 				else
 					throw new InvalidOperationException(
-							"Only other vectors can be added to vectors. You're trying to add " + b[0].getClass()
+							"Only other vectors can be added to vectors. You're trying to add " + Tools.type(b[0])
 									+ " to a vector.");
 			} else if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).add((MScalar) b[0]);
 				else
 					throw new InvalidOperationException(
-							"Only other scalars can be added to scalars. You're trying to add " + b[0].getClass()
+							"Only other scalars can be added to scalars. You're trying to add " + Tools.type(b[0])
 									+ " to a scalar.");
 			} else if (a instanceof MMatrix) {
 				if (b[0] instanceof MMatrix)
 					return ((MMatrix) a.copy()).add((MMatrix) b[0]);
 				else
 					throw new InvalidOperationException(
-							"Only other matrices can be added to matrices. You're trying to add " + b[0].getClass()
+							"Only other matrices can be added to matrices. You're trying to add " + Tools.type(b[0])
 									+ " to a matrix.");
 			}
 			throw new InvalidOperationException(
-					"ADD operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"ADD operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -104,24 +105,24 @@ public enum Operator {
 				else
 					throw new InvalidOperationException(
 							"Only other vectors can be subtracted off vectors. You're trying to subtract "
-									+ b[0].getClass() + " off a vector.");
+									+ Tools.type(b[0]) + " off a vector.");
 			} else if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
 					return ((MScalar) a.copy()).subtract((MScalar) b[0]);
 				else
 					throw new InvalidOperationException(
 							"Only other scalars can be subtracted off scalars. You're trying to subtract "
-									+ b[0].getClass() + " off a scalar.");
+									+ Tools.type(b[0]) + " off a scalar.");
 			} else if (a instanceof MMatrix) {
 				if (b[0] instanceof MMatrix)
 					return ((MMatrix) a.copy()).subtract((MMatrix) b[0]);
 				else
 					throw new InvalidOperationException(
 							"Only other matrices can be subtracted off matrices. You're trying to subtract "
-									+ b[0].getClass() + " off a matrix.");
+									+ Tools.type(b[0]) + " off a matrix.");
 			}
 			throw new InvalidOperationException(
-					"SUBTRACT operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"SUBTRACT operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -159,7 +160,7 @@ public enum Operator {
 					return ((MMatrix) a).multiplyLeft((MMatrix) b[0]);
 			}
 			throw new InvalidOperationException(
-					"MULTIPLY operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"MULTIPLY operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -181,7 +182,7 @@ public enum Operator {
 			} else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
-					"CROSS operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"CROSS operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -216,7 +217,7 @@ public enum Operator {
 			}*/ else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
-					"DIVIDE operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"DIVIDE operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -248,7 +249,7 @@ public enum Operator {
 			} else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
-					"POWER operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"POWER operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -271,7 +272,7 @@ public enum Operator {
 					return ((MReal) a.copy()).mod((MReal) b[0]);
 			}
 			throw new InvalidOperationException(
-					"MODULO operator is not defined for " + a.getClass() + " and " + b[0].getClass());
+					"MODULO operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
 		}
 		
 		@Override
@@ -326,7 +327,7 @@ public enum Operator {
 				return ((MVector) a.copy()).transpose();
 			else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, null, this);
-			throw new InvalidOperationException("Can't transpose object " + a.getClass().getSimpleName());
+			throw new InvalidOperationException("Can't transpose object " + Tools.type(a));
 		}
 
 		@Override
@@ -354,7 +355,7 @@ public enum Operator {
 				return ((MScalar) a).copy().conjugate();
 			else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, null, this);
-			throw new InvalidOperationException("Can't conjugate object " + a.getClass().getSimpleName());
+			throw new InvalidOperationException("Can't conjugate object " + Tools.type(a));
 		}
 
 		@Override
@@ -522,7 +523,7 @@ public enum Operator {
 				
 			}
 			throw new IllegalArgumentException(
-					"Object of type " + a.getClass().getSimpleName() + " is not indexable");
+					"Object of type " + Tools.type(a) + " is not indexable");
 		}
 		
 		private int[] getBeginEnd(MVector slice) {

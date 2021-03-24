@@ -1,6 +1,7 @@
 package com.github.juupje.calculator.algorithms.calculus;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Parser;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.main.Variables;
@@ -60,7 +61,7 @@ public class Gradient extends Algorithm {
 			throw new IllegalArgumentException("Expected one or two arguments, got " + args.length + ". see 'help grad' for more help.");
 		MathObject obj  = Variables.get(args[0]);
 		if(obj == null || !(obj instanceof MFunction))
-			throw new IllegalArgumentException("First argument needs to be a function, got " + (obj==null ? args[0] : obj.getClass().getSimpleName()));
+			throw new IllegalArgumentException("First argument needs to be a function, got " + (obj==null ? args[0] : Tools.type(obj)));
 		f = (MFunction) obj;
 		if(!f.shape().isScalar())
 			throw new IllegalArgumentException("The Gradient is only defined for scalar functions, got function of shape " + f.shape());

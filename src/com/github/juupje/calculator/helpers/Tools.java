@@ -121,6 +121,16 @@ public class Tools {
 		return pos;
 	}
 	
+	public static String type(Object obj) {
+		String type = obj.getClass().getSimpleName();
+		if(type.length()!=0)
+			return type;
+		else {
+			type = obj.getClass().getName();
+			return type.substring(type.lastIndexOf(".")+1);
+		}
+	}
+	
 	public static boolean checkNameValidity(String name) {
 		return checkNameValidity(name, false);
 	}

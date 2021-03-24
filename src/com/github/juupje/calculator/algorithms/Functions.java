@@ -246,7 +246,7 @@ public class Functions {
 			else if(m instanceof MMatrix)
 				return evaluate((MMatrix) m);
 			else
-				throw new IllegalArgumentException(name() + " is only defined for scalars, vectors and matrices, got " + m.getClass().getSimpleName());
+				throw new IllegalArgumentException(name() + " is only defined for scalars, vectors and matrices, got " + Tools.type(m));
 		}
 		
 		
@@ -552,7 +552,7 @@ public class Functions {
 		if (m instanceof MReal)
 			return new MReal(Math.toDegrees(((MReal) m).getValue()));
 		else
-			throw new InvalidOperationException("Can't convert " + m.getClass() + " to degrees.");
+			throw new InvalidOperationException("Can't convert " + Tools.type(m) + " to degrees.");
 	}
 
 	/**
@@ -567,7 +567,7 @@ public class Functions {
 	public static MScalar toRadians(MScalar m) {
 		if (m instanceof MReal)
 			return new MReal(Math.toRadians(((MReal) m).getValue()));
-		throw new InvalidOperationException("Can't convert " + m.getClass() + " to degrees.");
+		throw new InvalidOperationException("Can't convert " + Tools.type(m) + " to degrees.");
 	}
 
 	// ############### SCALAR FUNCTIONS ###############

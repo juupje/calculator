@@ -44,6 +44,7 @@ public class MIndexedObject extends MIndexable {
 		return pos;
 	}
 	
+	@SuppressWarnings("unused")
 	private int[] posToIndices(int pos) {
 		if(pos<0 || pos>=values.length)
 			throw new IndexException("Position " + pos + " out of range for IndexedObject with " + values.length + " elements");

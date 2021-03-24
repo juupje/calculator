@@ -84,7 +84,7 @@ public class Printer {
 			return;
 		}
 		
-		writer.println(node.hashCode() + "[label=<" + node.toHTMLLabel() + ">, tooltip=\"" + node.getClass().getSimpleName() + "<" + (node.getData() instanceof Operator ? "Operator" : node.getData().getClass().getSimpleName()) + ">" + "\"];");
+		writer.println(node.hashCode() + "[label=<" + node.toHTMLLabel() + ">, tooltip=\"" + Tools.type(node) + "<" + Tools.type(node.data) + ">" + "\"];");
 		
 		if (node.left() != null) {
 			writer.println(node.hashCode() + " -> " + node.left().hashCode() + ";");
@@ -372,7 +372,7 @@ public class Printer {
 		else if(mo instanceof MSequence)
 			return toLatex((MSequence) mo);
 		else
-			throw new IllegalArgumentException("Can't export " + mo.getClass() + " to LaTex");
+			throw new IllegalArgumentException("Can't export " + Tools.type(mo) + " to LaTex");
 	}
 
 	/**
@@ -659,7 +659,7 @@ public class Printer {
 		if (mo instanceof MExpression)
 			printDot((MExpression) mo, name);
 		else
-			throw new IllegalArgumentException("Can't export " + mo.getClass() + " in a Dot format.");
+			throw new IllegalArgumentException("Can't export " + Tools.type(mo) + " in a Dot format.");
 	}
 
 	/**

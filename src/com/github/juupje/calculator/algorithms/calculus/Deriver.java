@@ -2,6 +2,7 @@ package com.github.juupje.calculator.algorithms.calculus;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
@@ -303,7 +304,7 @@ public class Deriver extends Algorithm {
 			throw new IllegalArgumentException("No arguments found. See 'help derivative' for more info.");
 		MathObject obj  = Variables.get(args[0]);
 		if(obj == null || !(obj instanceof MFunction))
-			throw new IllegalArgumentException("First argument needs to be a function, got " + obj.getClass().getSimpleName());
+			throw new IllegalArgumentException("First argument needs to be a function, got " + Tools.type(obj));
 		f = (MFunction) obj;
 		String[] params = f.getParameters();
 		Shape[] paramShapes = f.getParamShapes();
