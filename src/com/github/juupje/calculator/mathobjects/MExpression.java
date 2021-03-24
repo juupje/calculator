@@ -59,6 +59,14 @@ public class MExpression implements MathObject {
 		tree.insert(tree.getRoot(), node, dir);
 	}
 	
+	@Override
+	public MExpression multiply(MScalar s) {
+		Node<Operator> node = new Node<>(Operator.MULTIPLY);
+		node.left(new Node<MScalar>(s));
+		tree.insert(tree.getRoot(), node, Node.RIGHT);
+		return this;
+	}
+	
 	/**
 	 * Inserts {@link Operator#NEGATE} at the root of the tree.
 	 */

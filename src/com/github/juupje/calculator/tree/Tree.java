@@ -112,7 +112,7 @@ public class Tree {
 		return Shape.SCALAR; //scalar shape
 	}
 	
-	public Node<?> copy(Node<?> n, java.util.function.Function<Node<?>, Node<?>> func) {
+	public Node<?> copy(Node<?> n, java.util.function.Function<Node<?>, ? extends Node<?>> func) {
 		Node<?> copy = func.apply(n);
 		if(n.left() != null)
 			copy.left(copy(n.left(), func));
@@ -130,7 +130,7 @@ public class Tree {
 		});
 	}
 	
-	public Tree copy(java.util.function.Function<Node<?>, Node<?>> func) {
+	public Tree copy(java.util.function.Function<Node<?>, ? extends Node<?>> func) {
 		return new Tree(copy(root, func));
 	}
 	

@@ -99,12 +99,13 @@ public class Sum extends Algorithm {
 			if(shapes.length==3) {
 				if(!shapes[1].isScalar() || !shapes[2].isScalar())
 					throw new ShapeException("Second and third argument are expected to be scalars");
+				if(shapes[0].isScalar())
+					throw new ShapeException("Can't sum over unindexed object.");
 			}
-			int[] seqshape = shapes[0].asArray();
-			if(seqshape.length==1) return new Shape();
-			int[] shape = new int[seqshape.length-1];
+			if(shapes[0].dim()==1) return new Shape();
+			int[] shape = new int[shapes[0].dim()-1];
 			for(int i = 0; i <shape.length; i++)
-				shape[i] = seqshape[i+1];
+				shape[i] = shapes[0].get(i+1);
 			return new Shape(shape);
 		}
 		return null;

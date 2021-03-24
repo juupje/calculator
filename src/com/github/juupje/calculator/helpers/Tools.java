@@ -1,5 +1,6 @@
 package com.github.juupje.calculator.helpers;
 
+import java.util.List;
 import java.util.Set;
 
 import com.github.juupje.calculator.algorithms.Algorithms;
@@ -18,6 +19,14 @@ public class Tools {
 		StringBuilder builder = new StringBuilder();
 		for(Object obj : list)
 			builder.append(obj).append(s);
+		return builder.substring(0, builder.length()-s.length());
+	}
+	
+	public static String join(String s, List<? extends Object> set) {
+		if(set.size()==0) return "";
+		StringBuilder builder = new StringBuilder();
+		for(Object obj : set)
+			builder.append(obj.toString()).append(s);
 		return builder.substring(0, builder.length()-s.length());
 	}
 	

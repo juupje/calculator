@@ -45,7 +45,7 @@ public class MFunction extends MExpression {
 		tree = new FunctionTree(processTree(tr, defined, vars).getRoot());
 		paramMap = new HashMap<String, MathObject>(vars.length);
 	}
-
+	
 	@Override
 	public MFunction copy() {
 		return new MFunction(vars, varShapes, tree.copy(new TreeFunction() {
@@ -363,6 +363,12 @@ public class MFunction extends MExpression {
 
 	public MFunction divide(MathObject other) {
 		addOperation(Operator.DIVIDE, other);
+		return this;
+	}
+	
+	@Override
+	public MFunction multiply(MScalar s) {
+		addOperation(Operator.MULTIPLY, s);
 		return this;
 	}
 

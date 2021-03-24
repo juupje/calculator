@@ -101,6 +101,14 @@ public class MRecSequence extends MSequence {
 	public String toString() {
 		return Printer.toText(this);
 	}
+	
+	@Override
+	public MRecSequence multiply(MScalar s) {
+		super.multiply(s);
+		for(MScalar item : items)
+			item.multiply(s);
+		return this;
+	}
 
 	@Override
 	public MathObject get(int index) {

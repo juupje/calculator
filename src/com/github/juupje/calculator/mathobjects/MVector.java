@@ -3,17 +3,16 @@ package com.github.juupje.calculator.mathobjects;
 import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.Norm;
+import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
-import com.github.juupje.calculator.settings.Settings;
 
-public class MVector implements MathObject{
+public class MVector extends MIndexable {
 	MathObject[] v;
 	int size;
 	boolean transposed = false;
-	Shape shape;
 	
 	public MVector(Shape s) {
 		if(s.dim()==1)
@@ -240,12 +239,35 @@ public class MVector implements MathObject{
 		return v[i];
 	}
 	
+	@Override
+	public MathObject get(int... index) {
+		if(index.length==1)
+			return get(index[0]);
+		else if(index.length==2 && transposed && index[0]==0)
+			return get(index[1]);
+		throw new IndexException("Can't get "+index.length+"D index of shape " + shape);
+	}
+	
+	/**
+	 * Sets the element specified by the given index to the given object
+	 * @param index the element's index.
+	 * @param m the object to which the element will be set
+	 */
 	public void set(int index, MathObject m) {
 		v[index] = m;
 	}
 	
 	public void set(int index, double d) {
 		v[index] = new MReal(d);
+	}
+	
+	@Override
+	public void set(MathObject m, int... index) {
+		if(index.length==1)
+			set(index[0], m);
+		else if(index.length==2 && transposed && index[0]==0)
+			set(index[1], m);
+		throw new IndexException("Can't set "+index.length+"D index of shape " + shape);
 	}
 	
 	/**
@@ -283,16 +305,13 @@ public class MVector implements MathObject{
 	}
 	
 	/**
-	 * Inverts the vector. This means that every component will inverted separately.
-	 * Note, though this operation is not mathematically defined, this results in a*inv(a)=1.
-	 * @return {@code this}
+	 * Inverts the vector, this operation is not mathematically defined.
+	 * @throws InvalidOperationException the inverse of vector is not defined.
 	 * @see MathObject#invert()
 	 */
 	@Override
 	public MVector invert() {
-		for(MathObject element : v)
-			element.invert();
-		return this;
+		throw new InvalidOperationException("Inverse of vector is not defined.");
 	}
 	
 	/**
@@ -341,13 +360,7 @@ public class MVector implements MathObject{
 	
 	@Override
 	public String toString() {
-		String s = "(";
-		for(MathObject element : v) {
-			s += element.toString() + ", ";
-			if(Settings.getBool(Settings.MULTILINE_MATRIX) && element instanceof MMatrix)
-				s += System.lineSeparator();
-		}
-		return s.substring(0, s.lastIndexOf(',')) + ")" + (transposed ? "'" : "");
+		return Printer.toText(v) + (transposed ? "'" : "");
 	}
 	
 	//###### static methods #####	

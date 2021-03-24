@@ -25,6 +25,11 @@ public interface MathObject {
 	 */
 	public abstract MathObject evaluate();
 	
+	public abstract MathObject multiply(MScalar s);
+	default MathObject multiply(double d) {
+		return multiply(new MReal(d));
+	}
+	
 	public abstract Shape shape();
 	public abstract boolean isNumeric();
 	

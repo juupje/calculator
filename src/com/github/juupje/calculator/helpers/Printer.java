@@ -70,7 +70,7 @@ public class Printer {
 	 * 
 	 * @param node the {@link Node} to be printed.
 	 */
-	private static void printNodeDot(Node<?> node) {
+	private static void printNodeDot(Node<?> node, boolean connectParent) {
 		if(node.data instanceof MVectorFunction) {
 			MVectorFunction v = (MVectorFunction) node.data;
 			String name = "";
@@ -78,20 +78,25 @@ public class Printer {
 				name += i + ", ";
 				writer.println(node.hashCode() + " -> " + i);
 				writer.println(i + " -> " + v.get(i).getTree().getRoot().hashCode());
-				printNodeDot(v.get(i).getTree().getRoot());
+				printNodeDot(v.get(i).getTree().getRoot(), connectParent);
 			}
 			writer.println(node.hashCode() + "[label=\"(" + name.substring(0, name.length()-2) + ")\"];");			
 			return;
 		}
-		writer.println(node.hashCode() + "[label=\"" + node.toString() + "\"];");
+		
+		writer.println(node.hashCode() + "[label=<" + node.toHTMLLabel() + ">, tooltip=\"" + node.getClass().getSimpleName() + "<" + (node.getData() instanceof Operator ? "Operator" : node.getData().getClass().getSimpleName()) + ">" + "\"];");
+		
 		if (node.left() != null) {
-			writer.println(node.hashCode() + " -> " + node.left().hashCode());
-			printNodeDot(node.left());
+			writer.println(node.hashCode() + " -> " + node.left().hashCode() + ";");
+			printNodeDot(node.left(), connectParent);
 		}
 		if (node.right() != null) {
-			writer.println(node.hashCode() + " -> " + node.right().hashCode());
-			printNodeDot(node.right());
+			writer.println(node.hashCode() + " -> " + node.right().hashCode() + ";");
+			printNodeDot(node.right(), connectParent);
 		}
+		if(node.parent != null && connectParent)
+			writer.println(node.hashCode() + " -> " + node.parent.hashCode() + " [style=dashed];");
+		
 	}
 
 	/**
@@ -103,6 +108,19 @@ public class Printer {
 	 * @see #printDot(Node)
 	 */
 	public static void printDot(Tree tree, String name) {
+		printDot(tree, name, false);
+	}
+	
+	/**
+	 * Prints the given <tt>Tree</tt> in a Dot format to a file with the
+	 * given name. The method uses {@link #printNodeDot(Node)} to print the nodes.
+	 * 
+	 * @param tree the {@link Tree} to be printed.
+	 * @param name the name of the Dot file (excluding the .dot extension).
+	 * @param connectParent draws connections from nodes to their parents
+	 * @see #printDot(Node)
+	 */
+	public static void printDot(Tree tree, String name, boolean connectParent) {
 		try {
 			writer = new PrintWriter(name + ".dot", "UTF-8");
 			writer.println("digraph tree {");
@@ -112,7 +130,7 @@ public class Printer {
 			else if (!tree.root.isInternal() && !(tree.root.data instanceof MVectorFunction))
 				writer.println(tree.root.toString());
 			else
-				printNodeDot(tree.root);
+				printNodeDot(tree.root, connectParent);
 			writer.println("labelloc=\"t\"\nlabel=\"" + name + "\"\n}");
 			writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -559,6 +577,18 @@ public class Printer {
 			}
 			return s.substring(0, s.length() - 1) + "]";
 		}
+	}
+	
+	public static String toText(MathObject[] vector) {
+		String s = "(";
+		for(int i = 0; i < vector.length; i++) {
+			s += vector[i].toString();
+			if(i!=vector.length-1)
+				s += ", ";
+			if(Settings.getBool(Settings.MULTILINE_MATRIX) && vector[i] instanceof MMatrix)
+				s += System.lineSeparator();
+		}
+		return s + ")";
 	}
 
 	/**

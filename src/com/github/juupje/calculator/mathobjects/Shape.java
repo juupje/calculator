@@ -52,14 +52,6 @@ public final class Shape {
 		
 	}
 	
-	/**
-	 * Returns the {@code shape} array.
-	 * @return an {@code this.shape}.
-	 */
-	public int[] asArray() {
-		return shape;
-	}
-	
 	public Shape copy() {
 		int[] s2 = new int[shape.length];
 		for(int i = 0; i < s2.length; i++)
@@ -85,16 +77,20 @@ public final class Shape {
 		return shape.length;
 	}
 	
+	/**
+	 * If the dimension of this Shape is 2, a new Shape with rows/columns switched is returned.
+	 * If the dimension is 1, a new shape with 1 row and columns equal to {@code this.rows()} is returned.
+	 * Otherwise, an exception is thrown.
+	 * 
+	 * @return A new, transposed Shape
+	 */
 	public Shape transpose() {
-		if(shape.length>2)
+		if(shape.length==2)
+			return new Shape(shape[1], shape[0]);
+		else if(shape.length==1)
+			return new Shape(1, shape[0]);
+		else
 			throw new ShapeException("Can't transpose shape " + toString());
-		if(shape.length==2) {
-			int temp = shape[0];
-			shape[0]=shape[1];
-			shape[1] = temp;
-		} else if(shape.length==1)
-			shape = new int[] {1, shape[0]};
-		return this;
 	}
 	
 	/**
@@ -163,13 +159,9 @@ public final class Shape {
 	}
 	
 	public static Shape invert(Shape a)  {
-		if(a.dim()!=1)
+		if(a.isScalar() || (a.dim()==2 && a.isSquare()))
 			return a;
 		throw new ShapeException("Objects of shape " + a + " cannot be inverted.");
-	}
-	
-	public static Shape transpose(Shape a) {
-		return a.copy().transpose();
 	}
 	
 	public int rows() {
@@ -208,9 +200,9 @@ public final class Shape {
 		if(obj == null || obj instanceof Number)
 			return isScalar();
 		if(obj instanceof Shape && ((Shape) obj).dim() == dim()) {
-			int[] other = ((Shape) obj).asArray();
+			Shape other = (Shape) obj;
 			for(int i = 0; i < shape.length; i++)
-				if(other[i] != shape[i])
+				if(other.get(i) != shape[i])
 					return false;
 			return true;
 		}

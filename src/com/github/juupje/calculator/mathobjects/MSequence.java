@@ -7,14 +7,13 @@ import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Parser;
 
-public class MSequence implements MathObject {
+public class MSequence extends MIndexable {
 	
 	String indexName = "";
 	int begin = 1;
 	int end;
 	MFunction func;
 	MReal index;
-	Shape shape;
 	
 	public MSequence(String index, int begin, int end, MFunction func) {
 		this.indexName = index;
@@ -47,6 +46,18 @@ public class MSequence implements MathObject {
 		throw new IndexException(String.valueOf(index), String.valueOf(begin), (String)(end>0 ? end : "infinity"));
 	}
 	
+	@Override
+	public MathObject get(int... index) {
+		if(index.length==1)
+			return get(index[0]);
+		throw new IndexException("Cannot get " + index.length + "D index from 1D sequence");
+	}
+	
+	@Override
+	public void set(MathObject m, int... index) {
+		throw new InvalidOperationException("Cannot set element of sequence");
+	}
+	
 	public MFunction getFunction() {
 		return func;
 	}
@@ -63,6 +74,12 @@ public class MSequence implements MathObject {
 		return indexName;
 	}
 
+	@Override
+	public MSequence multiply(MScalar s) {
+		func.multiply(s);
+		return this;
+	}
+	
 	/**
 	 * Negates the defining function of the sequence. This is equivalent to negating every element in this sequence.
 	 * @see MFunction#negate();

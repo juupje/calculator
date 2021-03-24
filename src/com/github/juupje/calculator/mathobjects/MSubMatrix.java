@@ -8,11 +8,10 @@ import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.mathobjects.MMatrix.Slice;
 
-public class MSubMatrix implements MathObject {
+public class MSubMatrix extends MIndexable {
 	private int rstart, rend, cstart, cend;
 	private int rows, cols;
 	private MMatrix p; //parent
-	Shape shape;
 	
 	/**
 	 * @param startrow inclusive
@@ -31,9 +30,12 @@ public class MSubMatrix implements MathObject {
 		shape = new Shape(rows, cols);
 	}
 	
-	private boolean checkindex(int i, int j) {
-		if(i>=rows || j>=cols)
-			throw new IndexException("Index [" + i +", " + j + "] out of bounds for submatrix of size (" + rows + ", " + cols + ")");
+	@Override
+	boolean checkindex(int... indices) {
+		if(indices.length != 2)
+			throw new IndexException("Too many indices ("+indices.length+") for submatrix of dimension 2");
+		if(indices[0]>=rows || indices[1]>=cols)
+			throw new IndexException("Index [" + indices[0] +", " + indices[1] + "] out of bounds for submatrix of size (" + rows + ", " + cols + ")");
 		return true;
 	}
 	
@@ -49,6 +51,13 @@ public class MSubMatrix implements MathObject {
 		return p.get(i+rstart, j+cstart);
 	}
 	
+	@Override
+	public MathObject get(int... index) {
+		checkindex(index);
+		return get(index[0], index[1]);
+		
+	}
+	
 	/**
 	 * Sets the component at the i-th row and j-th column of the submatrix to the given
 	 * {@link MathObject}.
@@ -61,6 +70,13 @@ public class MSubMatrix implements MathObject {
 		checkindex(i,j);
 		p.set(i+rstart, j+cstart, obj);
 	}
+	
+	@Override
+	public void set(MathObject obj, int... index) {
+		checkindex(index);
+		set(index[0], index[1], obj);
+	}
+	
 	
 	/**
 	 * Copies the given matrix into this submatrix.
@@ -277,7 +293,22 @@ public class MSubMatrix implements MathObject {
 						"The column-vector/matrix product is only defined for an n-vector and (1 x m)-matrix, got "
 								+ other.shape + " and " + shape);
 		}
-	}	
+	}
+	
+	/**
+	 * Multiplies this {@code MSubMatrix} element-wise with the value in the given
+	 * {@code MScalar}
+	 * 
+	 * @param other the {@code MScalar} to be multiplied with.
+	 * @return {@code this}
+	 */
+	@Override
+	public MSubMatrix multiply(MScalar other) {
+		for (int i = rstart; i < rend; i++)
+			for(int j = cstart; j < cend; j++)
+				p.m[i][j].multiply(other);
+		return this;
+	}
 	
 	/**
 	 * Returns the elements in this submatrix.

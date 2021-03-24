@@ -1,6 +1,8 @@
 package com.github.juupje.calculator.tree;
 
 import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.helpers.exceptions.TreeException;
+import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.mathobjects.MConst;
@@ -69,9 +71,11 @@ public class Node<T> {
 				parent.left(n);
 			else
 				parent.right(n);
+		} else {
+			throw new TreeException("Cannot replace root of tree");
 		}
 		if(right != null || left != null)
-			System.out.println("ATTENTION: node was replaced and it's children discarded, old: " + left.parent + "[" + left + ", " + right + "] " + 
+			Calculator.ioHandler.debug("ATTENTION: node was replaced and it's children discarded, old: " + left.parent + "[" + left + ", " + right + "] " + 
 		" new: " + n + (n != null ? "[" + n.left + ", " + n.right + "]": ""));
 	}
 	
@@ -153,5 +157,9 @@ public class Node<T> {
 		else if(data instanceof Function)
 			return ((Function) data).toString();
 		return data.toString();
+	}
+	
+	public String toHTMLLabel() {
+		return toString() + "<br/><font point-size=\"10\">"+ hashCode() + "</font>";
 	}
 }

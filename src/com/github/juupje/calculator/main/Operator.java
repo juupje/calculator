@@ -3,11 +3,17 @@ package com.github.juupje.calculator.main;
 import java.util.ArrayList;
 import java.util.function.Function;
 
+import com.github.juupje.calculator.algorithms.algebra.range.ArrayRange;
+import com.github.juupje.calculator.algorithms.algebra.range.IndexRange;
+import com.github.juupje.calculator.algorithms.algebra.range.RangeIterator;
+import com.github.juupje.calculator.algorithms.algebra.range.SimpleRange;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFunction;
+import com.github.juupje.calculator.mathobjects.MIndexable;
+import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
@@ -134,26 +140,19 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only multiply exactly two MathObjects, got " + (1 + b.length));
+			if(a instanceof MScalar)
+				return b[0].copy().multiply((MScalar) a);
+			if(b[0] instanceof MScalar)
+				return a.copy().multiply((MScalar) b[0]);
 			if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			else if (a instanceof MVector) {
 				if (b[0] instanceof MVector)
 					return ((MVector) a).multiply((MVector) b[0]); // copy is not needed, because MVector.multiply(MVector) doesn't
 																// change either of the MVectors.
-				if (b[0] instanceof MScalar)
-					return ((MVector) a.copy()).multiply((MScalar) b[0]);
 				if (b[0] instanceof MMatrix)
 					return ((MMatrix) b[0].copy()).multiplyRight((MVector) a);
-			} else if (a instanceof MScalar) {
-				if (b[0] instanceof MScalar)
-					return ((MScalar) a.copy()).multiply((MScalar) b[0]);
-				if (b[0] instanceof MVector)
-					return ((MVector) b[0].copy()).multiply((MScalar) a);
-				if (b[0] instanceof MMatrix)
-					return ((MMatrix) b[0].copy()).multiply((MScalar) a);
 			} else if (a instanceof MMatrix) {
-				if (b[0] instanceof MScalar)
-					return ((MMatrix) a.copy()).multiply((MScalar) b[0]);
 				if (b[0] instanceof MVector)
 					return ((MMatrix) a).multiplyLeft((MVector) b[0]);
 				if (b[0] instanceof MMatrix)
@@ -203,7 +202,9 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only divide exactly two MathObjects, got " + (1 + b.length));
-			if (a instanceof MVector) {
+			if(b[0] instanceof MScalar)
+				return a.copy().multiply(((MScalar) b[0]).invert());
+			/*if (a instanceof MVector) {
 				if (b[0] instanceof MScalar)
 					return ((MVector) a.copy()).divide((MScalar) b[0]);
 			} else if (a instanceof MScalar) {
@@ -212,7 +213,7 @@ public enum Operator {
 			} else if (a instanceof MMatrix) {
 				if (b[0] instanceof MScalar)
 					return ((MMatrix) a.copy()).divide((MScalar) b[0]);
-			} else if(a instanceof MExpression || b[0] instanceof MExpression)
+			}*/ else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
 					"DIVIDE operator is not defined for " + a.getClass() + " and " + b[0].getClass());
@@ -331,7 +332,7 @@ public enum Operator {
 		@Override
 		public Shape shape(Shape a, Shape... b) {
 			if(b.length==0)
-			return Shape.transpose(a);
+			return a.transpose(); //doesn't change a
 		throw new InvalidOperationException("Can only transpose one mathobject, got " + (b.length+1));
 		}
 	},
@@ -370,7 +371,7 @@ public enum Operator {
 			if (a instanceof MVector) {
 				MVector v = (MVector) a;
 				if (b.length != 1)
-					throw new IllegalArgumentException("A vector only has 1 index, got " + (b.length));
+					throw new IndexException("A vector only has 1 index, got " + (b.length));
 				if (MReal.isPosInteger(b[0]))
 					return v.get((int) ((MReal) b[0]).getValue());
 				else if(b[0] instanceof MVector) { //b[0] is a slice
@@ -385,7 +386,7 @@ public enum Operator {
 							"Vector index needs to be a positive integer scalar value or a slice, got " + b[0].toString());
 			} else if (a instanceof MSequence) {
 				if (b.length != 1)
-					throw new IllegalArgumentException("A sequence only has 1 index, got " + (b.length));
+					throw new IndexException("A sequence only has 1 index, got " + (b.length));
 				if (MReal.isPosInteger(b[0]))
 					return ((MSequence) a).get((int) ((MReal) b[0]).getValue());
 				else if(b[0] instanceof MVector) {
@@ -411,10 +412,10 @@ public enum Operator {
 						if(c instanceof MReal && ((MReal) c).isPosInteger() && d instanceof MReal && ((MReal) d).isPosInteger())
 							return ((MMatrix) a).get((int) ((MReal) c).getValue(), (int) ((MReal) d).getValue());
 						else
-							throw new IllegalArgumentException("Matrix index needs to contain integer values, got " + b[0]);
+							throw new IndexException("Matrix index needs to contain integer values, got " + b[0]);
 					}
 					else
-						throw new IllegalArgumentException(
+						throw new IndexException(
 								"Matrix index needs to be an (integer) scalar value or a size 2 vector, got " + b[0].toString());
 				} else if (b.length == 2) {
 					if (b[0] == null && MReal.isPosInteger(b[1]))
@@ -432,7 +433,7 @@ public enum Operator {
 								result[k] = m.get(row, j);
 							return new MVector(result);	
 						} else
-							throw new IllegalArgumentException("Expected 2nd argument to be positive integer or vector/slice, got " + b[1]);
+							throw new IndexException("Expected 2nd argument to be positive integer or vector/slice, got " + b[1]);
 					} else if(b[0] instanceof MVector) {
 						int[] beginEnd = getBeginEnd((MVector) b[0]);
 						MMatrix m = (MMatrix) a;
@@ -450,16 +451,78 @@ public enum Operator {
 									result[k][l] = m.get(i,j);
 							return new MMatrix(result);
 						} else {
-							throw new IllegalArgumentException("Expected second index to be positive integer or vector/slice, got " + b[1]);
+							throw new IndexException("Expected second index to be positive integer or vector/slice, got " + b[1]);
 						}
 					} else 
 						throw new IllegalArgumentException(
 								"Unexpected index arguments, see the help for syntax.");
 				}
-			}else if(a instanceof MExpression || b[0] instanceof MExpression)
+			}else if(a instanceof MExpression || b[0] instanceof MExpression) {
 				return applyOnExpression(a, b[0], this);
+			} else if(a instanceof MIndexable) {
+				MIndexable indexable = (MIndexable) a;
+				//Check if each index is a single value
+				boolean containsSlice = false;
+				if(b.length==a.shape().size()) {
+					for(MathObject obj : b)
+						if(!(obj instanceof MReal)) {
+							containsSlice = true;
+							break;
+						}
+				} else
+					containsSlice = true;
+				if(!containsSlice) {
+					//If the result should be a single value (so all indices are single/scalar values)
+					//Put them in a list and use get() method from MIndexable
+					int[] indices = new int[b.length];
+					for(int i = 0; i < b.length; i++) {
+						if(((MReal) b[i]).isPosInteger())
+							indices[i] = (int) ((MReal) b[i]).getValue();
+						else
+							throw new IndexException("Index value needs to be a positive integer, got " + b[i]);
+					}
+					return indexable.get(indices);
+				} else {
+					//The indices contains one or more slices
+					//Find the ranges of those slices
+					IndexRange[] ranges = new IndexRange[a.shape().size()];
+					ArrayList<Integer> sizes = new ArrayList<>(); //to save the shape of the resulting object
+					for(int i = 0; i < b.length; i++) {
+						if(b[i] instanceof MReal) {
+							if(((MReal) b[i]).isPosInteger()) {
+								ranges[i] = new ArrayRange(new int[] {(int) ((MReal) b[i]).getValue()});
+							} else
+								throw new IndexException("Index value needs to be a positive integer, got " + b[i]);
+						} else if(b[i] instanceof MVector) {
+							int[] slice = getBeginEnd((MVector) b[i]);
+							ranges[i] = new SimpleRange(slice[0], slice[1]-1);
+							sizes.add(slice[1]-slice[0]);
+						}
+					}
+					//create an range iterator
+					RangeIterator iter = new RangeIterator(ranges);
+					//Convert sizes to an array (in order to be passed to the constructor of Shape())
+					int[] arr_sizes = new int[sizes.size()];
+					int len = 1;
+					for(int i = 0; i < sizes.size(); i++) {
+						len *= sizes.get(i);
+						arr_sizes[i] = sizes.get(i);
+					}
+					Shape shape = new Shape(arr_sizes);
+					//Save the selected elements to a new MIndexedObject
+					MathObject[] result = new MathObject[len];
+					int i = 0;
+					while(true) {
+						result[i++] = indexable.get(iter.getIndices());
+						if(!iter.next())
+							break;
+					}
+					return new MIndexedObject(shape, result);
+				}
+				
+			}
 			throw new IllegalArgumentException(
-					"Only matrices and vectors have indexed components, got " + a.getClass());
+					"Object of type " + a.getClass().getSimpleName() + " is not indexable");
 		}
 		
 		private int[] getBeginEnd(MVector slice) {

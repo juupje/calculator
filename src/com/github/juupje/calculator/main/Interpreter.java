@@ -169,10 +169,10 @@ public class Interpreter {
 				MVector v2 = (MVector) obj;
 				if(oper == null) {
 					for(int i = index[0][0]; i < index[0][1]; i++)
-						v.set(i, v2.get(i));
+						v.set(i, v2.get(i-index[0][0]));
 				} else {
 					for(int i = index[0][0]; i < index[0][1]; i++)
-						v.set(i, oper.evaluate(v.get(i), v2.get(i)));
+						v.set(i, oper.evaluate(v.get(i), v2.get(i-index[0][0])));
 				}
 			}
 		} else if(mo instanceof MMatrix) {

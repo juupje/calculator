@@ -11,10 +11,9 @@ import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
 
-public class MMatrix implements MathObject {
+public class MMatrix extends MIndexable {
 
 	MathObject m[][];
-	Shape shape;
 
 	public MMatrix(MathObject[][] m) {
 		this.m = m;
@@ -99,6 +98,14 @@ public class MMatrix implements MathObject {
 		shape = new Shape(m.length, m[0].length);
 	}
 
+	@Override
+	boolean checkindex(int... indices) {
+		if(indices.length != 2)
+			throw new IndexException("Too many indices ("+indices.length+") for submatrix of dimension 2");
+		if(indices[0]>=shape.rows() || indices[1]>=shape.cols())
+			throw new IndexException("Index [" + indices[0] +", " + indices[1] + "] out of bounds for submatrix of size " + shape);
+		return true;
+	}
 	/**
 	 * Returns the component at the i-th row and j-th column of this matrix.
 	 * 
@@ -107,7 +114,15 @@ public class MMatrix implements MathObject {
 	 * @return the component at [i,j] as a {@link MathObject}
 	 */
 	public MathObject get(int i, int j) {
+		checkindex(i,j);
 		return m[i][j];
+	}
+	
+	@Override
+	public MathObject get(int... index) {
+		if(index.length==2)
+			return get(index[0], index[1]);
+		throw new IndexException("Can't get "+index.length+"D index of shape " + shape);
 	}
 
 	/**
@@ -119,7 +134,14 @@ public class MMatrix implements MathObject {
 	 * @param mo the <tt>MathObject</tt> to be set at [i,j]
 	 */
 	public void set(int i, int j, MathObject mo) {
+		checkindex(i, j);
 		m[i][j] = mo;
+	}
+	
+	@Override
+	public void set(MathObject mo, int... index) {
+		checkindex(index);
+		m[index[0]][index[1]] = mo;
 	}
 
 	/**
@@ -231,12 +253,13 @@ public class MMatrix implements MathObject {
 	}
 
 	/**
-	 * Multiplies this {@code MVector} element-wise with the value in the given
+	 * Multiplies this {@code MMatrix} element-wise with the value in the given
 	 * {@code MScalar}
 	 * 
 	 * @param other the {@code MScalar} to be multiplied with.
 	 * @return {@code this}
 	 */
+	@Override
 	public MMatrix multiply(MScalar other) {
 		for (MathObject[] row : m)
 			for (int i = 0; i < row.length; i++)
@@ -251,6 +274,7 @@ public class MMatrix implements MathObject {
 	 * @return the result of the call: {@code this}.
 	 * @see #multiply(MScalar)
 	 */
+	@Override
 	public MMatrix multiply(double d) {
 		return multiply(new MReal(d));
 	}
@@ -454,7 +478,7 @@ public class MMatrix implements MathObject {
 			for (int j = 0; j < matrix[i].length; j++)
 				matrix[i][j] = m[j][i];
 		m = matrix;
-		shape.transpose();
+		shape = shape.transpose();
 		return this;
 	}
 
@@ -500,17 +524,6 @@ public class MMatrix implements MathObject {
 			B = B.multiplyLeft(B);
 			if(bits[j]) result = result.multiplyLeft(B);
 		}
-		
-		/*if(i%2!=0) {
-			odd = true;
-			i-=1;
-		}
-		MMatrix B = this;
-		while(i>1) {
-			B = B.multiplyLeft(B);
-			i/=2;
-		}
-		if(odd) return B.multiplyLeft(this);*/
 		return result;
 	}
 
@@ -583,11 +596,11 @@ public class MMatrix implements MathObject {
 	 */
 	@Override
 	public MMatrix evaluate() {
-		MMatrix copy = (MMatrix) copy();
-		for (MathObject[] row : copy.elements())
-			for (int i = 0; i < row.length; i++)
-				row[i] = row[i].evaluate();
-		return copy;
+		MathObject[][] copy = new MathObject[shape.rows()][shape.cols()];
+		for (int i = 0; i < copy.length; i++)
+			for (int j = 0; j < copy[0].length; j++)
+				copy[i][j] = m[i][j].evaluate();
+		return new MMatrix(copy);
 	}
 	
 	@Override
