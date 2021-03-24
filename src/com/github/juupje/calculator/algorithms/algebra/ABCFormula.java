@@ -150,20 +150,22 @@ public class ABCFormula extends Algorithm {
 	
 	public MVector ABCD() {
 		MScalar E = B.copy();
-		B.multiply(B); //B->B^2
+		E.multiply(E); //E->E^2
 		C.multiply(3).multiply(A); //C->3*C*A
-		MScalar delta0 = B.copy().subtract(C);
-		MScalar delta1 = B.multiply(E).multiply(2).subtract(E.multiply(C).multiply(3)).add(D.multiply(27).multiply(A).multiply(A));
-		D = delta1.copy().multiply(delta1).subtract(delta0.copy().power(3).multiply(4));
+		MScalar delta0 = E.copy().subtract(C);
+		MScalar delta1 = E.multiply(B).multiply(2).subtract(B.copy().multiply(C).multiply(3)).add(D.multiply(27).multiply(A).multiply(A)); //E->delta1, D->27*D*A^2
+		D = delta1.copy().multiply(delta1).subtract(delta0.copy().power(3).multiply(4)); //D redefined
 		
 		MComplex ksi = new MComplex(-0.5, 0.5*Math.sqrt(3));
-		D = D.sqrt();
-		MScalar C = delta1.add(D).divide(2).power(1./3);
+		D = D.sqrt(); //D->sqrt(D)
+		C = delta1.add(D).divide(2).power(1./3); //C redefined, delta1->((delta1+D)/2)^1/3
 		A.multiply(-3).invert(); //A -> -1/3A
-		MScalar x1 = C.copy().add(B).add(delta0.divide(C)).multiply(A); //delta0->delta0/C
-		C.multiply(ksi);
-		MScalar x2 = C.copy().add(B).add(delta0.divide(ksi)).multiply(A); //delta0->delta0/ksi
-		C.multiply(ksi);
+		delta0 = delta0.divide(C);//delta0->delta0/C
+		MScalar x1 = C.copy().add(B).add(delta0).multiply(A); 
+		C=C.multiply(ksi);
+		delta0 = delta0.divide(ksi);//delta0->delta0/ksi
+		MScalar x2 = C.copy().add(B).add(delta0).multiply(A); 
+		C=C.multiply(ksi);
 		MScalar x3 = C.add(B).add(delta0.divide(ksi)).multiply(A); //delta0 -> delta0/ksi
 		return new MVector(x1, x2, x3);
 	}
