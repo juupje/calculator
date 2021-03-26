@@ -1,14 +1,13 @@
 package com.github.juupje.calculator.settings;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.github.juupje.calculator.helpers.JSONReader;
 import com.github.juupje.calculator.helpers.Tools;
+import com.github.juupje.calculator.helpers.io.JSONReader;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Parser;
 
@@ -42,10 +41,6 @@ public enum Settings {
 	}
 
 	public static HashMap<Setting, Object> map = new HashMap<Setting, Object>();
-
-	// Runtime arguments
-	public static ArrayList<String> arguments = new ArrayList<>();
-
 	Setting setting;
 
 	Settings(Class<?> c) {
@@ -60,8 +55,17 @@ public enum Settings {
 		return setting;
 	}
 
+	/**
+	 * This setting is set for the current session but not saved in the preferences
+	 * @param s the setting to be set
+	 * @param value the new value
+	 */
+	public static void setTemporary(Settings s, Object value) {
+		set(s.getSetting(), value, true);
+	}
+	
 	public static void set(Settings s, Object value) {
-		set(s.getSetting(), value);
+		set(s.getSetting(), value, false);
 	}
 	
 	/**
@@ -70,11 +74,12 @@ public enum Settings {
 	 * @param setting the <tt>Setting</tt> whose value will be changed.
 	 * @param value   the new value of <tt>setting</tt>.
 	 */
-	public static void set(Setting setting, Object value) {
+	public static void set(Setting setting, Object value, boolean temporary) {
 		if (value == null)
 			return;
 		if (value.getClass().equals(setting.getType())) {
-			Calculator.settingsHandler.set(setting, value);
+			if(!temporary)
+				Calculator.settingsHandler.set(setting, value);
 			map.put(setting, value);
 		} else
 			throw new IllegalArgumentException("Setting " + setting.toString().toLowerCase() + " expects value of type "
@@ -88,14 +93,10 @@ public enum Settings {
 	 * @param o the new value of that <tt>Setting</tt>.
 	 */
 	public static void set(String s, Object o) {
-		Setting setting = null;
-		try {
-			setting = settings.get(s.toLowerCase());
-		} catch (IllegalArgumentException e) {
+		Setting setting = settings.get(s.toLowerCase());
+		if(setting == null)
 			throw new IllegalArgumentException("There is no setting with name '" + s + "'.");
-		}
-		if (setting != null)
-			set(setting, o);
+		set(setting, o, false);
 	}
 	
 	public static int getInt(Settings setting) {
@@ -166,32 +167,6 @@ public enum Settings {
 		}
 	}
 
-	public static void setArgument(String[] args) {
-		for (String s : args)
-			arguments.add(s);
-	}
-	
-	public static String[] getArguments() {
-		String[] args = new String[arguments.size()];
-		return arguments.toArray(args);
-	}
-
-	public static boolean existsArgument(String name) {
-		return arguments.contains(name);
-	}
-
-	public static String getNextArgument(String name) {
-		return arguments.get(arguments.indexOf(name) + 1);
-	}
-
-	/**
-	 * @param i the index of the argument to be returned
-	 * @return the argument associated with the index.
-	 */
-	public static String getArgument(int i) {
-		return arguments.get(i);
-	}
-
 	public static void processCommand(String s) {
 		String[] args = Parser.getArguments(s);
 
@@ -251,7 +226,7 @@ public enum Settings {
 				map.put(s, sh.getString(name, (String) value));
 		}
 		else //set to the given default value
-			set(s, value);
+			set(s, value, false);
 		return s;
 	}
 	

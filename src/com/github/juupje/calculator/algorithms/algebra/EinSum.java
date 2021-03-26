@@ -391,8 +391,8 @@ public class EinSum extends Algorithm {
 					if(n.getIndices().size()!=0) {
 						List<String> unmatched = n.getIndices().keySet().stream().map(index -> index.getName()).collect(Collectors.toList());
 						if(unmatched.size()==1)
-							throw new EinSumException("Unmatched dummy index: " + unmatched.get(0));
-						throw new EinSumException("Unmatched dummy indices: " + Tools.join(", ", unmatched));
+							throw new EinSumException("Unmatched dummy index " + unmatched.get(0).replace("$", ""));
+						throw new EinSumException("Unmatched dummy indices " + Tools.join(", ", unmatched).replace("$", ""));
 					}
 				}
 				

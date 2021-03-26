@@ -36,6 +36,7 @@ import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MVectorFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.settings.Arguments;
 import com.github.juupje.calculator.settings.Settings;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
@@ -122,7 +123,7 @@ public class Printer {
 	 */
 	public static void printDot(Tree tree, String name, boolean connectParent) {
 		try {
-			writer = new PrintWriter(name + ".dot", "UTF-8");
+			writer = new PrintWriter(getDefaultPath() + name + ".dot", "UTF-8");
 			writer.println("digraph tree {");
 			writer.println("node [fontname=\"Arial\"];");
 			if (tree.root == null)
@@ -152,7 +153,7 @@ public class Printer {
 
 	public static void printDot(Graph<?> g, String name) {
 		try {
-			writer = new PrintWriter(name + ".dot", "UTF-8");
+			writer = new PrintWriter(getDefaultPath() + name + ".dot", "UTF-8");
 			writer.println("digraph dependencies {");
 			for (Graph<?>.Node n : g.getNodes()) {
 				writer.println(n.hashCode() + "[label=\"" + n.toString() + "\"];");
@@ -710,10 +711,10 @@ public class Printer {
 	private static void printLatex(String str, String name) {
 		try {
 			String n = System.lineSeparator();
-			File f = new File(name + ".tex");
+			File f = new File(getDefaultPath() + name + ".tex");
 			if (f.exists()) {
 				String s = new String(Files.readAllBytes(f.toPath()));
-				writer = new PrintWriter(name + ".tex", "UTF-8");
+				writer = new PrintWriter(f, "UTF-8");
 				int index = s.indexOf(latexEnd);
 				writer.println(s.substring(0, index == -1 ? 0 : index));
 				writer.println(name.replace("_", " \\_") + ":" + n + "\\begin{equation*}" + n + str + n
@@ -740,7 +741,7 @@ public class Printer {
 	 */
 	private static File printText(String str, String fileName, String ext) {
 		try {
-			File f = new File(fileName + "." + ext);
+			File f = new File(getDefaultPath() + fileName + "." + ext);
 			if (f.exists())
 				Files.write(f.toPath(), (System.lineSeparator() + str).getBytes(), StandardOpenOption.APPEND);
 			else
@@ -924,7 +925,7 @@ public class Printer {
 			throw new UnexpectedCharacterException(name + "." + ext + " is not a valid filename.");
 		}
 		do {
-			file = new File(name + num++ + "." + ext);
+			file = new File(getDefaultPath() + name + num++ + "." + ext);
 		} while (file.exists());
 		return file.getName().substring(0, file.getName().lastIndexOf("."));
 	}
@@ -937,4 +938,10 @@ public class Printer {
         }
         return true;
     }
+	
+	public static String getDefaultPath() {
+		if(Arguments.exists("workdir"))
+			return (String) Arguments.get("workdir");
+		return "";
+	}
 }

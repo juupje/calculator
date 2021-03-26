@@ -4,13 +4,15 @@ import java.io.File;
 
 import com.github.juupje.calculator.graph.Graph;
 import com.github.juupje.calculator.helpers.ErrorHandler;
-import com.github.juupje.calculator.helpers.IOHandler;
+import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
+import com.github.juupje.calculator.helpers.io.IOHandler;
 import com.github.juupje.calculator.main.plugins.PluginLoader;
+import com.github.juupje.calculator.settings.Arguments;
 import com.github.juupje.calculator.settings.Settings;
 import com.github.juupje.calculator.settings.SettingsHandler;
 
@@ -39,19 +41,20 @@ public class Calculator {
 		settingsHandler = sh;
 	}
 	
-	public static void start(String[] args) {
+	public static void parseArgs(String[] args) {
+		Arguments.parse(args);
+	}
+	
+	public static void start() {
 		dependencyGraph = new Graph<Variable>();
 		Settings.loadPrefs();
 		running = true;
-		if(args != null && args.length > 0) {
-			Settings.setArgument(args);
-			if(args[0].equals("run"))
-				try {
-					Interpreter.execute(new File(args[1]));
-				} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
-					errorHandler.handle(e);
-				}
-		}
+		if(Arguments.exists("run"))
+			try {
+				Interpreter.execute(new File(Printer.getDefaultPath() + (String) Arguments.get("run")));
+			} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
+				errorHandler.handle(e);
+			}
 	}
 	
 	public static boolean isRunning() {
@@ -72,8 +75,10 @@ public class Calculator {
 		setIOHandler(new IOHandler());
 		setErrorHandler(new ErrorHandler());
 		setSettingsHandler(new SettingsHandler());
-		PluginLoader.load();
-		start(args);
+		parseArgs(args);
+		if(Arguments.exists("plugindir"))
+			PluginLoader.load(new File((String) Arguments.get("plugindir")));
+		start();
 		new Calculator();
 	}
 }

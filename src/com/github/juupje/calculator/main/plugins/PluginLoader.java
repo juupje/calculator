@@ -15,12 +15,16 @@ import com.github.juupje.calculator.main.Calculator;
 public class PluginLoader {
 	
 	private static ArrayList<Plugin> loadedPlugins;
-	private static final int minVersion = 3;
+	private static final int minVersion = 4;
 	
-	public static void load() {
-		File dir = new File(System.getProperty("user.dir")+ File.separator + "plugins");
-		System.out.println(dir);
-		if(!dir.exists() || !dir.isDirectory()) return;
+	public static void load(File dir) {
+		if(dir == null)
+			return;
+		else if(!dir.exists() || !dir.isDirectory()) {
+			Calculator.ioHandler.err("Cannot find plugin directory.");
+			return;
+		}
+		Calculator.ioHandler.out("Loading plugins in " + dir.toString());
 
         File[] flist = dir.listFiles(new FileFilter() {
             public boolean accept(File file) {return file.getPath().toLowerCase().endsWith(".jar");}
@@ -54,6 +58,7 @@ public class PluginLoader {
 	}
 	
 	public static void initHelp() {
+		if(loadedPlugins == null || loadedPlugins.size()==0) return;
 		for(Plugin p : loadedPlugins)
 			Helper.insertHelpFile(p.initHelp());
 	}

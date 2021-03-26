@@ -45,7 +45,7 @@ public enum Commands {
 		@Override
 		public void process(String args) {
 			try {
-				Interpreter.execute(new File(args));
+				Interpreter.execute(new File(Printer.getDefaultPath() + args));
 			} catch (ShapeException | UnexpectedCharacterException | InvalidFunctionException | TreeException
 					| CircularDefinitionException e) {
 				Calculator.errorHandler.handle(e);

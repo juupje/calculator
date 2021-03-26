@@ -1,9 +1,9 @@
 package com.github.juupje.calculator.algorithms.calculus;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.helpers.CSVHandler;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
+import com.github.juupje.calculator.helpers.io.CSVHandler;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MReal;

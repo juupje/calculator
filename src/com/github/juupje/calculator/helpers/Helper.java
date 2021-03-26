@@ -1,11 +1,17 @@
 package com.github.juupje.calculator.helpers;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.github.juupje.calculator.helpers.io.ANSITags;
+import com.github.juupje.calculator.helpers.io.IOHandler;
+import com.github.juupje.calculator.helpers.io.JSONReader;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.plugins.PluginLoader;
 
@@ -55,18 +61,18 @@ public class Helper {
 		if(jobj.has("plugin"))
 			help += "\tFrom plugin: " + jobj.getString("plugin") + "\n";
 		if(type.equals("setting"))
-			help += "\tName: " + jobj.getString("name")
-					+ "\n\tType: " + jobj.getString("type")
-					+ "\n\tDescription: " + jobj.getString("description")
-					+ "\n\tDefault: " + jobj.get("default");
+			help += "\t"+IOHandler.ansi("Name: ", ANSITags.ANSI_RED) + jobj.getString("name")
+					+ "\n\t"+IOHandler.ansi("Type: ", ANSITags.ANSI_RED) + jobj.getString("type")
+					+ "\n\t"+IOHandler.ansi("Description: ", ANSITags.ANSI_RED) + jobj.getString("description")
+					+ "\n\t"+IOHandler.ansi("Default: ", ANSITags.ANSI_RED) + jobj.get("default");
 		else if(type.equals("constant")) {
 			help += "\tName: " + jobj.getString("name")
 			+ "\n\tValue: " + jobj.getString("value");
 		} else
-			help += "\tSyntax: " + jobj.getString("syntax")
-					+ "\n\tDescription: " + jobj.getString("description")
-					+ "\n\tArguments: " + jobj.getString("arguments")
-					+ "\n\tResult: " + jobj.getString("result");
+			help += "\t" + IOHandler.ansi("Syntax: ", ANSITags.ANSI_RED) + jobj.getString("syntax")
+					+ "\n\t" + IOHandler.ansi("Description: ", ANSITags.ANSI_RED)+ jobj.getString("description")
+					+ "\n\t" + IOHandler.ansi("Arguments: ", ANSITags.ANSI_RED) + jobj.getString("arguments")
+					+ "\n\t" + IOHandler.ansi("Result: ", ANSITags.ANSI_RED) + jobj.getString("result");
 		Calculator.ioHandler.out(help);
 	}
 
@@ -78,8 +84,11 @@ public class Helper {
 			for(String s : keys)
 				list += "\n\n" + s.substring(0, 1).toUpperCase() + s.substring(1) + ":\n\t" + Tools.join("\n\t", json.getJSONObject(s).keySet());
 			list = list.substring(2); //remove the first two linebreaks
-		} else
-			list = args + ":\n\t" + Tools.join("\n\t", json.getJSONObject(args).keySet());
+		} else {
+			List<String> keyList = json.getJSONObject(args).keySet().stream().collect(Collectors.toList());
+			Collections.sort(keyList);
+			list = args + ":\n\t" + Tools.join("\n\t", keyList);
+		}
 		Calculator.ioHandler.out(list);
 	}
 }

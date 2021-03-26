@@ -1,418 +1,526 @@
 {
-    "functions": {
-    	"sin": {
-			"syntax": "sin(s)",
-			"description": "Calculates the sine of the argument.",
-			"arguments": "Any real or complex number in radians.",
-			"result": "A complex or real number which equals the sine of the argument. For real arguments the result will be in [-1,1]."
-		},
-		"cos": {
-			"syntax": "cos(s)",
-			"description": "Calculates the cosine of the argument.",
-			"arguments": "Any real or complex number in radians.",
-			"result": "A complex or real number which equals the cosine of the argument. For real arguments the result will be in [-1,1]."
-		},
-		"tan": {
-			"syntax": "tan(s)",
-			"description": "Calculates the tangent of the argument.",
-			"arguments": "Any real or complex number in radians.",
-			"result": "A complex or real number which equals the tangent of the argument."
-		},
-		"sind": {
-			"syntax": "sind(s)",
-			"description": "Calculates the sine of the argument.",
-			"arguments": "Any real number in degrees.",
-			"result": "A real number from [-1,1] which equals the sine of the argument."
-		},
-		"cosd": {
-			"syntax": "cosd(s)",
-			"description": "Calculates the cosine of the argument.",
-			"arguments": "Any real number in degrees.",
-			"result": "A real number from [-1,1] which equals the cosine of the argument."
-		},
-		"tand": {
-			"syntax": "tand(s)",
-			"description": "Calculates the tangent of the argument.",
-			"arguments": "Any real number in degrees.",
-			"result": "A real number which equals the tangent of the argument."
-		},
-		"asin": {
-			"syntax": "asin(s)",
-			"description": "Calculates the inverse sine (arcsine) of the argument. That is, the number whose sine equals the argument.",
-			"arguments": "Any complex number or a real number from [-1,1].",
-			"result": "A complex or real number whose sine equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
-		},
-		"acos": {
-			"syntax": "cosd(s)",
-			"description": "Calculates the inverse cosine (arccosine) of the argument. That is, the number whose cosine equals the argument.",
-			"arguments": "Any complex number or a real number from [-1,1].",
-			"result": "A complex or real number whose cosine equals the argument. For real arguments the result will be in [0, pi]."
-		},
-		"atan": {
-			"syntax": "tand(s)",
-			"description": "Calculates the inverse tangent (arctangent) of the argument. That is, the number whose tangent equals the argument.",
-			"arguments": "Any real or complex number.",
-			"result": "A complex or real number whose tangent equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
-		},
-        "sinh": {
-			"syntax": "sinh(s)",
-			"description": "Calculates the hyperbolic sine of the argument, defined as sinh(s)=(exp(s)-exp(-s))/2.",
-			"arguments": "Any real or complex number in radians.",
-			"result": "A complex or real number which equals the hyperbolic sine of the argument."
-		},
-		"cosh": {
-			"syntax": "cosh(s)",
-			"description": "Calculates the hyperbolic cosine of the argument, defined as cosh(s)=(exp(s)+exp(-s))/2.",
-			"arguments": "Any real or complex number in radians.",
-			"result": "A complex or real number which equals the hyperbolic cosine of the argument."
-		},
-		"tanh": {
-			"syntax": "tanh(s)",
-			"description": "Calculates the hyperbolic tangent of the argument, defined as tanh(s)=sinh(s)/cosh(s)",
-			"arguments": "Any real or complex number in radians.",
-			"result": "A complex or real number which equals the hyperbolic tangent of the argument."
-		},
-        "asinh": {
-			"syntax": "asinh(s)",
-			"description": "Calculates the inverse hyperbolic sine of the argument, defined by asinh(z)=ln(z+sqrt(z^2+1)). For real arguments: sinh(asinh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
-			"arguments": "Any complex number or a real number.",
-			"result": "A complex or real number which equals the inverse hyperbolic sine of the argument."
-		},
-		"acosh": {
-			"syntax": "acosh(s)",
-			"description": "Calculates the inverse hyperbolic cosine of the argument, defined by acosh(z)=ln(z+sqrt(z^2-1)). For real arguments: cosh(acoshh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
-			"arguments": "Any complex number or a real number.",
-			"result": "A complex or real number which equals the inverse hyperbolic cosine of the argument."
-		},
-        "atanh": {
-			"syntax": "atanh(s)",
-			"description": "Calculates the inverse hyperbolic tangent of the argument, defined by atanh(z)=ln((z+1)/(z-1))/2. For real arguments: tanh(atanh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
-			"arguments": "Any complex number or a real number.",
-			"result": "A complex or real number which equals the inverse hyperbolic tangent of the argument."
-		},
-		"toRad": {
-			"syntax": "toRad(s)",
-			"description": "Converts the argument from degrees to radians. This is done using rad=deg*pi/180",
-			"arguments": "Any real number.",
-			"result": "A real number which corresponds to the same angle in radians as the argument in degrees."
-		},
-		"toDeg": {
-			"syntax": "toDeg(s)",
-			"description": "Converts the argument from radians to degrees. This is done using deg=rad*180/pi",
-			"arguments": "Any real number.",
-			"result": "A real number which corresponds to the same angle in degrees as the argument in radians."
-		},
-		"sqrt": {
-			"syntax": "sqrt(s)",
-			"description": "Calculates the square root of the argument. If the setting COMPLEX_ENABLED is set to true, the argument can be negative too, in which case the result will be complex.",
-			"arguments": "A positive (zero included) number, or a negative or complex number (see above).",
-			"result": "A real non-negative number whose square equals the argument, or a complex number (see above)."
-		},
-        "abs": {
-            "syntax": "abs(x)",
-			"description": "Calculates the absolute value |x| of the argument.",
-			"arguments": "Any number or vector, complex or real.",
-			"result": "A real non-negative number which equals the distance from x to the coordinate origin."
-        },
-        "ln": {
-            "syntax": "ln(s)",
-			"description": "Calculates the natural logarithm of the argument. If s is complex, it returns the natural logarithm of s in the principle branch, defined by Ln(s)=ln(abs(s))+i*abs(s)",
-			"arguments": "Any non-zero complex or real number.",
-			"result": "If s is real: a number y such that e^y=x. If s is complex: a number w such that Exp(w)=s, where Exp is the complex exponential on the principle branch."
-        },
-        "log": {
-            "syntax": "log(s)",
-			"description": "Calculates the base-10 logarithm of the argument. If s is complex, it returns the natural logarithm of s in the principle branch divided by ln(10), see help(ln).",
-			"arguments": "Any non-zero complex or real number.",
-			"result": "If s is real: a number y such that 10^y=x. If s is complex: Ln(s)/ln(10), where Ln is the complex natural logarithm on the principle branch."
-        },
-        "exp": {
-            "syntax": "exp(s)",
-			"description": "Calculates the exponential of the argument. If s is complex, it returns the exponential of s in the principle branch.",
-			"arguments": "Any complex or real number.",
-			"result": "If s is real: e^s, where e is Euler's number. If s is complex: Exp(s)=e^(Re(s))*(cos(Im(s))+i*sin(Im(s))), where Re(s) and Im(s) are the real and imaginary parts of s."
-        },
-        "fact": {
-            "syntax": "fact(n)",
-			"description": "Calculates the factorial of the argument (written as n!)",
-			"arguments": "Any non-negative real integer.",
-			"result": "the factorial of n: n!=n*(n-1)*(n-2)*...*1"
-        },
-        "conj": {
-            "syntax": "conj(z)",
-			"description": "Calculates the complex conjugate of the argument: conj(z)=conj(x+iy)=x-iy",
-			"arguments": "Any real or complex number, vector or matrix.",
-			"result": "The complex conjugate of the argument (if the argument is vector or matrix shaped, a new vector or matrix of the conjugates of each element is returned)."
-        },
-        "det": {
-            "syntax": "det(A)",
-			"description": "Calculates the determinant of the argument.",
-			"arguments": "Any real-valued square matrix.",
-			"result": "The determinant of A."
-        }        
-	},
-	"algorithms": {
-		"derivative": {
-			"syntax": "derivative(f), derivative(f, x) or derivative(f, x, a)",
-			"description": "Analytically calculates the derivative of the function  with respect to the variable x (if provided) at location a (if provided).",
-			"arguments": "f: a function depending on one or more variables. x: the name of the variable to which f should be derived (not need if the function only has one variable). For multivariate functions x can also be a vector for a directional derivative. a: (optional) the value to be used as the input for the derivative.",
-			"result": "If a is given (df/dx)(a) (or (x*grad(f))(a) ) will be returned, otherwise (df/dx) is returned."
-		},
-        "grad": {
-            "syntax": "grad(f) or grad(f, a)",
-            "description": "Analytically calculates the gradient of the given scalarfunction. The gradient is defined as (grad f)_i=(del/del_i)f. If a location a is provided, the gradient at a will be calculated.",
-            "arguments": "f: a scalar-shaped function (that means f.shape()==0), depending on one or more variables. a (optional): the value to be used as the input for the gradient.",
-            "result": "If a is given, (grad(f))(a) will be returned as a vector, otherwise grad(f) is returned as a vectorfunction."
-        },
-		"integral": {
-			"syntax": "integral(f, a, b) or integral(f, a, b, s)",
-			"description": "Numerically approximates the definite integral of the function f from a to b with (optional) s steps (nodes) using Gaussian-Legendre Quadrature.",
-			"arguments": "f: a function depending on n variables. a: a vector containing n lower bound values.If n=1, this can be a (real) scalar. b: a vector containing n upper bound values. If n=1 this can be a (real) scalar only if a is one as well. s (optional): the amount of steps in the numerical approximation, the default is set in the INT_DEF_STEPS setting. The order of the lower- and upper bound values should correspond to the order of the variables of f.",
-			"result": "An approximation of the definite integral of f between a and b. The approximation is exact for polynomes with degree <2N-1, where N is the amount of steps."
-		},
-		"ref": {
-			"syntax": "ref(M) or ref(M, b)",
-			"description": "Calculates the row echilon form of the matrix m (optionally augmented with b) using Gaussian Elimination.",
-			"arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Gaussian Elimination.",
-			"result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Gaussian Elimination on M augmented with b."
-		},
-		"rref": {
-			"syntax": "ref(M) or ref(M, b)",
-			"description": "Calculates the reduced row echilon form of the matrix m (optionally augmented with b) using Jordan-Gauss Elimination.",
-			"arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Jordan-Gauss Elimination.",
-			"result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Jordan-Gauss Elimination on M augmented with b."
-		},
-        "lu": {
-			"syntax": "lu(M)",
-			"description": "Calculates the PLU decomposition of M. This means that three matrices (L, U, P) are calculated, such that PM=LU (so M=inv(P)LU). L is a lower triangular matrix, U is an upper triangular matrix, and P is a pivot matrix.",
-			"arguments": "M: a (n x n)-matrix with real elements.",
-			"result": "A vector containing (L, U, P), with L upper triangular, U lower triangular and P a pivot matrix. Such that LU=PM."
-		},
-		"abc": {
-			"syntax": "abc(a, b, c)",
-			"description": "Uses the ABC-Formula to calculate the root of a quadratic equation of the form y=ax^2+bx+c. If the setting COMPLEX_ENABLED is set to true, the a complex result may be returned.",
-			"arguments": "a, b and c: real numbers",
-			"result": "A vector with 2 elements containing both roots, if one or both of the roots is complex and the setting COMPLEX_ENABLED is set to false, one or both of the elements may be null. If only one element is null, it will be the second one."
-		},
-        "simplify": {
-			"syntax": "simplify(e)",
-			"description": "Tries to simplify a given expression (or function). This involves computing all numerical operations (like 2*3 or log(12)), removing trivial operations (such as x*0, x*1, y+0, y^1) and reordering the expression (see help(reorder)).",
-			"arguments": "e: a function or an expression",
-			"result": "An object (function or expression) which (mathematically) equals e, but without numerical operations and trivial operations."
-		},
-        "reorder": {
-			"syntax": "reorder(e)",
-			"description": "Tries to reorder a given expression (or function). This involves moving numberical values to the front, and functions to he back of the expression.",
-			"arguments": "e: a function or an expression",
-			"result": "An object (function or expression) which (mathematically) equals e, but in a different (more natural) order."
-		}
-	},
-	"commands": {
-		"del": {
-			"syntax": "del(a,b,...) or delete(a,b,...)",
-			"description": "Deletes the given variables. This can be used to free memory if you are working with large objects which are no longer needed.",
-			"arguments": "a, b, ...: arbitrary amount of variable names.",
-			"result": "-"
-		},
-		"dot": {
-			"syntax": "dot(a) or dot(a, name)",
-			"description": "Exports the given variable as a tree graph in a dot format (see Graphviz for more info) to a file with the given name or 'output_dot*.dot' where * is the first available integer. If the argument equals 'dependencies' the dependencies graph is exported (developer feature).",
-			"arguments": "a: an expression, function or 'dependencies'. name (optional): the name of the file to which the variable is exported (without extension).",
-			"result": "A .dot file containing the dot code representing the tree graph of the argument"
-		},
-		"execute": {
-			"syntax": "execute(file)",
-			"description": "Executes the statements in the given file.",
-			"arguments": "file: the name of the file to be executed (including the .cal extension and the path if the file is not in the same directory as the program).",
-			"result": "The statements in the file and their results printed to the console."
-		},
-		"help": {
-			"syntax": "help(command)",
-			"description": "Displays the entry in the help document for the given command.",
-			"arguments": "command: the name of the command which's help page should be displayed.",
-			"result": "The help page of the given command printed to the console."
-		},
-		"latex": {
-			"syntax": "latex(a) or latex(a, name)",
-			"description": "Exports the given variable in its LaTeX format to a file with the given name or 'output_latex*.tex' if no name is given, where * is the first available integer.",
-			"arguments": "a: the name of the variable to be exported as LaTeX. name (optional): the name of the file to which the LaTeX code should be written (without the .tex extension).",
-			"result": "A .tex file containing the LaTeX code representing the argument."
-		},
-		"list": {
-			"syntax": "list(type) or list()",
-			"description": "Prints a list of available help pages for commands, functions, algorithms or settings. If no argument is given, all pages are listed.",
-			"arguments": "type (optional): the category which should be listed. Can be 'algorithms', 'commands', 'functions' or 'settings'.",
-			"result": "A list of available commands/functions/algorithms/settings."
-		},
-		"print": {
-			"syntax": "print(a)",
-			"description": "Prints the given variable to the console.",
-			"arguments": "a: the name of the variable to be printed to the console.",
-			"result": "The variable in text printed to the console."
-		},
-		"setting": {
-			"syntax": "setting(key) or setting(key, value)",
-			"description": "Prints the setting if only the key is given, or sets the setting to a new value if both key and value are given. If the key equals 'reset' the settings will be reset to their default values. See help(<setting>) or list(setting) for more info.",
-			"arguments": "key: the name of the setting or 'reset'. value (optional): the new value of the setting (note that each setting requires a specific value type (e.g. integer, string, boolean etc.)",
-			"result": "The current value of the setting printed to the console if only the key is given."
-		},
-		"shape": {
-			"syntax": "shape(a)",
-			"description": "Prints the shape of the given variable.",
-			"arguments": "a: the name of the variable.",
-			"result": "The shape of the given variable."
-		},
-		"time": {
-			"syntax": "time(expression) or time(expression, runs)",
-			"description": "Measures the time needed to execute the given expression. To increase precision, the expression is run multiple times. How often the expression is run can be given in the second argument or else is set to the TIMER_DEF_RUNS setting.",
-			"arguments": "expression: the expression whose execution time should be measured. runs (optional): how often the expression should be run.",
-			"result": "The total time required for all runs and the average time per run."
-		},
-		"type": {
-			"syntax": "type(a)",
-			"description": "Prints the type (=java class name) of the given variable.",
-			"arguments": "a: the name of the variable whose type should be printed.",
-			"result": "The type of the given variable."
-		}
-	},
-	"settings": {
-		"abc_show_text": {
-			"name": "abc_show_text",
-			"type": "boolean",
-			"description": "whether or not the ABC-Formula algorithm should display more information as text. See help(abc) for more info.",
-			"default": true
-		},
-		"complex_enabled": {
-			"name": "complex_enabled",
-			"type": "boolean",
-			"description": "whether or not complex numbers can be returned by functions.",
-			"default": false
-		},
-		"complex_in_polar": {
-			"name": "compex_in_polar",
-			"type": "boolean",
-			"description": "whether or not complex number should be expressed in their polar form. If false, complex numbers will be given in cartesian form.",
-			"default": false
-		},
-		"int_def_steps": {
-			"name": "int_def_steps",
-			"type": "integer",
-			"description": "The default amount of steps (nodes) used by the Gaussian Quadrature algorithm. See help(integral).",
-			"default": 16
-		},
-		"notation": {
-			"name": "notation",
-			"type": "integer",
-			"description": "The type of notation which is used to display numbers. normal=1, engineering=2, scientific=3.",
-			"default": 1
-		},
-		"precision": {
-			"name": "precision",
-			"type": "integer",
-			"description": "The amount of decimal places to be displayed in the console.",
-			"default": 3
-		},
-		"show_stacktrace": {
-			"name": "show_stacktrace",
-			"type": "boolean",
-			"description": "whether or not the stacktrace of error messages should be shown. The stacktrace can be used by the developer to pinpoint the code generating the error.",
-			"default": false
-		},
-		"timer_def_runs": {
-			"name": "timer_def_runs",
-			"type": "integer",
-			"description": "The default amount of runs of the time command. See help(time) for more info.",
-			"default": 100
-		}
-	},
-    "constants": {
-        "pi": {
-            "name": "Mathematical constant pi: the ratio of the circumference and diameter of a circle.",
-            "value": "3.1415926..."
-        },
-        "e": {
-            "name": "Mathematical constant e (Euler's number): the limit of (1+1/n)^n for n->infinity.",
-            "value": "2.7182818285..."
-        },
-        "i": {
-            "name": "Imaginary unit: a number such that i^2=-1.",
-            "value": "i"
-        },
-        "_c": {
-            "name": "Physical constant c: speed of light in a vacuum.",
-            "value": "299792458 (m/s)"
-        },
-        "_e": {
-            "name": "Physical constant e: electron charge.",
-            "value": "1.60217662e-19 (C)"
-        },
-        "_mu0": {
-            "name": "Physical constant mu_0: magnetic permeability of vacuum.",
-            "value": "1.2566370614359173e-06 (N/A^2)"
-        },
-        "_epsilon0": {
-            "name": "Physical constant epsilon_0: the electric permittivity of vacuum (also: (di)electric constant.",
-            "value": "8.854187817620389e-12 (F/m)"
-        },
-        "_h": {
-            "name": "Physical constant h: Plank's constant",
-            "value": "6.62607004e-34 (Js)"
-        },
-        "_hbar": {
-            "name": "Physical constant hbar: reduces Plank's constant.",
-            "value": "_h/(2pi)=1.0545718001391127e-34 Js"
-        },
-        "_G": {
-            "name": "Physical constant G: Newton's gravitational constant.",
-            "value": "6.67408e-11 (m^3/(kg s^2))"
-        },
-        "_g": {
-            "name": "Physical constant g: standard gravitational acceleration on earth.",
-            "value": "9.80665 (m/s^2)"
-        },
-        "_R": {
-            "name": "Physical constant R: molar gas constant.",
-            "value": "8.3144598 (J/(K mol))"
-        },
-        "_alpha": {
-            "name": "Physical constant alpha: fine structure constant",
-            "value": "0.0072973525664"
-        },
-        "_NA": {
-            "name": "Physical constant N_A: Avogadro's number.",
-            "value": "6.022140857e23 (1/mol)"
-        },
-        "_k": {
-            "name": "Physical constant k (or k_B): Boltzmann constant.",
-            "value": "1.38064852e-23 (J/K)"
-        },
-        "_sigma": {
-            "name": "Physical constant sigma: Stefan-Boltzmann constant.",
-            "value": "5.670367e-8 (W/(m^2 K^4))"
-        },
-        "_wien": {
-            "name": "Physical constant b: Wien's displacement contant.",
-            "value": "0.0028977729 (m K)"
-        },
-        "_Ry": {
-            "name": "Physical constant Ry: Rydberg constant",
-            "value": "10973731.568508 (m/s)"
-        },
-        "_m_e": {
-            "name": "Physical constant m_e: electron mass",
-            "value": "9.10938356e-31 (kg)"
-        },
-        "_m_p": {
-            "name": "Physical constant m_p: proton mass",
-            "value": "1.672621898e-27 (kg)"
-        },
-        "_m_n": {
-            "name": "Physical constant m_n: neutron mass",
-            "value": "1.674927471e-27 (kg)"
-        },
-        "_u": {
-            "name": "Physical constant u: atomic mass unit",
-            "value": "1.66053904e-27 (kg)"
-        }
+  "functions": {
+    "toDeg": {
+      "syntax": "toDeg(s)",
+      "description": "Converts the argument from radians to degrees. This is done using deg=rad*180/pi",
+      "arguments": "Any real number.",
+      "result": "A real number which corresponds to the same angle in degrees as the argument in radians."
+    },
+    "toRad": {
+      "syntax": "toRad(s)",
+      "description": "Converts the argument from degrees to radians. This is done using rad=deg*pi/180",
+      "arguments": "Any real number.",
+      "result": "A real number which corresponds to the same angle in radians as the argument in degrees."
+    },
+    "sin": {
+      "syntax": "sin(s)",
+      "description": "Calculates the sine of the argument.",
+      "arguments": "Any real or complex number in radians.",
+      "result": "A complex or real number which equals the sine of the argument. For real arguments the result will be in [-1,1]."
+    },
+    "cos": {
+      "syntax": "cos(s)",
+      "description": "Calculates the cosine of the argument.",
+      "arguments": "Any real or complex number in radians.",
+      "result": "A complex or real number which equals the cosine of the argument. For real arguments the result will be in [-1,1]."
+    },
+    "tan": {
+      "syntax": "tan(s)",
+      "description": "Calculates the tangent of the argument.",
+      "arguments": "Any real or complex number in radians.",
+      "result": "A complex or real number which equals the tangent of the argument."
+    },
+    "sind": {
+      "syntax": "sind(s)",
+      "description": "Calculates the sine of the argument.",
+      "arguments": "Any real number in degrees.",
+      "result": "A real number from [-1,1] which equals the sine of the argument."
+    },
+    "cosd": {
+      "syntax": "cosd(s)",
+      "description": "Calculates the cosine of the argument.",
+      "arguments": "Any real number in degrees.",
+      "result": "A real number from [-1,1] which equals the cosine of the argument."
+    },
+    "tand": {
+      "syntax": "tand(s)",
+      "description": "Calculates the tangent of the argument.",
+      "arguments": "Any real number in degrees.",
+      "result": "A real number which equals the tangent of the argument."
+    },
+    "sinh": {
+      "syntax": "sinh(s)",
+      "description": "Calculates the hyperbolic sine of the argument, defined as sinh(s)=(exp(s)-exp(-s))/2.",
+      "arguments": "Any real or complex number in radians.",
+      "result": "A complex or real number which equals the hyperbolic sine of the argument."
+    },
+    "cosh": {
+      "syntax": "cosh(s)",
+      "description": "Calculates the hyperbolic cosine of the argument, defined as cosh(s)=(exp(s)+exp(-s))/2.",
+      "arguments": "Any real or complex number in radians.",
+      "result": "A complex or real number which equals the hyperbolic cosine of the argument."
+    },
+    "tanh": {
+      "syntax": "tanh(s)",
+      "description": "Calculates the hyperbolic tangent of the argument, defined as tanh(s)=sinh(s)/cosh(s)",
+      "arguments": "Any real or complex number in radians.",
+      "result": "A complex or real number which equals the hyperbolic tangent of the argument."
+    },
+    "asin": {
+      "syntax": "asin(s)",
+      "description": "Calculates the inverse sine (arcsine) of the argument. That is, the number whose sine equals the argument.",
+      "arguments": "Any complex number or a real number from [-1,1].",
+      "result": "A complex or real number whose sine equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
+    },
+    "acos": {
+      "syntax": "cosd(s)",
+      "description": "Calculates the inverse cosine (arccosine) of the argument. That is, the number whose cosine equals the argument.",
+      "arguments": "Any complex number or a real number from [-1,1].",
+      "result": "A complex or real number whose cosine equals the argument. For real arguments the result will be in [0, pi]."
+    },
+    "atan": {
+      "syntax": "tand(s)",
+      "description": "Calculates the inverse tangent (arctangent) of the argument. That is, the number whose tangent equals the argument.",
+      "arguments": "Any real or complex number.",
+      "result": "A complex or real number whose tangent equals the argument. For real arguments the result will be in [-pi/2, pi/2]."
+    },
+    "asinh": {
+      "syntax": "asinh(s)",
+      "description": "Calculates the inverse hyperbolic sine of the argument, defined by asinh(z)=ln(z+sqrt(z^2+1)). For real arguments: sinh(asinh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
+      "arguments": "Any complex number or a real number.",
+      "result": "A complex or real number which equals the inverse hyperbolic sine of the argument."
+    },
+    "acosh": {
+      "syntax": "acosh(s)",
+      "description": "Calculates the inverse hyperbolic cosine of the argument, defined by acosh(z)=ln(z+sqrt(z^2-1)). For real arguments: cosh(acoshh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
+      "arguments": "Any complex number or a real number.",
+      "result": "A complex or real number which equals the inverse hyperbolic cosine of the argument."
+    },
+    "atanh": {
+      "syntax": "atanh(s)",
+      "description": "Calculates the inverse hyperbolic tangent of the argument, defined by atanh(z)=ln((z+1)/(z-1))/2. For real arguments: tanh(atanh(x))=x. This does not hold for all complex numbers, due to the logarithm giving values on the principle branch.",
+      "arguments": "Any complex number or a real number.",
+      "result": "A complex or real number which equals the inverse hyperbolic tangent of the argument."
+    },
+    "sqrt": {
+      "syntax": "sqrt(s)",
+      "description": "Calculates the square root of the argument. If the setting COMPLEX_ENABLED is set to true, the argument can be negative too, in which case the result will be complex.",
+      "arguments": "A positive (zero included) number, or a negative or complex number (see above).",
+      "result": "A real non-negative number whose square equals the argument, or a complex number (see above)."
+    },
+    "root": {
+      "syntax": "root([a,b])",
+      "description": "Calculates the b-th root of a.",
+      "arguments": "A vector containing two scalars (real or complex).",
+      "result": "A complex or real scalar equal to a^inv(b)"
+    },
+    "abs": {
+      "syntax": "abs(x)",
+      "description": "Calculates the absolute value |x| of the argument.",
+      "arguments": "Any number or vector, complex or real.",
+      "result": "A real non-negative number which equals the distance from x to the coordinate origin."
+    },
+    "ln": {
+      "syntax": "ln(s)",
+      "description": "Calculates the natural logarithm of the argument. If s is complex, it returns the natural logarithm of s in the principle branch, defined by Ln(s)=ln(abs(s))+i*abs(s)",
+      "arguments": "Any non-zero complex or real number.",
+      "result": "If s is real: a number y such that e^y=x. If s is complex: a number w such that Exp(w)=s, where Exp is the complex exponential on the principle branch."
+    },
+    "log": {
+      "syntax": "log(s)",
+      "description": "Calculates the base-10 logarithm of the argument. If s is complex, it returns the natural logarithm of s in the principle branch divided by ln(10), see help(ln).",
+      "arguments": "Any non-zero complex or real number.",
+      "result": "If s is real: a number y such that 10^y=x. If s is complex: Ln(s)/ln(10), where Ln is the complex natural logarithm on the principle branch."
+    },
+    "exp": {
+      "syntax": "exp(s)",
+      "description": "Calculates the exponential of the argument. If s is complex, it returns the exponential of s in the principle branch.",
+      "arguments": "Any complex or real number.",
+      "result": "If s is real: e^s, where e is Euler's number. If s is complex: Exp(s)=e^(Re(s))*(cos(Im(s))+i*sin(Im(s))), where Re(s) and Im(s) are the real and imaginary parts of s."
+    },
+    "fact": {
+      "syntax": "fact(n)",
+      "description": "Calculates the factorial of the argument (written as n!)",
+      "arguments": "Any non-negative real integer.",
+      "result": "the factorial of n: n!=n*(n-1)*(n-2)*...*1"
+    },
+    "conj": {
+      "syntax": "conj(z)",
+      "description": "Calculates the complex conjugate of the argument: conj(z)=conj(x+iy)=x-iy",
+      "arguments": "Any real or complex number, vector or matrix.",
+      "result": "The complex conjugate of the argument (if the argument is vector or matrix shaped, a new vector or matrix of the conjugates of each element is returned)."
+    },
+    "det": {
+      "syntax": "det(A)",
+      "description": "Calculates the determinant of the argument.",
+      "arguments": "Any real-valued square matrix.",
+      "result": "The determinant of A."
     }
+  },
+  "algorithms": {
+    "integral": {
+      "syntax": "integral(f, a, b) or integral(f, a, b, s)",
+      "description": "Numerically approximates the definite integral of the function f from a to b with (optional) s steps (nodes) using Gaussian-Legendre Quadrature.",
+      "arguments": "f: a function depending on n variables. a: a vector containing n lower bound values.If n=1, this can be a (real) scalar. b: a vector containing n upper bound values. If n=1 this can be a (real) scalar only if a is one as well. s (optional): the amount of steps in the numerical approximation, the default is set in the INT_DEF_STEPS setting. The order of the lower- and upper bound values should correspond to the order of the variables of f.",
+      "result": "An approximation of the definite integral of f between a and b. The approximation is exact for polynomes with degree <2N-1, where N is the amount of steps."
+    },
+    "derivative": {
+      "syntax": "derivative(f), derivative(f, x) or derivative(f, x, a)",
+      "description": "Analytically calculates the derivative of the function  with respect to the variable x (if provided) at location a (if provided).",
+      "arguments": "f: a function depending on one or more variables. x: the name of the variable to which f should be derived (not need if the function only has one variable). For multivariate functions x can also be a vector for a directional derivative. a: (optional) the value to be used as the input for the derivative.",
+      "result": "If a is given (df/dx)(a) (or (x*grad(f))(a) ) will be returned, otherwise (df/dx) is returned."
+    },
+    "grad": {
+      "syntax": "grad(f) or grad(f, a)",
+      "description": "Analytically calculates the gradient of the given scalarfunction. The gradient is defined as (grad f)_i=(del/del_i)f. If a location a is provided, the gradient at a will be calculated.",
+      "arguments": "f: a scalar-shaped function (that means f.shape()==0), depending on one or more variables. a (optional): the value to be used as the input for the gradient.",
+      "result": "If a is given, (grad(f))(a) will be returned as a vector, otherwise grad(f) is returned as a vectorfunction."
+    },
+    "ref": {
+      "syntax": "ref(M) or ref(M, b)",
+      "description": "Calculates the row echilon form of the matrix m (optionally augmented with b) using Gaussian Elimination.",
+      "arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Gaussian Elimination.",
+      "result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Gaussian Elimination on M augmented with b."
+    },
+    "rref": {
+      "syntax": "ref(M) or ref(M, b)",
+      "description": "Calculates the reduced row echilon form of the matrix m (optionally augmented with b) using Jordan-Gauss Elimination.",
+      "arguments": "M: a (n x m)-matrix with real elements. b (optional): a (n x k)-matrix or n-vector with real elements, this is the augmented matrix (or vector) in the Jordan-Gauss Elimination.",
+      "result": "A (n x m+k)-matrix (k=0 if b is not given) containing the result of the Jordan-Gauss Elimination on M augmented with b."
+    },
+    "lu": {
+      "syntax": "lu(M)",
+      "description": "Calculates the PLU decomposition of M. This means that three matrices (L, U, P) are calculated, such that PM=LU (so M=inv(P)LU). L is a lower triangular matrix, U is an upper triangular matrix, and P is a pivot matrix.",
+      "arguments": "M: a (n x n)-matrix with real elements.",
+      "result": "A vector containing (L, U, P), with L upper triangular, U lower triangular and P a pivot matrix. Such that LU=PM."
+    },
+    "qr": {
+      "syntax": "qr(M)",
+      "description": "Calculates the QR-decomposition of M. This means that two matrices (Q,R) are calculated, such that M=QR. Q is an orthogonal matrix and U an upper triangular matrix.",
+      "arguments": "M: an (n x m) real matrix",
+      "result": "A vector containing (Q, R), with Q orthogonal and R upper triangular, QR=M."
+    },
+    "diag": {
+      "syntax": "diag(v) or diag(v, k) or diag(s, r, c) or diag(s, r, c, k) or diag(M) or diag(M, k)",
+      "description": "In the first four cases: constructs a matrix with the k-th diagonal being filled with the values of vector v or scalar s. In the third and fourth cases, the positive, real integers r and c determine the row and column count of the matrix respectively. In the last two cases, the k-th diagonal is extracted (as a vector) from the matrix M. If k is not given, k is set to 0 (e.g. the main diagonal). A positive k corresponds to upper diagonals.",
+      "arguments": "v: a vector containing exclusively scalar elements. s: a scalar. r and c: positive real integers. M: a matrix. k: a positive real integer.",
+      "result": "In the first two cases: a square matrix with v on the k-th diagonal, all other values are zero. In the third and fourth cases: an rxc matrix with all entries on the k-th diagonal equal to s, all other values are zero. In the last two cases: a vector containing the k-th diagonal of M."
+    },
+    "id": {
+      "syntax": "id(n)",
+      "description": "Constructs a nxn unit matrix",
+      "arguments": "n: a positive real integer",
+      "result": "A nxn unit matrix"
+    },
+    "full": {
+      "syntax": "full(r, c, s)",
+      "description": "Constructs a rxc matrix with all entries equal to s",
+      "arguments": "r and c: positive, real integers. s: any numerical object.",
+      "result": "A rxc matrix with all entries equal to s"
+    },
+    "zeros": {
+      "syntax": "zeros(r, c)",
+      "description": "Constructs a rxc zero matrix (e.g. all entries are equal to zero)",
+      "arguments": "r and c: positive, real integers.",
+      "result": "A rxc zero matrix"
+    },
+    "ones": {
+      "syntax": "ones(r, c)",
+      "description": "Constructs a rxc matrix with entries equal to one.",
+      "arguments": "r and c: positive, real integers.",
+      "result": "A rxc matrix with all entries equal to one."
+    },
+    "trace": {
+      "syntax": "trace(M)",
+      "description": "Calculates the trace of matrix M. The trace is defined at the sum of the diagonal entries.",
+      "arguments": "M: a square matrix",
+      "result": "the trace of M."
+    },
+    "eig": {
+      "syntax": "eig(M)",
+      "description": "Calculates the eigenvalues of the matrix M. These are values x such that M*v=x*v for some vector v (or equivalently det(M-xI)=0).",
+      "arguments": "M: a square matrix with scalar entries",
+      "result": "A vector containing the eigenvalues of M."
+    },
+    "norm": {
+      "syntax": "norm(x, k) or norm(x)",
+      "description": "Calculates the k-th norm of the vector or matrix x.\nPossible values for k are 1, 2 or infinity. If x is a matrix, k=2 corresponds to the frobenius norm. If k is not given, the 2-norm is assumed for vectors and the frobenius norm for matrices.",
+      "arguments": "x: a vector or matrix with scalar entries.",
+      "result": "A real value corresponding to the k-norm of x."
+    },
+    "sum": {
+      "syntax": "sum(s, a, b) or sum(s)",
+      "description": "Calculates the sum from index a to index b of the sequence s. If a and b are not given, they are assumed to be the begining and end of the sequence, respectively. Note that a and b need to be given for an infinite sequence.",
+      "arguments": "s: a sequence or recursive sequence. a and b: positive, real integers.",
+      "result": "The sum s[a]+s[a+1]+...+s[b]"
+    },
+    "einsum": {
+      "syntax": "einsum(expr, free indices)",
+      "description": "Evaluates the expression 'expr' for each combination of the values of the free indices. During the evaluation, the einstein summation convention is taken into account. This means that for each term in which an index, which is not one of the free indices, occurs exactly twice, a sum over that index is added implicitly. Examples: the matrix product of A (3x4) and B (4x2) can be obtained by einsum(A[j,k]*B[k,l], j=0:3, l=[0,1]); the trace of A (n x n): einsum(A[j,j])",
+      "arguments": "expr: a literal expression (so not a pre-defined one). free indices: a series of comma-seperated index values, which can be given as [index name]=begin:end or [index name]=[val1, val2, ...]. See the examples",
+      "result": "An indexed object containing entries for each combination of values of the free indices"
+    },
+    "abc": {
+      "syntax": "abc(a, b, c) or abc(a, b, c, d)",
+      "description": "If three arguments are given: uses the ABC-Formula to calculate the root of a quadratic equation of the form y=ax^2+bx+c. If the setting COMPLEX_ENABLED is set to true, the a complex result may be returned.\nIf four indices are given: uses the cubic-formula to calculate the three roots of a cubic equation of the form y=ax^3+bx^2+cx+d. Note that the result may be complex.",
+      "arguments": "a, b, c, d: real or complex scalars",
+      "result": "A vector with 2 or 3 elements containing the roots. In the case of three arguments and the setting COMPLEX_ENABLED is set to false, if one or both of the roots is complex, one or both of the elements may be null. If only one element is null, it will be the second one."
+    },
+    "simplify": {
+      "syntax": "simplify(e)",
+      "description": "Tries to simplify a given expression (or function). This involves computing all numerical operations (like 2*3 or log(12)), removing trivial operations (such as x*0, x*1, y+0, y^1) and reordering the expression (see help(reorder)).",
+      "arguments": "e: a function or an expression",
+      "result": "An object (function or expression) which (mathematically) equals e, but without numerical operations and trivial operations."
+    },
+    "reorder": {
+      "syntax": "reorder(e)",
+      "description": "Tries to reorder a given expression (or function). This involves moving numberical values to the front, and functions to he back of the expression.",
+      "arguments": "e: a function or an expression",
+      "result": "An object (function or expression) which (mathematically) equals e, but in a different (more natural) order."
+    },
+    "distribute": {
+      "syntax": "distribute(e)",
+      "description": "Distributes the terms in e. This means that as much brackets as possible are eliminated.",
+      "arguments": "e: a function or an expression",
+      "result": "An object (function or expression) which (mathematically) equals e, but with as few bracketed expressions as possible."
+    },
+    "com": {
+      "syntax": "com(A,B)",
+      "description": "Calculates the commutator of A and B, which as defined as [A,B]=:A*B-B*A. This can be used to determine of the multiplication order of A and B can be switched without changing the result. This is the case exactly when the result equals 0.",
+      "arguments": "A and B: any two mathobjects. Note that an error will be thrown if any of the operations in (A*B)-(B*A) is not supported or defined.",
+      "result": "The commutator of A and B"
+    },
+    "acom": {
+      "syntax": "acom(A,B)",
+      "description": "Calculates the anti-commutator of A and B, which as defined as [A,B]=:A*B+B*A.",
+      "arguments": "A and B: any two mathobjects. Note that an error will be thrown if any of the operations in (A*B)+(B*A) is not supported or defined.",
+      "result": "The anti-commutator of A and B"
+    },
+    "ans": {
+      "syntax": "ans() or ans(k)",
+      "description": "If k is not given or if k=0, this returns the last answer in the answer history. If k is positive it returns the k-th answer from the start of the current session, with k=1 being the first answer. If k is negative, it returns the (-k)-th answer from the end of the answer history. This means that ans(-1) returns the second-to-last answer.",
+      "arguments": "k: a real integer",
+      "result": "The k-th answer from the start of the answer history if k>0, otherwise the k-th answer from the end of the answer history."
+    }
+  },
+  "commands": {
+    "del": {
+      "syntax": "del(a,b,...) or delete(a,b,...)",
+      "description": "Deletes the given variables. This can be used to free memory if you are working with large objects which are no longer needed.",
+      "arguments": "a, b, ...: arbitrary amount of variable names.",
+      "result": "-"
+    },
+    "dot": {
+      "syntax": "dot(a) or dot(a, name)",
+      "description": "Exports the given variable as a tree graph in a dot format (see Graphviz for more info) to a file with the given name or 'output_dot*.dot' where * is the first available integer. If the argument equals 'dependencies' the dependencies graph is exported (developer feature).",
+      "arguments": "a: an expression, function or 'dependencies'. name (optional): the name of the file to which the variable is exported (without extension).",
+      "result": "A .dot file containing the dot code representing the tree graph of the argument"
+    },
+    "execute": {
+      "syntax": "execute(file)",
+      "description": "Executes the statements in the given file.",
+      "arguments": "file: the name of the file to be executed (including the .cal extension and the path if the file is not in the same directory as the program).",
+      "result": "The statements in the file and their results printed to the console."
+    },
+    "help": {
+      "syntax": "help(command)",
+      "description": "Displays the entry in the help document for the given command.",
+      "arguments": "command: the name of the command which's help page should be displayed.",
+      "result": "The help page of the given command printed to the console."
+    },
+    "latex": {
+      "syntax": "latex(a) or latex(a, name)",
+      "description": "Exports the given variable in its LaTeX format to a file with the given name or 'output_latex*.tex' if no name is given, where * is the first available integer.",
+      "arguments": "a: the name of the variable to be exported as LaTeX. name (optional): the name of the file to which the LaTeX code should be written (without the .tex extension).",
+      "result": "A .tex file containing the LaTeX code representing the argument."
+    },
+    "list": {
+      "syntax": "list(type) or list()",
+      "description": "Prints a list of available help pages for commands, functions, algorithms or settings. If no argument is given, all pages are listed.",
+      "arguments": "type (optional): the category which should be listed. Can be 'algorithms', 'commands', 'functions' or 'settings'.",
+      "result": "A list of available commands/functions/algorithms/settings."
+    },
+    "print": {
+      "syntax": "print(a)",
+      "description": "Prints the given variable to the console.",
+      "arguments": "a: the name of the variable to be printed to the console.",
+      "result": "The variable in text printed to the console."
+    },
+    "setting": {
+      "syntax": "setting(key) or setting(key, value)",
+      "description": "Prints the setting if only the key is given, or sets the setting to a new value if both key and value are given. If the key equals 'reset' the settings will be reset to their default values. See help(<setting>) or list(setting) for more info.",
+      "arguments": "key: the name of the setting or 'reset'. value (optional): the new value of the setting (note that each setting requires a specific value type (e.g. integer, string, boolean etc.)",
+      "result": "The current value of the setting printed to the console if only the key is given."
+    },
+    "shape": {
+      "syntax": "shape(a)",
+      "description": "Prints the shape of the given variable.",
+      "arguments": "a: the name of the variable.",
+      "result": "The shape of the given variable."
+    },
+    "time": {
+      "syntax": "time(expression) or time(expression, runs)",
+      "description": "Measures the time needed to execute the given expression. To increase precision, the expression is run multiple times. How often the expression is run can be given in the second argument or else is set to the TIMER_DEF_RUNS setting.",
+      "arguments": "expression: the expression whose execution time should be measured. runs (optional): how often the expression should be run.",
+      "result": "The total time required for all runs and the average time per run."
+    },
+    "type": {
+      "syntax": "type(a)",
+      "description": "Prints the type (=java class name) of the given variable.",
+      "arguments": "a: the name of the variable whose type should be printed.",
+      "result": "The type of the given variable."
+    }
+  },
+  "settings": {
+    "abc_show_text": {
+      "name": "abc_show_text",
+      "type": "boolean",
+      "description": "whether or not the ABC-Formula algorithm should display more information as text. See help(abc) for more info.",
+      "default": true
+    },
+    "complex_enabled": {
+      "name": "complex_enabled",
+      "type": "boolean",
+      "description": "whether or not complex numbers can be returned by functions.",
+      "default": false
+    },
+    "complex_in_polar": {
+      "name": "compex_in_polar",
+      "type": "boolean",
+      "description": "whether or not complex number should be expressed in their polar form. If false, complex numbers will be given in cartesian form.",
+      "default": false
+    },
+    "int_def_steps": {
+      "name": "int_def_steps",
+      "type": "integer",
+      "description": "The default amount of steps (nodes) used by the Gaussian Quadrature algorithm. See help(integral).",
+      "default": 16
+    },
+    "notation": {
+      "name": "notation",
+      "type": "integer",
+      "description": "The type of notation which is used to display numbers. normal=1, engineering=2, scientific=3.",
+      "default": 1
+    },
+    "precision": {
+      "name": "precision",
+      "type": "integer",
+      "description": "The amount of decimal places to be displayed in the console.",
+      "default": 3
+    },
+    "show_stacktrace": {
+      "name": "show_stacktrace",
+      "type": "boolean",
+      "description": "whether or not the stacktrace of error messages should be shown. The stacktrace can be used by the developer to pinpoint the code generating the error.",
+      "default": false
+    },
+    "timer_def_runs": {
+      "name": "timer_def_runs",
+      "type": "integer",
+      "description": "The default amount of runs of the time command. See help(time) for more info.",
+      "default": 100
+    },
+    "debug": {
+      "name": "debug",
+      "type": "boolean",
+      "description": "If true, debugging messages are print during some calculations.",
+      "default": false
+    },
+    "multiline_matrix": {
+      "name": "multiline_matrix",
+      "type": "boolean",
+      "description": "If true, matrices (and 2D or 3D indexed objects) are printed in a 2D grid-like representation. If false, matrices are printed inline with a ';' separating the rows, indexed objects are printed a 1D array with the shape printed separately.",
+      "default": true
+    }
+  },
+  "constants": {
+    "pi": {
+      "name": "Mathematical constant pi: the ratio of the circumference and diameter of a circle.",
+      "value": "3.1415926..."
+    },
+    "e": {
+      "name": "Mathematical constant e (Euler's number): the limit of (1+1/n)^n for n->infinity.",
+      "value": "2.7182818285..."
+    },
+    "i": {
+      "name": "Imaginary unit: a number such that i^2=-1.",
+      "value": "i"
+    },
+    "_c": {
+      "name": "Physical constant c: speed of light in a vacuum.",
+      "value": "299792458 (m/s)"
+    },
+    "_e": {
+      "name": "Physical constant e: electron charge.",
+      "value": "1.60217662e-19 (C)"
+    },
+    "_mu0": {
+      "name": "Physical constant mu_0: magnetic permeability of vacuum.",
+      "value": "1.2566370614359173e-06 (N/A^2)"
+    },
+    "_epsilon0": {
+      "name": "Physical constant epsilon_0: the electric permittivity of vacuum (also: (di)electric constant.",
+      "value": "8.854187817620389e-12 (F/m)"
+    },
+    "_h": {
+      "name": "Physical constant h: Plank's constant",
+      "value": "6.62607004e-34 (Js)"
+    },
+    "_hbar": {
+      "name": "Physical constant hbar: reduces Plank's constant.",
+      "value": "_h/(2pi)=1.0545718001391127e-34 Js"
+    },
+    "_G": {
+      "name": "Physical constant G: Newton's gravitational constant.",
+      "value": "6.67408e-11 (m^3/(kg s^2))"
+    },
+    "_g": {
+      "name": "Physical constant g: standard gravitational acceleration on earth.",
+      "value": "9.80665 (m/s^2)"
+    },
+    "_R": {
+      "name": "Physical constant R: molar gas constant.",
+      "value": "8.3144598 (J/(K mol))"
+    },
+    "_alpha": {
+      "name": "Physical constant alpha: fine structure constant",
+      "value": "0.0072973525664"
+    },
+    "_NA": {
+      "name": "Physical constant N_A: Avogadro's number.",
+      "value": "6.022140857e23 (1/mol)"
+    },
+    "_k": {
+      "name": "Physical constant k (or k_B): Boltzmann constant.",
+      "value": "1.38064852e-23 (J/K)"
+    },
+    "_sigma": {
+      "name": "Physical constant sigma: Stefan-Boltzmann constant.",
+      "value": "5.670367e-8 (W/(m^2 K^4))"
+    },
+    "_wien": {
+      "name": "Physical constant b: Wien's displacement contant.",
+      "value": "0.0028977729 (m K)"
+    },
+    "_Ry": {
+      "name": "Physical constant Ry: Rydberg constant",
+      "value": "10973731.568508 (m/s)"
+    },
+    "_m_e": {
+      "name": "Physical constant m_e: electron mass",
+      "value": "9.10938356e-31 (kg)"
+    },
+    "_m_p": {
+      "name": "Physical constant m_p: proton mass",
+      "value": "1.672621898e-27 (kg)"
+    },
+    "_m_n": {
+      "name": "Physical constant m_n: neutron mass",
+      "value": "1.674927471e-27 (kg)"
+    },
+    "_u": {
+      "name": "Physical constant u: atomic mass unit",
+      "value": "1.66053904e-27 (kg)"
+    }
+  }
 }
