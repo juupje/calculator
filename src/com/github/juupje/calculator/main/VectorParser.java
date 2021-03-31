@@ -19,9 +19,9 @@ public class VectorParser extends Parser {
 		super(s);
 		expr = expr.replace(" ",  "");
 		if(expr.charAt(0)=='[')
-			expr.substring(1);
+			expr = expr.substring(1);
 		if(expr.charAt(expr.length()-1)==']')
-			expr.substring(0,expr.length()-1);
+			expr = expr.substring(0,expr.length()-1);
 		v = new ArrayList<>();
 	}
 	
