@@ -112,6 +112,10 @@ public class MIndexedObject extends MIndexable {
 		return new MIndexedObject(shape.copy(), copy);
 	}
 	
+	public MathObject[] elements() {
+		return values;
+	}
+	
 	public MMatrix toMatrix() {
 		if(shape.dim()==2) {
 			MathObject[][] matrix = new MathObject[shape.get(0)][shape.get(1)];

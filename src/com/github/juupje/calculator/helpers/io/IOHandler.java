@@ -37,7 +37,7 @@ public class IOHandler {
 	}
 	
 	public void debug(String str) {
-		if(enabled && ((boolean)Arguments.get("debug") || Settings.getBool(Settings.DEBUG)))
+		if(enabled && (Arguments.getBool(Arguments.DEBUG) || Settings.getBool(Settings.DEBUG)))
 			out("DEBUG: " + str);
 	}
 	
@@ -100,7 +100,7 @@ public class IOHandler {
 	}
 	
 	public static String ansi(String str, ANSITags tag) {
-		if((boolean) Arguments.get("ansicolors")==true)
+		if(Arguments.getBool(Arguments.ANSI_COLORS)==true)
 			return tag.getString() + str + ANSITags.ANSI_RESET.getString();
 		return str;
 	}

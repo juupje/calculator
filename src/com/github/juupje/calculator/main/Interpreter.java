@@ -22,6 +22,7 @@ import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
+import com.github.juupje.calculator.settings.Arguments;
 
 public class Interpreter {
 
@@ -46,7 +47,8 @@ public class Interpreter {
 			MathObject result = new Parser(s).evaluate();
 			if(result != null) {
 				Variables.ans(result.copy());
-				Calculator.ioHandler.out(Printer.toText(result));
+				if(!Arguments.getBool(Arguments.SILENT_ANSWERS))
+					Calculator.ioHandler.out(Printer.toText(result));
 			}
 		}
 	}
@@ -123,7 +125,8 @@ public class Interpreter {
 				}
 			} else
 				Variables.set(name, result);
-			Calculator.ioHandler.out(result.toString());
+			if(!Arguments.getBool(Arguments.SILENT_ANSWERS))
+				Calculator.ioHandler.out(result.toString());
 			Variables.ans(result.copy());
 		}
 	}

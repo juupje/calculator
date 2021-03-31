@@ -28,6 +28,7 @@ import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MConst;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFunction;
+import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MRecSequence;
@@ -338,15 +339,59 @@ public class Printer {
 		return latex.append(System.lineSeparator()).append("\\end{pmatrix}").toString();
 	}
 	
+	public static String toLatex(MIndexedObject m) {
+		StringBuilder latex = new StringBuilder();
+		if(m.shape().dim()==2) {
+			latex.append("\\begin{pmatrix}").append(System.lineSeparator());
+			MathObject[] values = m.elements();
+			int cols = m.shape().cols();
+			for (int i = 0; i < values.length; i++) {
+				latex.append(toLatex(values[i]));
+				if(i+1==values.length) continue;
+				if((i+1)%cols==0)
+					latex.append(" \\\\ ");
+				else
+					latex.append(" & ");
+			}
+			latex.append(System.lineSeparator()).append("\\end{pmatrix}");
+		} else if(m.shape().dim()<=1) {
+			latex.append("\\begin{pmatrix}").append(System.lineSeparator());
+			MathObject[] values = m.elements();
+			for(int i = 0; i < values.length; i++) {
+				latex.append(toLatex(values[i]));
+				if(i != values.length-1)
+					latex.append(" & ");
+			}
+			latex.append(System.lineSeparator()).append("\\end{pmatrix}");			
+		} else {
+			final String[] indices = {"alpha", "beta", "gamma", "delta", "rho", "sigma", "mu", "nu", "kappa", "lambda"};
+			StringBuilder shape = new StringBuilder();
+			latex.append("\\{a_{");
+			int indexCount = m.shape().size();
+			int toberepeated = (indexCount>2*indices.length ? indices.length : (indexCount<indices.length ? 0 : indexCount%indices.length));
+			for(int i = 0; i < indexCount; i++) {
+				int index = i%indices.length;
+				latex.append("\\"+indices[index]);
+				shape.append(m.shape().get(i));
+				if(index<toberepeated)
+					latex.append("_{"+((int) i/indices.length) + "}");
+				if(i != indexCount-1) {
+					shape.append("\\times");
+				}
+			}
+			latex.append("}\\}\\quad(").append(shape).append(")");
+		}
+		return latex.toString();
+	}
+	
 	public static String toLatex(MSequence m) {
 		String name = m.getIndexName()=="a" ? "b" : "a";
-		String indexedName = name + "_" + m.getIndexName();
+		String indexedName = name + "_{" + m.getIndexName() + "}";
 		StringBuilder latex = new StringBuilder();
 		latex.append("(").append(indexedName).append(")_{").append(m.getIndexName()).append("\\in\\mathbb{N}}\\qquad ");
 		if(m instanceof MRecSequence) {
 			String fstring = toLatex(m.getFunction());
 			latex.append(indexedName).append("=").append(fstring.replace("__", name + "_"));
-			System.out.println(latex);
 		} else
 			latex.append(indexedName).append("=").append(toLatex(m.getFunction()));
 		return latex.toString();
@@ -364,6 +409,8 @@ public class Printer {
 			return toLatex((MVector) mo);
 		else if (mo instanceof MMatrix)
 			return toLatex((MMatrix) mo);
+		else if (mo instanceof MIndexedObject) 
+			return toLatex((MIndexedObject) mo);
 		else if (mo instanceof MExpression)
 			return toLatex((MExpression) mo);
 		else if (mo instanceof MReal)
@@ -940,8 +987,8 @@ public class Printer {
     }
 	
 	public static String getDefaultPath() {
-		if(Arguments.exists("workdir"))
-			return (String) Arguments.get("workdir");
+		if(Arguments.exists(Arguments.WORK_DIR))
+			return Arguments.get(Arguments.WORK_DIR);
 		return "";
 	}
 }

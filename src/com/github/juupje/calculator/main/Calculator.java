@@ -49,9 +49,9 @@ public class Calculator {
 		dependencyGraph = new Graph<Variable>();
 		Settings.loadPrefs();
 		running = true;
-		if(Arguments.exists("run"))
+		if(Arguments.exists(Arguments.RUN))
 			try {
-				Interpreter.execute(new File(Printer.getDefaultPath() + (String) Arguments.get("run")));
+				Interpreter.execute(new File(Printer.getDefaultPath() + Arguments.get(Arguments.RUN)));
 			} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
 				errorHandler.handle(e);
 			}
@@ -76,8 +76,8 @@ public class Calculator {
 		setErrorHandler(new ErrorHandler());
 		setSettingsHandler(new SettingsHandler());
 		parseArgs(args);
-		if(Arguments.exists("plugindir"))
-			PluginLoader.load(new File((String) Arguments.get("plugindir")));
+		if(Arguments.exists(Arguments.PLUGIN_DIR))
+			PluginLoader.load(new File(Arguments.get(Arguments.PLUGIN_DIR)));
 		start();
 		new Calculator();
 	}
