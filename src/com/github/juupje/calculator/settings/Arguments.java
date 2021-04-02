@@ -7,6 +7,7 @@ import com.github.juupje.calculator.main.Calculator;
 
 public class Arguments {
 	public static final String DEBUG = "debug";
+	public static final String NO_CONFIRMATIONS = "no_confirmations";
 	public static final String ANSI_COLORS = "ansicolors";
 	public static final String SILENT_ANSWERS = "silentanswers";
 	public static final String PLUGIN_DIR = "plugindir";
@@ -17,9 +18,10 @@ public class Arguments {
 	private static HashMap<String, Object> arguments = new HashMap<>();
 	static {
 		//set default booleans
-		arguments.put("debug", false);
-		arguments.put("ansicolors", false);
-		arguments.put("silentanswers", false);
+		arguments.put(DEBUG, false);
+		arguments.put(ANSI_COLORS, false);
+		arguments.put(SILENT_ANSWERS, false);
+		arguments.put(NO_CONFIRMATIONS, false);
 	}
 	
 	public static void parse(String[] args) {
@@ -54,6 +56,9 @@ public class Arguments {
 						arguments.put(arg, true);
 						break;
 					case SILENT_ANSWERS:
+						arguments.put(arg, true);
+						break;
+					case NO_CONFIRMATIONS:
 						arguments.put(arg, true);
 						break;
 					default:

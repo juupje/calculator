@@ -172,8 +172,8 @@ public enum Settings {
 
 		if (args.length == 1) {
 			args[0] = args[0].toLowerCase();
-			if (args[0].equals("reset") && Calculator.ioHandler
-					.askYesNo("Are you sure you want to reset all settings to their default values?"))
+			if (args[0].equals("reset") && (Arguments.getBool(Arguments.NO_CONFIRMATIONS)==false || Calculator.ioHandler
+					.askYesNo("Are you sure you want to reset all settings to their default values?")))
 				resetVariables();
 			else {
 				Object result = map.get(settings.get(args[0]));
