@@ -414,9 +414,9 @@ public class Printer {
 		else if (mo instanceof MExpression)
 			return toLatex((MExpression) mo);
 		else if (mo instanceof MReal)
-			return mo.toString();
+			return numToLatex((MReal) mo);
 		else if (mo instanceof MComplex)
-			return mo.toString().replace("(", "{").replace(")", "}");
+			return numToLatex((MComplex) mo);
 		else if(mo instanceof MSequence)
 			return toLatex((MSequence) mo);
 		else
@@ -894,7 +894,8 @@ public class Printer {
 	}
 	
 	/**
-	 * Converts the double value of the {@link MScalar} to a String.
+	 * Converts the value of the {@link MScalar} to a String. Takes into account the setting
+	 * COMPLEX_IN_POLAR if the value is complex.
 	 * 
 	 * @param scalar the {@code MScalar} to be converted to a String.
 	 * @return the created String.
@@ -940,6 +941,22 @@ public class Printer {
 			}
 		case Settings.SCI:
 			s = String.format(locale, "%." + Settings.getInt(Settings.PRECISION) +"e",num);
+			//Do some more formatting to remove '+' signs in the exponent as well as 
+			//'0's at the beginning of the exponent
+			int index = s.indexOf("e");
+			if(index == -1) break;
+			String exp = s.substring(index+2);
+			String sign = s.charAt(index+1)=='-' ? "-" : "";
+			int i = 0;
+			for(; i < exp.length(); i++)
+				if(exp.charAt(i)!='0')
+					break;
+			if(i == exp.length()) {
+				s = s.substring(0, index); //drop the exponent and the 'e'
+				break;
+			}
+			if(i>0) exp = exp.substring(i);
+			s = s.substring(0, index+1) + sign + exp;
 			break;
 		case Settings.ENG:
 		   // If the value is negative, make it positive so the log10 works
@@ -955,6 +972,49 @@ public class Printer {
 		if(s.equals("-0"))
 			return "0";
 		return s;
+	}
+	
+	/**
+	 * Converts the value of the {@link MScalar} to a LaTeX string. Takes into account the setting
+	 * COMPLEX_IN_POLAR if the value is complex.
+	 * 
+	 * @param scalar the {@code MScalar} to be converted to LaTeX.
+	 * @return the created String.
+	 */
+	public static String numToLatex(MScalar s) {
+		if(s.isNaN())
+			return "NaN";
+		if (s.isComplex()) {
+			((MComplex) s).fixPhi();
+			if (Settings.getBool(Settings.COMPLEX_IN_POLAR))
+				return numToString(((MComplex) s).getR()) + "\\cdot e^{" + numToString(((MComplex) s).arg()) + "i}";
+			else {
+				String stra = numToLatex(s.real());
+				String strb = numToLatex(s.imag());
+				if(stra.equals("0") && strb.equals("0"))
+					return "0";
+				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
+						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "i" : "");
+			}
+		}
+		return numToLatex(s.real());
+	}
+	
+	/**
+	 * Converts the double to a LaTeX string. Using the number representation settings in
+	 * {@link Settings}. It uses the {@link #numToString(double)} method and replaces the exponential e{...}
+	 * with \cdot10^{...}
+	 * 
+	 * @param double the value to be converted.
+	 * @return the created String.
+	 */
+	public static String numToLatex(double d) {
+		String str = numToString(d);
+		int index = str.indexOf("e");
+		if(index == -1)
+			return str;
+		String exp = str.substring(index+1);
+		return str.substring(0, index)+"\\cdot10^{"+(exp.charAt(0)=='+' ? exp.substring(1) : exp)+"}";
 	}
 
 	/**

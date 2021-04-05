@@ -441,7 +441,7 @@ public class Parser {
 					d = new Parser(findEndOfBrackets()).evaluate(); // Gets the factor inside the function
 					d = Functions.getFunction(letters).evaluate(d);
 				} else if(letters.equals("inv"))
-					d = processFactor().invert();
+					d = Operator.INVERT.evaluate(processFactor());
 				else
 					throw new UnexpectedCharacterException(expr, p, pos);
 			}
