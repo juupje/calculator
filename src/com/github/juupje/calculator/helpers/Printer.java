@@ -1,10 +1,7 @@
 package com.github.juupje.calculator.helpers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -37,6 +34,7 @@ import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MVectorFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.mathobjects.Shape;
 import com.github.juupje.calculator.settings.Arguments;
 import com.github.juupje.calculator.settings.Settings;
 import com.github.juupje.calculator.tree.Node;
@@ -46,8 +44,7 @@ public class Printer {
 	private static final Locale locale = Locale.ROOT;
 	private static String lastLatexFileName = null;
 	private static String lastTextFileName = null;
-	private static PrintWriter writer;
-
+	private static final String newLine = System.lineSeparator();
 	/**
 	 * The latex preamble used for writing stuff to LaTeX files:
 	 * 
@@ -72,32 +69,33 @@ public class Printer {
 	 * 
 	 * @param node the {@link Node} to be printed.
 	 */
-	private static void printNodeDot(Node<?> node, boolean connectParent) {
+	private static void printNodeDot(StringBuilder sb, Node<?> node, boolean connectParent) {
 		if(node.data instanceof MVectorFunction) {
 			MVectorFunction v = (MVectorFunction) node.data;
 			String name = "";
 			for(int i = 0; i < v.size(); i++) {
 				name += i + ", ";
-				writer.println(node.hashCode() + " -> " + i);
-				writer.println(i + " -> " + v.get(i).getTree().getRoot().hashCode());
-				printNodeDot(v.get(i).getTree().getRoot(), connectParent);
+				sb.append(node.hashCode()).append(" -> ").append(i).append(newLine);
+				sb.append(i).append(" -> ").append(v.get(i).getTree().getRoot().hashCode()).append(newLine);
+				printNodeDot(sb, v.get(i).getTree().getRoot(), connectParent);
 			}
-			writer.println(node.hashCode() + "[label=\"(" + name.substring(0, name.length()-2) + ")\"];");			
+			sb.append(node.hashCode()).append("[label=\"(").append(name.substring(0, name.length()-2)).append(")\"];").append(newLine);			
 			return;
 		}
 		
-		writer.println(node.hashCode() + "[label=<" + node.toHTMLLabel() + ">, tooltip=\"" + Tools.type(node) + "<" + Tools.type(node.data) + ">" + "\"];");
+		sb.append(node.hashCode()).append("[label=<").append(node.toHTMLLabel()).append(">, tooltip=\"")
+			.append(Tools.type(node)).append("<").append(Tools.type(node.data)).append(">").append("\"];").append(newLine);
 		
 		if (node.left() != null) {
-			writer.println(node.hashCode() + " -> " + node.left().hashCode() + ";");
-			printNodeDot(node.left(), connectParent);
+			sb.append(node.hashCode()).append(" -> ").append(node.left().hashCode()).append(";").append(newLine);
+			printNodeDot(sb,node.left(), connectParent);
 		}
 		if (node.right() != null) {
-			writer.println(node.hashCode() + " -> " + node.right().hashCode() + ";");
-			printNodeDot(node.right(), connectParent);
+			sb.append(node.hashCode()).append(" -> ").append(node.right().hashCode()).append(";").append(newLine);
+			printNodeDot(sb, node.right(), connectParent);
 		}
 		if(node.parent != null && connectParent)
-			writer.println(node.hashCode() + " -> " + node.parent.hashCode() + " [style=dashed];");
+			sb.append(node.hashCode()).append(" -> ").append(node.parent.hashCode()).append(" [style=dashed];").append(newLine);
 		
 	}
 
@@ -123,19 +121,18 @@ public class Printer {
 	 * @see #printDot(Node)
 	 */
 	public static void printDot(Tree tree, String name, boolean connectParent) {
-		try {
-			writer = new PrintWriter(getDefaultPath() + name + ".dot", "UTF-8");
-			writer.println("digraph tree {");
-			writer.println("node [fontname=\"Arial\"];");
+			StringBuilder sb = new StringBuilder();
+			sb.append("digraph tree {"+newLine).append("node [fontname=\"Arial\"];"+newLine);
 			if (tree.root == null)
-				writer.println("");
+				sb.append(newLine);
 			else if (!tree.root.isInternal() && !(tree.root.data instanceof MVectorFunction))
-				writer.println(tree.root.toString());
+				sb.append(tree.root.toString()).append(newLine);
 			else
-				printNodeDot(tree.root, connectParent);
-			writer.println("labelloc=\"t\"\nlabel=\"" + name + "\"\n}");
-			writer.close();
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+				printNodeDot(sb, tree.root, connectParent);
+			sb.append("labelloc=\"t\"\nlabel=\"").append(name).append("\"\n}").append(newLine);
+		try {
+			Calculator.ioHandler.writeToFile(getDefaultPath() + name + ".dot", sb, false);
+		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
 		}
 	}
@@ -153,22 +150,28 @@ public class Printer {
 	}
 
 	public static void printDot(Graph<?> g, String name) {
-		try {
-			writer = new PrintWriter(getDefaultPath() + name + ".dot", "UTF-8");
-			writer.println("digraph dependencies {");
+			StringBuilder sb = new StringBuilder();
+			sb.append("digraph dependencies {").append(newLine);
 			for (Graph<?>.Node n : g.getNodes()) {
-				writer.println(n.hashCode() + "[label=\"" + n.toString() + "\"];");
+				sb.append(n.hashCode()).append("[label=\"").append(n.toString()).append("\"];").append(newLine);
 				for (Graph<?>.Edge e : n.getEdges())
 					if(e.getA().equals(n))
-						writer.println(e.getA().hashCode() + "->" + e.getB().hashCode());
+						sb.append(e.getA().hashCode()).append("->").append(e.getB().hashCode()).append(newLine);
 			}
-			writer.println("}");
-			writer.close();
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			sb.append("}").append(newLine);
+		try {
+			Calculator.ioHandler.writeToFile(getDefaultPath()+name+".dot", sb, false);
+		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
 		}
 	}
 
+	private static String printNodeLatex(Node<?> n) {
+		StringBuilder sb = new StringBuilder();
+		printNodeLatex(sb, n);
+		return sb.toString();
+	}
+	
 	/**
 	 * Recursively converts the given node and its children to a LaTeX format which
 	 * is then returned as a <tt>String</tt>. *
@@ -176,113 +179,145 @@ public class Printer {
 	 * @param node the {@link Node} to be converted to LaTeX.
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 */
-	public static String printNodeLatex(Node<?> n) {
-		String s = "";
+	private static void printNodeLatex(StringBuilder sb, Node<?> n) {
 		if (n.data instanceof MConst) {
-			s += toLatex((MConst)n.data);
+			toLatex(sb,(MConst)n.data);
 		} else if (n.data instanceof Operator) {
 			Operator op = (Operator) n.data;
 			switch (op) {
 			case ADD:
 			case SUBTRACT:
-				s += printNodeLatex(n.left()) + (op == Operator.ADD ? "+" : "-") + printNodeLatex(n.right());
+				printNodeLatex(sb, n.left());
+				sb.append((op == Operator.ADD ? "+" : "-"));
+				printNodeLatex(sb, n.right());
 				break;
 			case MULTIPLY:
-				String s2 = printNodeLatex(n.right());
+				printNodeLatex(sb, n.left());
+				String s2 = printNodeLatex(n.right()); //because this cannot be appended directly
 				boolean brackets = n.right().data.equals(Operator.ADD) || n.right().data.equals(Operator.SUBTRACT);//s2.contains("-") || s2.contains("+");
 				if (brackets)
 					s2 = "\\left(" + s2 + "\\right)";
-				if (n.left().isNumeric() && !Character.isDigit(s2.charAt(0))) // there needn't be a multiplication dot
-																				// between a number and a variable.
-					s += printNodeLatex(n.left()) + s2;
+				if (n.left().isNumeric() && !Character.isDigit(s2.charAt(0)))
+					// there needn't be a multiplication dot between a number and a variable.
+					sb.append(s2);
 				else
-					s += printNodeLatex(n.left()) + "\\cdot " + s2;
+					sb.append("\\cdot ").append(s2);
 				break;
 			case DIVIDE:
-				s += "\\frac{" + printNodeLatex(n.left()) + "}{" + printNodeLatex(n.right()) + "}";
+				sb.append("\\frac{");
+				printNodeLatex(sb, n.left());
+				sb.append("}{");
+				printNodeLatex(sb, n.right());
+				sb.append("}");
 				break;
 			case POWER:
-				if (n.left().isInternal())
-					s += "\\left(" + printNodeLatex(n.left()) + "\\right)";
-				else
-					s += printNodeLatex(n.left());
-				s += "^{" + printNodeLatex(n.right()) + "}";
+				if (n.left().isInternal()) {
+					sb.append("\\left(");
+					printNodeLatex(sb, n.left());
+					sb.append("\\right)");
+				} else
+					printNodeLatex(sb, n.left());
+				sb.append("^{");
+				printNodeLatex(sb, n.right());
+				sb.append("}");
 				break;
 			case MOD:
-				s += printNodeLatex(n.left()) + "\\bmod " + printNodeLatex(n.right());
+				printNodeLatex(sb, n.left());
+				sb.append("\\bmod ");
+				printNodeLatex(sb, n.right());
 				break;
 			case NEGATE:
-				s += "-" + printNodeLatex(n.left());
+				sb.append("-");
+				printNodeLatex(sb, n.left());
 				break;
 			case INVERT:
-				s += (n.left().isInternal() ? "\\left(" + printNodeLatex(n.left()) + "\\right)" : printNodeLatex(n.left())) + "^{-1}";
+				if(n.left().isInternal()) {
+					sb.append("\\left(");
+					printNodeLatex(sb, n.left());
+					sb.append("\\right)");
+				} else
+					printNodeLatex(sb, n.left());
+				sb.append("^{-1}");
 				break;
 			case ELEMENT:
-				s += printNodeLatex(n.left()) + "_{" + printNodeLatex(n.right()) + "}";
+				printNodeLatex(sb, n.left());
+				sb.append("_{");
+				printNodeLatex(sb, n.right());
+				sb.append("}");
 				break;
 			case CONJUGATE:
-				s += printNodeLatex(n.left()) + "^*";
+				printNodeLatex(sb, n.left());
+				sb.append("^*");
 			default:
 				break;
 			}
 		} else if (n.data instanceof Function) {
 			switch ((Function) n.data) {
 			case SQRT:
-				s += "\\sqrt{" + printNodeLatex(n.left()) + "}";
+				sb.append("\\sqrt{");
+				printNodeLatex(sb, n.left());
+				sb.append("}");
 				break;
 			case ABS:
-				s += "\\left|" + printNodeLatex(n.left()) + "\\right|";
+				sb.append("\\left|");
+				printNodeLatex(sb, n.left());
+				sb.append("\\right|");
 				break;
 			case SIN:
 			case COS:
 			case TAN:
 			case LN:
 			case LOG:
-				s += "\\" + n.data + "\\left(" + printNodeLatex(n.left()) + "\\right)";
+				sb.append("\\").append(n.data.toString()).append("\\left(");
+				printNodeLatex(sb, n.left());
+				sb.append("\\right)");
 				break;
 			case ASIN:
 			case ACOS:
 			case ATAN:
-				s += "\\arc" + n.data.toString().substring(1) + "\\left(" + printNodeLatex(n.left()) + "\\right)";
+				sb.append("\\arc").append(n.data.toString().substring(1)).append("\\left(");
+				printNodeLatex(sb, n.left());
+				sb.append("\\right)");
 				break;
 			default:
-				s += "\\operatorname{" + n.data + "}{\\left(" + printNodeLatex(n.left()) + "\\right)}";
+				sb.append("\\operatorname{").append(n.data.toString()).append("}{\\left(");
+				printNodeLatex(sb, n.left());
+				sb.append("\\right)}");
 			}
 		} else if (n.data instanceof MathObject)
-			s += toLatex((MathObject) n.data);
+			toLatex(sb, (MathObject) n.data);
 		else
-			s += n.toString();
-		return s;
-
+			sb.append(n.toString());
+		sb.append(newLine);
 	}
 
-	public static String toLatex(MConst c) {
+	private static void toLatex(StringBuilder sb, MConst c) {
 		switch (c) {
 		case pi:
-			return "\\pi ";
+			sb.append("\\pi ");
 		case _sigma:
-			return"\\sigma ";
+			sb.append("\\sigma ");
 		case _alpha:
-			return "\\alpha ";
+			sb.append("\\alpha ");
 		case _b_w:
-			return"b_w";
+			sb.append("b_w");
 		case _NA:
-			return "N_A";
+			sb.append("N_A");
 		case _epsilon0:
-			return "\\epsilon_0";
+			sb.append("\\epsilon_0");
 		case _mu0:
-			return "\\mu_0";
+			sb.append("\\mu_0");
 		case _hbar:
-			return "\\hbar ";
+			sb.append("\\hbar ");
 		case _m_e:
 		case _m_n:
 		case _m_p:
-			return c.name().toLowerCase().substring(1); 
+			sb.append(c.name().toLowerCase().substring(1));
 		default:
 			String name = c.name();
 			if(name.startsWith("_"))
 				name = name.substring(1);
-			return name.toLowerCase();
+			sb.append(name.toLowerCase());
 		}
 	}
 	
@@ -295,12 +330,12 @@ public class Printer {
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 * @see #printNodeLatex(Node)
 	 */
-	public static String toLatex(MExpression expr) {
+	private static void toLatex(StringBuilder sb, MExpression expr) {
 		Tree tree = expr.getTree();
 		if (tree.root.isInternal())
-			return printNodeLatex(tree.root);
+			printNodeLatex(sb, tree.root);
 		else
-			return tree.root.toString();
+			sb.append(tree.root.toString());
 	}
 
 	/**
@@ -310,13 +345,15 @@ public class Printer {
 	 * @param v the {@link MVector} to be converted to LaTeX.
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 */
-	public static String toLatex(MVector v) {
-		StringBuilder latex = new StringBuilder("\\begin{pmatrix}");
+	private static void toLatex(StringBuilder sb, MVector v) {
+		sb.append("\\begin{pmatrix}");
 		String s = v.isTransposed() ? "&" : "\\\\";
-		for (MathObject mo : v.elements())
-			latex.append(toLatex(mo)).append(s);
-		latex.setLength(latex.length() - s.length());
-		return latex.append("\\end{pmatrix}").toString();
+		for (MathObject mo : v.elements()) {
+			toLatex(sb, mo);
+			sb.append(s);
+		}
+		sb.setLength(sb.length() - s.length());
+		sb.append("\\end{pmatrix}");
 	}
 
 	/**
@@ -326,103 +363,121 @@ public class Printer {
 	 * @param m the {@link MMatrix} to be converted to LaTeX.
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 */
-	public static String toLatex(MMatrix m) {
-		StringBuilder latex = new StringBuilder();
-		latex.append("\\begin{pmatrix}").append(System.lineSeparator());
+	private static void toLatex(StringBuilder sb, MMatrix m) {
+		sb.append("\\begin{pmatrix}").append(newLine);
 		for (MathObject[] row : m.elements()) {
-			for (MathObject mo : row)
-				latex.append(toLatex(mo)).append(" & ");
+			for (MathObject mo : row) {
+				toLatex(sb, mo);
+				sb.append(" & ");
+			}
 			//cut off the last "& " and add line separator.
-			latex.setLength(latex.length() - 2);
-			latex.append("\\\\");
+			sb.setLength(sb.length() - 2);
+			sb.append("\\\\");
 		}
-		return latex.append(System.lineSeparator()).append("\\end{pmatrix}").toString();
+		sb.append(newLine).append("\\end{pmatrix}");
 	}
 	
-	public static String toLatex(MIndexedObject m) {
-		StringBuilder latex = new StringBuilder();
+	private static void toLatex(StringBuilder sb, MIndexedObject m) {
 		if(m.shape().dim()==2) {
-			latex.append("\\begin{pmatrix}").append(System.lineSeparator());
+			sb.append("\\begin{pmatrix}").append(newLine);
 			MathObject[] values = m.elements();
 			int cols = m.shape().cols();
 			for (int i = 0; i < values.length; i++) {
-				latex.append(toLatex(values[i]));
+				toLatex(sb, values[i]);
 				if(i+1==values.length) continue;
 				if((i+1)%cols==0)
-					latex.append(" \\\\ ");
+					sb.append(" \\\\ ");
 				else
-					latex.append(" & ");
+					sb.append(" & ");
 			}
-			latex.append(System.lineSeparator()).append("\\end{pmatrix}");
+			sb.append(newLine).append("\\end{pmatrix}");
 		} else if(m.shape().dim()<=1) {
-			latex.append("\\begin{pmatrix}").append(System.lineSeparator());
+			sb.append("\\begin{pmatrix}").append(newLine);
 			MathObject[] values = m.elements();
 			for(int i = 0; i < values.length; i++) {
-				latex.append(toLatex(values[i]));
+				toLatex(sb, values[i]);
 				if(i != values.length-1)
-					latex.append(" & ");
+					sb.append(" & ");
 			}
-			latex.append(System.lineSeparator()).append("\\end{pmatrix}");			
+			sb.append(newLine).append("\\end{pmatrix}");			
 		} else {
 			final String[] indices = {"alpha", "beta", "gamma", "delta", "rho", "sigma", "mu", "nu", "kappa", "lambda"};
 			StringBuilder shape = new StringBuilder();
-			latex.append("\\{a_{");
+			sb.append("\\{a_{");
 			int indexCount = m.shape().size();
 			int toberepeated = (indexCount>2*indices.length ? indices.length : (indexCount<indices.length ? 0 : indexCount%indices.length));
 			for(int i = 0; i < indexCount; i++) {
 				int index = i%indices.length;
-				latex.append("\\"+indices[index]);
+				sb.append("\\"+indices[index]);
 				shape.append(m.shape().get(i));
 				if(index<toberepeated)
-					latex.append("_{"+((int) i/indices.length) + "}");
+					sb.append("_{"+((int) i/indices.length) + "}");
 				if(i != indexCount-1) {
 					shape.append("\\times");
 				}
 			}
-			latex.append("}\\}\\quad(").append(shape).append(")");
+			sb.append("}\\}\\quad(").append(shape).append(")");
 		}
-		return latex.toString();
 	}
 	
-	public static String toLatex(MSequence m) {
+	private static void toLatex(StringBuilder sb, MSequence m) {
 		String name = m.getIndexName()=="a" ? "b" : "a";
 		String indexedName = name + "_{" + m.getIndexName() + "}";
-		StringBuilder latex = new StringBuilder();
-		latex.append("(").append(indexedName).append(")_{").append(m.getIndexName()).append("\\in\\mathbb{N}}\\qquad ");
+		sb.append("(").append(indexedName).append(")_{").append(m.getIndexName()).append("\\in\\mathbb{N}}\\qquad ");
 		if(m instanceof MRecSequence) {
 			String fstring = toLatex(m.getFunction());
-			latex.append(indexedName).append("=").append(fstring.replace("__", name + "_"));
-		} else
-			latex.append(indexedName).append("=").append(toLatex(m.getFunction()));
-		return latex.toString();
+			sb.append(indexedName).append("=").append(fstring.replace("__", name + "_"));
+		} else {
+			sb.append(indexedName).append("=");
+			toLatex(sb, m.getFunction());
+		}
 	}
 
 	/**
 	 * Calls the <tt>toLatex()</tt> method which corresponds with the type of
 	 * <tt>mo</tt>
 	 * 
-	 * @param mo
+	 * @param mo The mathobject to be converted to LaTeX
 	 * @return a <tt>String</tt> containing the argument in LaTeX format.
 	 */
-	public static String toLatex(MathObject mo) {
+	private static void toLatex(StringBuilder sb, MathObject mo) {
 		if (mo instanceof MVector)
-			return toLatex((MVector) mo);
+			toLatex(sb, (MVector) mo);
 		else if (mo instanceof MMatrix)
-			return toLatex((MMatrix) mo);
+			toLatex(sb, (MMatrix) mo);
 		else if (mo instanceof MIndexedObject) 
-			return toLatex((MIndexedObject) mo);
+			toLatex(sb, (MIndexedObject) mo);
 		else if (mo instanceof MExpression)
-			return toLatex((MExpression) mo);
+			toLatex(sb, (MExpression) mo);
 		else if (mo instanceof MReal)
-			return numToLatex((MReal) mo);
+			sb.append(numToLatex((MReal) mo));
 		else if (mo instanceof MComplex)
-			return numToLatex((MComplex) mo);
+			sb.append(numToLatex((MComplex) mo));
 		else if(mo instanceof MSequence)
-			return toLatex((MSequence) mo);
+			toLatex(sb, (MSequence) mo);
 		else
 			throw new IllegalArgumentException("Can't export " + Tools.type(mo) + " to LaTex");
 	}
+	
+	/**
+	 * Converts a mathobject to a LaTeX string of that object.
+	 * The method uses {@link #toLatex(StringBuilder, MathObject)} for this task.
+	 * 
+	 * @param mo The mathobject to be converted to LaTeX
+	 * @return a String containing the LaTeX code
+	 */
+	public static String toLatex(MathObject mo) {
+		StringBuilder sb = new StringBuilder();
+		toLatex(sb, mo);
+		return sb.toString();
+	}
 
+	public static String nodeToText(Node<?> n) {
+		StringBuilder sb = new StringBuilder();
+		nodeToText(sb, n);
+		return sb.toString();
+	}
+	
 	/**
 	 * Recursively converts the given {@link Node} and its children to a text
 	 * representation.
@@ -430,16 +485,17 @@ public class Printer {
 	 * @param node the {@link Node} to be converted to text.
 	 * @return a <tt>String</tt> containing the argument in text format.
 	 */
-	public static String nodeToText(Node<?> n) {
-		String s = "";
+	private static void nodeToText(StringBuilder sb, Node<?> n) {
 		if (n.data instanceof MConst)
-			s += ((MConst) n.data).name();
+			sb.append(((MConst) n.data).name());
 		else if (n.data instanceof Operator) {
 			Operator op = (Operator) n.data;
 			switch (op) {
 			case ADD:
 			case SUBTRACT:
-				s += nodeToText(n.left()) + (op == Operator.ADD ? "+" : "-") + nodeToText(n.right());
+				nodeToText(sb, n.left());
+				sb.append(op == Operator.ADD ? "+" : "-");
+				nodeToText(sb, n.right());
 				break;
 			case MULTIPLY:
 				String s1 = nodeToText(n.left());
@@ -450,11 +506,11 @@ public class Printer {
 					s2 = "(" + s2 + ")";
 				if(brackets1)
 					s1 = "(" + s1 + ")";
-				if (n.left().isNumeric() && s2.charAt(0)!='-' && !Character.isDigit(s2.charAt(0))) // there needn't be a multiplication dot
-																			  // between a number and a variable.
-					s += s1 + s2;
+				if (n.left().isNumeric() && s2.charAt(0)!='-' && !Character.isDigit(s2.charAt(0)))
+					// there needn't be a multiplication dot between a number and a variable.
+					sb.append(s1).append(s2);
 				else
-					s += s1 + "*" + s2;
+					sb.append(s1).append("*").append(s2);
 				break;
 			case DIVIDE:
 			case POWER:
@@ -464,34 +520,53 @@ public class Printer {
 					right = "(" + right + ")";
 				if(n.left().right() != null)
 					left = "(" + left + ")";
-				s += left + (op == Operator.POWER ? "^" : "/") + right;
+				sb.append(left).append(op == Operator.POWER ? "^" : "/").append(right);
 				break;
 			case MOD:
-				s += "mod[" + nodeToText(n.left()) + ", " + nodeToText(n.right()) + "]";
+				sb.append("mod[");
+				nodeToText(sb, n.left());
+				sb.append(", ");
+				nodeToText(sb, n.right());
+				sb.append("]");
 				break;
 			case NEGATE:
-				s += "-" + nodeToText(n.left());
+				sb.append("-");
+				nodeToText(sb, n.left());
 				break;
 			case INVERT:
-				s += (n.left().isInternal() ? "(" + nodeToText(n.left()) + ")" : nodeToText(n.left())) + "^-1";
+				if(n.left().isInternal()) {
+					sb.append("(");
+					nodeToText(sb, n.left());
+					sb.append(")");
+				} else
+					nodeToText(sb, n.left());
+				sb.append("^-1");
 				break;
 			case ELEMENT:
-				s += nodeToText(n.left()) + "[" + nodeToText(n.right()) + "]";
+				nodeToText(sb, n.left());
+				sb.append("[");
+				nodeToText(sb, n.right());
+				sb.append("]");
 				break;
 			case CONJUGATE:
-				if(n.left().isInternal())
-					s += "&(" +nodeToText(n.left()) + ")";
-				else
-					s += "&" + nodeToText(n.left());
+				if(n.left().isInternal()) {
+					sb.append("&(");
+					nodeToText(sb, n.left());
+					sb.append(")");
+				} else {
+					sb.append("&");
+					nodeToText(sb, n.left());
+				}
 				break;
 			default:
 				break;
 			}
-		} else if (n.data instanceof Function)
-			s += n.data + "(" + nodeToText(n.left()) + ")";
-		else
-			s += n.toString();
-		return s;
+		} else if (n.data instanceof Function) {
+			sb.append(n.data).append("(");
+			nodeToText(sb, n.left());
+			sb.append(")");
+		} else
+			sb.append(n.toString());
 	}
 
 	/**
@@ -501,14 +576,43 @@ public class Printer {
 	 * @param mo the {@link MExpression} to be converted to text.
 	 * @return a <tt>String</tt> containing the argument in text format.
 	 */
-	public static String toText(MExpression mo) {
+	public static void toText(StringBuilder sb, MExpression mo) {
 		Tree tree = mo.getTree();
 		if (tree.root.isInternal())
-			return nodeToText(tree.root);
+			nodeToText(sb, tree.root);
 		else
-			return tree.root.toString();
+			sb.append(tree.root.toString());
+	}
+	
+	public static void toText(StringBuilder sb, MVector mo) {
+		toText(sb, mo.elements());
+	}
+	
+	public static void toText(StringBuilder sb, MMatrix mo) {
+		toText(sb, mo.elements());
 	}
 
+	public static void toText(StringBuilder sb, MIndexedObject mo) {
+		Shape shape = mo.shape();
+		if(shape.dim()==0 || shape.dim()==1)
+			toText(sb, mo.elements());
+		else if(shape.dim()==2)
+			toMatrixString(sb, mo.elements(), 0, shape.rows(), shape.cols());
+		else if(Settings.getBool(Settings.MULTILINE_MATRIX) && shape.dim()==3) {
+			int k = shape.get(0);
+			sb.append("[\n");
+			int rows = shape.get(1);
+			int cols = shape.get(2);
+			for(int i = 0; i < k; i++) {
+				toMatrixString(sb, mo.elements(), k*rows*cols, rows, cols);
+				sb.append(",\n");
+			}
+			sb.append("]");
+		} else {
+			sb.append("Shape ").append(shape.toString()).append("\n[").append(Tools.join(", ",(Object[]) mo.elements())).append("]");
+		}
+	}
+	
 	/**
 	 * Converts the given <tt>MExpression</tt> to a text format and returns it as a
 	 * <tt>String</tt>. This is done using {@link #nodeToText(Node)}.
@@ -516,22 +620,153 @@ public class Printer {
 	 * @param mo the {@link MExpression} to be converted to text.
 	 * @return a <tt>String</tt> containing the argument in text format.
 	 */
-	public static String toText(MSequence mo) {
-		return "{" + toText(mo.getFunction()) + " | " + mo.getIndexName() + "=" + 
-				mo.getBegin() + "..." + (mo.getEnd()>= 0 ? mo.getEnd() : "infinity") + "}";
+	public static void toText(StringBuilder sb, MSequence mo) {
+		sb.append("{");
+		toText(sb, mo.getFunction());
+		sb.append(" | ").append(mo.getIndexName()).append("=").append(mo.getBegin())
+			.append("...").append(mo.getEnd()>= 0 ? mo.getEnd() : "infinity").append("}");
 	}
 	
-	public static String toText(MRecSequence mo) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("r{[").append(mo.getIndexName()).append("]=").append(toText(mo.getFunction()).replace("_", ""));
-		builder.append(" | ");
+	public static void toText(StringBuilder sb, MRecSequence mo) {
+		sb.append("r{[").append(mo.getIndexName()).append("]=").append(toText(mo.getFunction()).replace("_", ""));
+		sb.append(" | ");
 		for(int i = 0; i < mo.getInitalParameterCount(); i++) {
 			if(i>0)
-				builder.append(", "); 
-			builder.append("[").append(i).append("]=").append(mo.get(i).toString());
+				sb.append(", "); 
+			sb.append("[").append(i).append("]=").append(mo.get(i).toString());
 		}
-		builder.append("}");
-		return builder.toString();
+		sb.append("}");
+	}	
+	
+	private static void toText(StringBuilder sb, MathObject[][] m) {
+		toText(sb, m, 0, m.length-1, 0, m[0].length-1);
+	}
+	
+	public static void toText(StringBuilder sb, Double[][] m, int rstart, int rend, int cstart, int cend) {
+		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
+			int rows = rend-rstart+1;
+			int cols = cend-cstart+1;
+			String[][] s = new String[rows][cols];
+			int[] colmax = new int[cols];
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++) {
+					s[i][j] = numToString(m[i+rstart][j+cstart]);
+					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
+				}
+			for(int i = 0; i < rows; i++) {
+				String row = "  ";
+				for(int j = 0; j < cols; j++) {
+					row += s[i][j];
+					for(int k = s[i][j].length(); k < colmax[j]; k++)
+						row += " ";
+				}
+				if(i==0)
+					sb.append("/").append(row).append("\\").append(newLine);
+				else if(i==rows-1)
+					sb.append("\\").append(row).append("/");
+				else
+					sb.append("|").append(row).append("|").append(newLine);
+			}
+		} else {
+			sb.append("[");
+			for(int i = rstart; i <= rend; i++) {
+				for (int j = cstart; j <= cend; j++)
+					sb.append(numToString(m[i][j])).append(", ");
+				sb.setLength(sb.length() - 2);
+				sb.append(";");
+			}
+			sb.setLength(sb.length() - 1);
+			sb.append("]");
+		}
+	}
+	
+	public static void toText(StringBuilder sb, MathObject[][] m, int rstart, int rend, int cstart, int cend) {
+		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
+			int rows = rend-rstart+1;
+			int cols = cend-cstart+1;
+			String[][] s = new String[rows][cols];
+			int[] colmax = new int[cols];
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++) {
+					s[i][j] = m[i+rstart][j+cstart].toString();
+					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
+				}
+			for(int i = 0; i < rows; i++) {
+				String row = "  ";
+				for(int j = 0; j < cols; j++) {
+					row += s[i][j];
+					for(int k = s[i][j].length(); k < colmax[j]; k++)
+						row += " ";
+				}
+				if(i==0)
+					sb.append("/").append(row).append("\\");
+				else if(i==rows-1)
+					sb.append(newLine).append("\\").append(row).append("/");
+				else
+					sb.append(newLine).append("|").append(row).append("|");
+			}
+		} else {
+			sb.append("[");
+			for(int i = rstart; i <= rend; i++) {
+				for (int j = cstart; j <= cend; j++)
+					sb.append(toText(m[i][j])).append(", ");
+				sb.setLength(sb.length() - 2);
+				sb.append(";");
+			}
+			sb.setLength(sb.length() - 1);
+			sb.append("]");
+		}
+	}
+	
+	private static void toMatrixString(StringBuilder sb, MathObject[] v, int start, int rows, int cols) {
+		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
+			String[][] s = new String[rows][cols];
+			int[] colmax = new int[cols];
+			for(int i = 0; i < rows; i++)
+				for(int j = 0; j < cols; j++) {
+					s[i][j] = v[i*cols+j+start].toString();
+					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
+				}
+			for(int i = 0; i < rows; i++) {
+				StringBuilder row = new StringBuilder("  ");
+				for(int j = 0; j < cols; j++) {
+					row.append(s[i][j]);
+					for(int k = s[i][j].length(); k < colmax[j]; k++)
+						row.append(" ");
+				}
+				if(i==0)
+					sb.append("/").append(row).append("\\");
+				else if(i==rows-1)
+					sb.append(newLine).append("\\").append(row).append("/");
+				else
+					sb.append(newLine).append("|").append(row).append("|");
+			}
+		} else {
+			sb.append("[");
+			int len = cols*rows;
+			for(int i = 0; i < len; i++) {
+				toText(sb, v[start+i]);
+				if(i!=len-1) {
+					if((i+1)%cols==0)
+						sb.append("; ");
+					else 
+						sb.append(", ");
+				}
+			}
+			sb.append("]");
+		}
+	}
+	
+	private static void toText(StringBuilder sb, MathObject[] vector) {
+		sb.append("(");
+		for(int i = 0; i < vector.length; i++) {
+			toText(sb, vector[i]);
+			if(i!=vector.length-1)
+				sb.append(", ");
+			if(Settings.getBool(Settings.MULTILINE_MATRIX) && vector[i] instanceof MMatrix)
+				sb.append(newLine);
+		}
+		sb.append(")");
 	}
 	
 	/**
@@ -544,99 +779,30 @@ public class Printer {
 	 * @return a <tt>String</tt> containing the argument in text format.
 	 */
 	public static String toText(MathObject mo) {
-		return mo.toString();
+		StringBuilder sb = new StringBuilder();
+		toText(sb, mo);
+		return sb.toString();
 	}
 	
-	public static String toText(MathObject[][] m) {
-		return toText(m, 0, m.length-1, 0, m[0].length-1);
-	}
-	
-	public static String toText(Double[][] m, int rstart, int rend, int cstart, int cend) {
-		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
-			int rows = rend-rstart+1;
-			int cols = cend-cstart+1;
-			String[][] s = new String[rows][cols];
-			int[] colmax = new int[cols];
-			for(int i = 0; i < rows; i++)
-				for(int j = 0; j < cols; j++) {
-					s[i][j] = numToString(m[i+rstart][j+cstart]);
-					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
-				}
-			String str = "";
-			for(int i = 0; i < rows; i++) {
-				String row = "  ";
-				for(int j = 0; j < cols; j++) {
-					row += s[i][j];
-					for(int k = s[i][j].length(); k < colmax[j]; k++)
-						row += " ";
-				}
-				if(i==0)
-					str = "/" + row + "\\\n";
-				else if(i==rows-1)
-					str += "\\" + row + "/";
-				else
-					str += "|" + row + "|\n";
-			}
-			return str;
-		} else {
-			String s = "[";
-			for(int i = rstart; i <= rend; i++) {
-				for (int j = cstart; j <= cend; j++)
-					s += numToString(m[i][j]) + ", ";
-				s = s.substring(0, s.length() - 2) + ";";
-			}
-			return s.substring(0, s.length() - 1) + "]";
-		}
-	}
-	
-	public static String toText(MathObject[][] m, int rstart, int rend, int cstart, int cend) {
-		if(Settings.getBool(Settings.MULTILINE_MATRIX)) {
-			int rows = rend-rstart+1;
-			int cols = cend-cstart+1;
-			String[][] s = new String[rows][cols];
-			int[] colmax = new int[cols];
-			for(int i = 0; i < rows; i++)
-				for(int j = 0; j < cols; j++) {
-					s[i][j] = m[i+rstart][j+cstart].toString();
-					colmax[j] = Math.max(colmax[j], s[i][j].length()+2);
-				}
-			String str = "";
-			for(int i = 0; i < rows; i++) {
-				String row = "  ";
-				for(int j = 0; j < cols; j++) {
-					row += s[i][j];
-					for(int k = s[i][j].length(); k < colmax[j]; k++)
-						row += " ";
-				}
-				if(i==0)
-					str = "/" + row + "\\\n";
-				else if(i==rows-1)
-					str += "\\" + row + "/";
-				else
-					str += "|" + row + "|\n";
-			}
-			return str;
-		} else {
-			String s = "[";
-			for(int i = rstart; i <= rend; i++) {
-				for (int j = cstart; j <= cend; j++)
-					s += m[i][j].toString() + ", ";
-				s = s.substring(0, s.length() - 2) + ";";
-			}
-			return s.substring(0, s.length() - 1) + "]";
-		}
-	}
-	
-	public static String toText(MathObject[] vector) {
-		String s = "(";
-		for(int i = 0; i < vector.length; i++) {
-			s += vector[i].toString();
-			if(i!=vector.length-1)
-				s += ", ";
-			if(Settings.getBool(Settings.MULTILINE_MATRIX) && vector[i] instanceof MMatrix)
-				s += System.lineSeparator();
-		}
-		return s + ")";
+	public static void toText(StringBuilder sb, MathObject mo) {
+		if (mo instanceof MVector)
+			toText(sb, (MVector) mo);
+		else if (mo instanceof MMatrix)
+			toText(sb, (MMatrix) mo);
+		else if (mo instanceof MIndexedObject) 
+			toText(sb, (MIndexedObject) mo);
+		else if (mo instanceof MExpression)
+			toText(sb, (MExpression) mo);
+		else if (mo instanceof MReal)
+			sb.append(numToString((MReal) mo));
+		else if (mo instanceof MComplex)
+			sb.append(numToString((MComplex) mo));
+		else if(mo instanceof MRecSequence)
+			toText(sb, (MRecSequence) mo);
+		else if(mo instanceof MSequence)
+			toLatex(sb, (MSequence) mo);
+		else
+			throw new IllegalArgumentException("Can't export " + Tools.type(mo) + " to text");
 	}
 
 	/**
@@ -757,21 +923,21 @@ public class Printer {
 	 */
 	private static void printLatex(String str, String name) {
 		try {
-			String n = System.lineSeparator();
 			File f = new File(getDefaultPath() + name + ".tex");
+			StringBuilder sb = new StringBuilder();
 			if (f.exists()) {
-				String s = new String(Files.readAllBytes(f.toPath()));
-				writer = new PrintWriter(f, "UTF-8");
+				String s = Calculator.ioHandler.readFile(f.toPath());
 				int index = s.indexOf(latexEnd);
-				writer.println(s.substring(0, index == -1 ? 0 : index));
-				writer.println(name.replace("_", " \\_") + ":" + n + "\\begin{equation*}" + n + str + n
-						+ "\\end{equation*}" + n + latexEnd);
+				sb.append(s.substring(0, index == -1 ? 0 : index)+newLine);
+				sb.append(name.replace("_", " \\_")).append(":").append(newLine)
+					.append("\\begin{equation*}").append(newLine).append(str).append(newLine)
+					.append("\\end{equation*}").append(newLine).append(latexEnd);
 			} else {
-				writer = new PrintWriter(f);
-				writer.println(latexPreamble + n + name.replace("_", "\\_") + ":\n\\begin{equation*}" + n + str + n
-						+ "\\end{equation*}" + n + latexEnd);
+				sb.append(latexPreamble).append(newLine).append(name.replace("_", "\\_"))
+					.append(":\n\\begin{equation*}").append(newLine).append(str).append(newLine)
+					.append("\\end{equation*}").append(newLine).append(latexEnd);
 			}
-			writer.close();
+			Calculator.ioHandler.writeToFile(f, sb, false);
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
 		}

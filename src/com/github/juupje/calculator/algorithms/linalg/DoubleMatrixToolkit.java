@@ -357,6 +357,8 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(matrix, rstart, rend, cstart, cend);
+		StringBuilder sb = new StringBuilder();
+		Printer.toText(sb, matrix, rstart, rend, cstart, cend);
+		return sb.toString();
 	}
 }

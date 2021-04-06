@@ -1,5 +1,10 @@
 package com.github.juupje.calculator.helpers.io;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 import com.github.juupje.calculator.main.Calculator;
@@ -97,6 +102,24 @@ public class IOHandler {
 				if(s.equals(result))
 					return option[0];
 		return options[0][0];
+	}
+	
+	public void writeToFile(File f, StringBuilder content, boolean append) throws IOException {
+		FileWriter writer = new FileWriter(f, append);
+		writer.append(content);
+		writer.flush();
+		writer.close();
+	}
+	
+	public void writeToFile(String path, StringBuilder content, boolean append) throws IOException {
+		FileWriter writer = new FileWriter(path, append);
+		writer.append(content);
+		writer.flush();
+		writer.close();
+	}
+	
+	public String readFile(Path path) throws IOException {
+		return new String(Files.readAllBytes(path));
 	}
 	
 	public static String ansi(String str, ANSITags tag) {

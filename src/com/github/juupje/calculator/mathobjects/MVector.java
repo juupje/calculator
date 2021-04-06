@@ -360,7 +360,7 @@ public class MVector extends MIndexable {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(v) + (transposed ? "'" : "");
+		return Printer.toText(this) + (transposed ? "'" : "");
 	}
 	
 	//###### static methods #####	

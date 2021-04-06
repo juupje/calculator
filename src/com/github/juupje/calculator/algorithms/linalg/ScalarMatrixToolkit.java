@@ -202,7 +202,9 @@ public class ScalarMatrixToolkit extends MatrixToolkit<MScalar> {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(matrix, rstart, rend, cstart, cend);
+		StringBuilder sb = new StringBuilder();
+		Printer.toText(sb, matrix, rstart, rend, cstart, cend);
+		return sb.toString();
 	}
 	
 	public static ScalarMatrixToolkit identity(int n) {
