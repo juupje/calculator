@@ -2,7 +2,7 @@ latex() {
 	for f in *.tex
 	do
 		pdflatex "$f"
-		xdg-open "$(basename -- $f).pdf"
+		xdg-open "${f%.*}.pdf"
 	done
 	if ["$2" == "D"]
 	then
@@ -13,10 +13,8 @@ latex() {
 dot() {
 	for f in *.dot
 	do
-		dot -Tps2 "$f" -o "$(basename -- $f).ps"
-		ps2pdf "$(basename -- $f).ps"
-		del "$(basename -- $f).ps"
-		xdg-open "$(basename -- $f).pdf"
+		dot -Tsvg "$f" -o "${f%.*}.svg"
+		xdg-open "${f%.*}.svg"
 	done
 	if ["$2" == "L"]
 	then
@@ -30,4 +28,17 @@ then
 elif [ "$1" == "D" ]
 then
 	dot
+else
+	if [ -f "$1" ]; then
+		echo "test"
+		if [ ${1: -4} == ".dot" ]; then
+			dot -Tsvg "$1" -o "${1%.*}.svg"
+			xdg-open "${1%.*}.svg"
+		elif [ ${1: -4} == ".tex" ]; then
+			pdflatex "$1"
+			xdg-open "${1%.*}.pdf"
+		fi
+	else
+		echo "File not found"
+	fi
 fi

@@ -2,10 +2,6 @@ package com.github.juupje.calculator.helpers;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,7 +11,6 @@ import java.util.Set;
 
 import com.github.juupje.calculator.algorithms.Functions.Function;
 import com.github.juupje.calculator.graph.Graph;
-import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Parser;
@@ -35,7 +30,6 @@ import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MVectorFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
-import com.github.juupje.calculator.settings.Arguments;
 import com.github.juupje.calculator.settings.Settings;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
@@ -131,7 +125,7 @@ public class Printer {
 				printNodeDot(sb, tree.root, connectParent);
 			sb.append("labelloc=\"t\"\nlabel=\"").append(name).append("\"\n}").append(newLine);
 		try {
-			Calculator.ioHandler.writeToFile(getDefaultPath() + name + ".dot", sb, false);
+			Calculator.ioHandler.writeToFile(name + ".dot", sb, false);
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
 		}
@@ -160,7 +154,7 @@ public class Printer {
 			}
 			sb.append("}").append(newLine);
 		try {
-			Calculator.ioHandler.writeToFile(getDefaultPath()+name+".dot", sb, false);
+			Calculator.ioHandler.writeToFile(name+".dot", sb, false);
 		} catch (IOException e) {
 			Calculator.errorHandler.handle(e);
 		}
@@ -288,7 +282,6 @@ public class Printer {
 			toLatex(sb, (MathObject) n.data);
 		else
 			sb.append(n.toString());
-		sb.append(newLine);
 	}
 
 	private static void toLatex(StringBuilder sb, MConst c) {
@@ -832,7 +825,7 @@ public class Printer {
 		if (params.length == 2)
 			lastLatexFileName = params[1].trim();
 		else if (lastLatexFileName == null)
-			lastLatexFileName = findAvailableName("output_latex", "tex");
+			lastLatexFileName = Calculator.ioHandler.findAvailableName("output_latex", "tex");
 		printLatex(toLatex(mo), lastLatexFileName);
 	}
 
@@ -858,7 +851,7 @@ public class Printer {
 		if (params.length == 2)
 			name = params[1];
 		else
-			name = findAvailableName("output_dot", "dot");
+			name = Calculator.ioHandler.findAvailableName("output_dot", "dot");
 
 		if (params[0].equals("dependencies")) {
 			printDot(Calculator.dependencyGraph, name);
@@ -903,8 +896,12 @@ public class Printer {
 		if (params.length == 2)
 			lastTextFileName = params[1].trim();
 		else if (lastTextFileName == null)
-			lastTextFileName = findAvailableName("output_text", "txt");
-		printText(toText(mo), lastTextFileName, "tex");
+			lastTextFileName = Calculator.ioHandler.findAvailableName("output_text", "txt");
+		try {
+			Calculator.ioHandler.writeToFile(lastTextFileName, toText(mo), false);
+		} catch(IOException e) {
+			Calculator.errorHandler.handle("Failed to write to file", e);
+		}
 	}
 
 	/**
@@ -923,10 +920,10 @@ public class Printer {
 	 */
 	private static void printLatex(String str, String name) {
 		try {
-			File f = new File(getDefaultPath() + name + ".tex");
+			File f = Calculator.ioHandler.getFile(name, "tex");
 			StringBuilder sb = new StringBuilder();
 			if (f.exists()) {
-				String s = Calculator.ioHandler.readFile(f.toPath());
+				String s = Calculator.ioHandler.readFileToString(f);
 				int index = s.indexOf(latexEnd);
 				sb.append(s.substring(0, index == -1 ? 0 : index)+newLine);
 				sb.append(name.replace("_", " \\_")).append(":").append(newLine)
@@ -943,29 +940,6 @@ public class Printer {
 		}
 	}
 
-	/**
-	 * Prints the given String to a file with the given name. If a file with the
-	 * given name already exists, the String will be appended.
-	 * 
-	 * @param str      the {@code String} to be printed.
-	 * @param fileName the name of the file to which <tt>str</tt> will be printed
-	 *                 to.
-	 * @param ext	   the extension of the file. 
-	 */
-	private static File printText(String str, String fileName, String ext) {
-		try {
-			File f = new File(getDefaultPath() + fileName + "." + ext);
-			if (f.exists())
-				Files.write(f.toPath(), (System.lineSeparator() + str).getBytes(), StandardOpenOption.APPEND);
-			else
-				Files.write(f.toPath(), str.getBytes());
-			return f;
-		} catch (IOException | InvalidPathException e) {
-			Calculator.errorHandler.handle(e);
-			return null;
-		}
-	}
-
 	public static void export(String arg) {
 		String[] args = Parser.getArguments(arg);
 		boolean temp = Settings.getBool(Settings.MULTILINE_MATRIX);
@@ -973,10 +947,10 @@ public class Printer {
 		try {
 			File f;
 			if(args.length==1 && args[0].length() != 0) {
-				f = printText(exportAll(), args[0], "cal");
+				f = Calculator.ioHandler.writeToFile(args[0] + ".cal", exportAll(), false);
 			} if(args.length==0 || (args.length==1 && args[0].length() == 0)) {
-				String name = findAvailableName("export", "cal");
-				f = printText(exportAll(), name, "cal");
+				String name = Calculator.ioHandler.findAvailableName("export", "cal");
+				f = Calculator.ioHandler.writeToFile(name + ".cal", exportAll(), false);
 			} else {
 				String filename = args[args.length-1];
 				ArrayList<Variable> toBeExported = new ArrayList<>(args.length-1);
@@ -1008,7 +982,7 @@ public class Printer {
 						if(n.start==0 && toBeExported.contains(n.getData()))
 							time = DFS(n, time+1, export, exported);
 				}
-				f = printText(export.toString(), filename, "cal");
+				f = Calculator.ioHandler.writeToFile(filename+".cal", export, false);
 			}
 			if(f != null)
 				Calculator.ioHandler.out("Saved export file to: " + f.getAbsolutePath());
@@ -1021,7 +995,7 @@ public class Printer {
 		}
 	}
 	
-	private static String exportAll() {		
+	public static StringBuilder exportAll() {		
 		StringBuilder export = new StringBuilder();
 		HashSet<String> exported = new HashSet<String>();
 		for(Entry<String, MathObject> entry : Variables.getAll().entrySet()) {
@@ -1036,7 +1010,7 @@ public class Printer {
 		for(Graph<Variable>.Node n : Calculator.dependencyGraph.getNodes())
 			if(n.start==0)
 				time = DFS(n, time+1, export, exported);
-		return export.toString();
+		return export;
 	}
 	
 	private static int DFS(Graph<Variable>.Node n, int time, StringBuilder s, HashSet<String> exported) {
@@ -1181,40 +1155,5 @@ public class Printer {
 			return str;
 		String exp = str.substring(index+1);
 		return str.substring(0, index)+"\\cdot10^{"+(exp.charAt(0)=='+' ? exp.substring(1) : exp)+"}";
-	}
-
-	/**
-	 * Finds a numeric suffix <tt>num>0</tt> (an integer bigger than 0) such that a
-	 * file with the name{@code name + num + "." + ext} does not exist.
-	 * 
-	 * @param name the name for which the suffix will be sought.
-	 * @param ext  the file extension to the filename.
-	 * @return the found filename.
-	 */
-	public static String findAvailableName(String name, String ext) {
-		int num = 0;
-		File file;
-		if(name.length()==0 || !isPathValid(name + "." + ext)) {
-			throw new UnexpectedCharacterException(name + "." + ext + " is not a valid filename.");
-		}
-		do {
-			file = new File(getDefaultPath() + name + num++ + "." + ext);
-		} while (file.exists());
-		return file.getName().substring(0, file.getName().lastIndexOf("."));
-	}
-
-	public static boolean isPathValid(String path) {
-        try {
-            Paths.get(path);
-        } catch (InvalidPathException ex) {
-            return false;
-        }
-        return true;
-    }
-	
-	public static String getDefaultPath() {
-		if(Arguments.exists(Arguments.WORK_DIR))
-			return Arguments.get(Arguments.WORK_DIR);
-		return "";
 	}
 }
