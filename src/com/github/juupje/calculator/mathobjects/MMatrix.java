@@ -386,11 +386,11 @@ public class MMatrix extends MIndexable {
 								+ other.shape() + " and " + shape);
 		} else {
 			if (shape.rows() == 1) {
-				MathObject[][] m = new MathObject[other.size][shape.cols()];
-				for (int i = 0; i < m.length; i++)
-					for (int j = 0; j < m[0].length; j++)
-						m[i][j] = Operator.MULTIPLY.evaluate(other.get(i), m[0][j]);
-				return new MMatrix(m);
+				MathObject[][] result = new MathObject[other.size][shape.cols()];
+				for (int i = 0; i < result.length; i++)
+					for (int j = 0; j < result[0].length; j++)
+						result[i][j] = Operator.MULTIPLY.evaluate(other.get(i), m[0][j]);
+				return new MMatrix(result);
 			} else
 				throw new ShapeException(
 						"The column-vector/matrix product is only defined for an n-vector and (1 x m)-matrix, got "
@@ -618,7 +618,7 @@ public class MMatrix extends MIndexable {
 
 	@Override
 	public String toString() {
-		return Printer.toText(m);
+		return Printer.toText(this);
 	}
 
 	/**

@@ -4,7 +4,6 @@ import java.io.File;
 
 import com.github.juupje.calculator.graph.Graph;
 import com.github.juupje.calculator.helpers.ErrorHandler;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
@@ -51,7 +50,7 @@ public class Calculator {
 		running = true;
 		if(Arguments.exists(Arguments.RUN))
 			try {
-				Interpreter.execute(new File(Printer.getDefaultPath() + Arguments.get(Arguments.RUN)));
+				Interpreter.execute(new File(Calculator.ioHandler.getDefaultPath() + Arguments.get(Arguments.RUN)));
 			} catch (UnexpectedCharacterException | InvalidFunctionException | TreeException | CircularDefinitionException | ShapeException e) {
 				errorHandler.handle(e);
 			}

@@ -432,7 +432,7 @@ public enum Operator {
 							MMatrix m = (MMatrix) a;
 							for(int k = 0, j = beginEnd[0]; j < beginEnd[1]; j++, k++)
 								result[k] = m.get(row, j);
-							return new MVector(result);	
+							return new MVector(result).transpose();//this is a row vector
 						} else
 							throw new IndexException("Expected 2nd argument to be positive integer or vector/slice, got " + b[1]);
 					} else if(b[0] instanceof MVector) {

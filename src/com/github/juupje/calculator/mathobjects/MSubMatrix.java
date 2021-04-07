@@ -379,6 +379,8 @@ public class MSubMatrix extends MIndexable {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(p.m, rstart, rend-1, cstart, cend-1);
+		StringBuilder sb = new StringBuilder();
+		Printer.toText(sb, p.m, rstart, rend-1, cstart, cend-1);
+		return sb.toString();
 	}
 }
