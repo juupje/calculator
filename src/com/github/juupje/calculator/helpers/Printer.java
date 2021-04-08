@@ -45,7 +45,7 @@ public class Printer {
 	 * <pre>
 	 * {@code
 	 * \documentclass[preview]{standalone}
-	 * \ usepackage{amsmath}
+	 * \'usepackage{amsmath}
 	 * \author{Calculator - By Joep Geuskens}
 	 * \begin{document}
 	 * </pre>

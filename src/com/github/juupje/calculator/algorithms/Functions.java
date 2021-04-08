@@ -694,8 +694,8 @@ public class Functions {
 	}
 
 	public static MScalar det(MMatrix m) {
-		if (m instanceof MMatrix && ((MMatrix) m).isSquare()) {
-			return ((MMatrix) m).det();
+		if (m.isSquare()) {
+			return m.det();
 		}
 		throw new IllegalArgumentException(
 				"The determinant is only defined for (square) matrices, got shape " + m.shape());

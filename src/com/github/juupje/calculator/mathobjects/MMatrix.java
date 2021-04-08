@@ -493,10 +493,12 @@ public class MMatrix extends MIndexable {
 				throw new InvalidOperationException("Cannot calculate determinant of non-numeric matrix");
 			}
 		}
-		MVector lup = new LUDecomposition(evaluate()).execute();
+		LUDecomposition decomp = new LUDecomposition(evaluate());
+		MVector lup = decomp.execute();
 		MMatrix L = (MMatrix) lup.get(0);
 		MMatrix U = (MMatrix) lup.get(1);
-		MReal det = new MReal(1);
+		//Take the determinant of the permutation matrix into account
+		MReal det = new MReal(decomp.getPermutationCount()%2==0 ? 1 : -1);
 		for(int i = 0; i < L.shape.rows(); i++) {
 			det.multiply(((MScalar) L.get(i, i))).multiply(((MScalar) U.get(i, i)));
 		}

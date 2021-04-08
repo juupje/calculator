@@ -12,6 +12,7 @@ public class LUDecomposition extends Algorithm {
 
 	Shape shape;
 	DoubleMatrixToolkit mtk;
+	int permutations = 0;
 	
 	public LUDecomposition() {}
 	
@@ -27,6 +28,7 @@ public class LUDecomposition extends Algorithm {
 	@Override
 	public MVector execute() {
 		if(!prepared) return null;
+		permutations = 0;
 		return lu();
 	}
 	
@@ -40,7 +42,9 @@ public class LUDecomposition extends Algorithm {
 		for(int col = 0; col < n; col++) {
 			int pivotIndex = pivotColumn(col);
 			if(pivotIndex != col) {
-				int temp = order[col]; order[col] = order[pivotIndex]; order[pivotIndex] = temp;			
+				//Switch order[col] with order[pivotIndex]
+				permutations++;
+				int temp = order[col]; order[col] = order[pivotIndex]; order[pivotIndex] = temp;		
 			}
 			L[col][col]=1;
 			for(int row = col+1; row < mtk.rows; row++) {
@@ -70,6 +74,10 @@ public class LUDecomposition extends Algorithm {
 			}
 		mtk.switchRows(col, indexMax);
 		return indexMax;
+	}
+	
+	public int getPermutationCount() {
+		return permutations;
 	}
 	
 	@Override
