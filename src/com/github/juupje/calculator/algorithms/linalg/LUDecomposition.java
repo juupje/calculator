@@ -3,7 +3,10 @@ package com.github.juupje.calculator.algorithms.linalg;
 import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
+import com.github.juupje.calculator.mathobjects.MIndexable;
+import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
+import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
@@ -13,6 +16,8 @@ public class LUDecomposition extends Algorithm {
 	Shape shape;
 	DoubleMatrixToolkit mtk;
 	int permutations = 0;
+	private static final double TOLERANCE = 1e-10;
+	boolean degenerate = false;
 	
 	public LUDecomposition() {}
 	
@@ -26,38 +31,91 @@ public class LUDecomposition extends Algorithm {
 	}
 	
 	@Override
-	public MVector execute() {
+	public MIndexable execute() {
 		if(!prepared) return null;
 		permutations = 0;
-		return lu();
+		int[] order = lu();
+		return expand(mtk.matrix, order);
 	}
 	
-	protected MVector lu() {
+	/**
+	 * Changes mtk.matrix such that it equals (L-I)+U where L is a lower triangular matrix
+	 * with 1's on the diagonal and U an upper triangular matrix, such that LU=PA, where P is a permutation matrix.
+	 * The permutation matrix is stored in an integer array which i-th value corresponds to the element in the i-th row 
+	 * of P which equals 1.
+	 * L can be reconstructed by taking the lower triangular part of mtk.matrix and setting the diagonals to 1.
+	 * U can be reconstructed by taking the upper triangular part of mtk.matrix (including the diagonal).
+	 * @return the order vector which can be used to construct P
+	 */
+	protected int[] lu() {
 		int n = mtk.cols;
-		double[][] L = new double[n][n];
-		int[][] P = new int[n][n];
 		int[] order = new int[n];
-		for(int i = 0; i < n; i++) order[i] = i;
 		
+		//set the order to unity
+		for(int i = 0; i < n; i++) order[i] = i;
 		for(int col = 0; col < n; col++) {
-			int pivotIndex = pivotColumn(col);
-			if(pivotIndex != col) {
-				//Switch order[col] with order[pivotIndex]
+			//Find pivot row
+			int pivot = findPivotIndex(col);
+			//Check if the matrix is degenerate
+			if(Math.abs(mtk.matrix[pivot][col])<TOLERANCE) {
+				degenerate=true;
+				//throw new RuntimeException("LU-Decomposition failed, matrix is (near-)degenerate");
+				continue;
+			}
+			
+			if(pivot != col) {
+				//We need to pivot row 'pivot' with row 'col'
+				//Switch order[col]<->order[pivot]
+				int temp = order[col];
+				order[col] = order[pivot];
+				order[pivot] = temp;
+				
+				mtk.switchRows(col, pivot);
 				permutations++;
-				int temp = order[col]; order[col] = order[pivotIndex]; order[pivotIndex] = temp;		
 			}
-			L[col][col]=1;
-			for(int row = col+1; row < mtk.rows; row++) {
-				L[row][col] = mtk.matrix[row][col]/mtk.matrix[col][col];
-				mtk.matrix[row][col] = 0d;
-				for(int i = col+1; i < mtk.cols; i++)
-					mtk.matrix[row][i] -= L[row][col]*mtk.matrix[col][i];
+			
+			for(int row = col+1; row < n; row++) {
+				mtk.matrix[row][col] /= mtk.matrix[col][col];
+				for(int k = col+1; k < n; k++)
+					mtk.matrix[row][k] -= mtk.matrix[row][col]*mtk.matrix[col][k];
 			}
 		}
-		for(int row = 0; row < mtk.rows; row++) {
-			P[row][order[row]] = 1;
+		return order;
+	}
+	
+	/**
+	 * Using the output of {@link #lu()} this method reconstructs the matrices L, U and P.
+	 * @param matrix the changed mtk.matrix of {@code lu()}
+	 * @param order the returned array of {@code lu()}
+	 * @return an MIndexedObject which equals [L, U, P]
+	 */
+	private MIndexedObject expand(Double[][] matrix, int[] order) {
+		int n = matrix.length;
+		MReal[][] L = new MReal[n][n];
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(i==j) L[i][i] = new MReal(1); //Diagonal
+				else if(i>j) L[i][j] = new MReal(mtk.matrix[i][j]); //row>col -> below diagonal
+				else L[i][j] = new MReal(0); //above diagonal
+			}
 		}
-		return new MVector(new MMatrix(L), new MMatrix(mtk.matrix), new MMatrix(P));
+		
+		MReal[][] U = new MReal[n][n];
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(j>=i) U[i][j] = new MReal(mtk.matrix[i][j]);//col>=row -> diagonal or above
+				else U[i][j] = new MReal(0);
+			}
+		}
+		
+		MReal[][] P = new MReal[n][n];
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(order[i]==j) P[i][j] = new MReal(1);
+				else P[i][j] = new MReal(0);
+			}
+		}
+		return new MIndexedObject(new Shape(3), new MathObject[] {new MMatrix(L), new MMatrix(U), new MMatrix(P)});
 	}
 	
 	/**
@@ -76,12 +134,30 @@ public class LUDecomposition extends Algorithm {
 		return indexMax;
 	}
 	
+	/**
+	 * Finds the row at index {@code row>=col} which contains the highest absolute value in column {@code col}.
+	 * This row can be pivoted with the {@code col}-th row for numerical stability.
+	 * @param col the index of the column
+	 * @return the pivot row of column {@code col}
+	 */
+	private int findPivotIndex(int col) {
+		double max = 0, curr_abs;
+		int indexMax = col;
+		for(int row = col; row < mtk.cols; row++) {
+			if((curr_abs = Math.abs(mtk.matrix[row][col])) > max) {
+				max = curr_abs;
+				indexMax = row;
+			}
+		}
+		return indexMax;
+	}
+	
 	public int getPermutationCount() {
 		return permutations;
 	}
 	
 	@Override
-	public MVector execute(MathObject... args) {
+	public MIndexable execute(MathObject... args) {
 		prepare(args);
 		return execute();
 	}

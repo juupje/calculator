@@ -494,7 +494,7 @@ public class MMatrix extends MIndexable {
 			}
 		}
 		LUDecomposition decomp = new LUDecomposition(evaluate());
-		MVector lup = decomp.execute();
+		MIndexable lup = decomp.execute();
 		MMatrix U = (MMatrix) lup.get(1);
 		//Take the determinant of the permutation matrix into account
 		MReal det = new MReal(decomp.getPermutationCount()%2==0 ? 1 : -1);

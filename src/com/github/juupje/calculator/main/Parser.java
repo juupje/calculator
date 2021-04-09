@@ -18,10 +18,10 @@ import com.github.juupje.calculator.mathobjects.MConst;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MFunction;
+import com.github.juupje.calculator.mathobjects.MIndexable;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
-import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
@@ -412,7 +412,7 @@ public class Parser {
 					//else
 						//throw new UnexpectedCharacterException("Expected '(' after a function instead of '" + (char) ch + "'.");
 				} //No 'else if' because if the result from the MFunction is a matrix or vector, it the following if-statement can be applied as well.
-				if(d instanceof MVector || d instanceof MMatrix || d instanceof MSequence) {
+				if(d instanceof MIndexable) {
 					do {
 						if(consume('[')) {
 							d = ELEMENT.evaluate(d, toSliceObject(Interpreter.extractIndex(expr,pos-1), d.shape()));

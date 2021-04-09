@@ -1,5 +1,6 @@
 bin/
 plugins/
+python/
 a.exe
 gaussquad.cpp
 *.aux
