@@ -7,6 +7,7 @@ import com.github.juupje.calculator.algorithms.algebra.range.ArrayRange;
 import com.github.juupje.calculator.algorithms.algebra.range.IndexRange;
 import com.github.juupje.calculator.algorithms.algebra.range.RangeIterator;
 import com.github.juupje.calculator.algorithms.algebra.range.SimpleRange;
+import com.github.juupje.calculator.algorithms.linalg.LUDecomposition;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
@@ -363,6 +364,31 @@ public enum Operator {
 			if(b.length==0)
 			return a;
 		throw new InvalidOperationException("Can only transpose one mathobject, got " + (b.length+1));
+		}
+	},
+	
+	SOLVE {
+		@Override
+		public MVector evaluate(MathObject a, MathObject... b) {
+			if(b.length!=1)
+  				throw new InvalidOperationException("Solve operator expected two arguments, got " + (b.length+1));
+			if(a instanceof MMatrix && b[0] instanceof MVector) {
+				return new LUDecomposition((MMatrix) a).solve((MVector) b[0]);
+			} else
+				throw new InvalidOperationException("Solve operator expected arguments matrix and vector, got " + Tools.type(a) + ", " + Tools.type(b[0]));				
+		}
+		
+		@Override
+		public Shape shape(Shape a, Shape... b) {
+			if(b.length!=1)
+				throw new InvalidOperationException("Solve operator expected two arguments, got " + (b.length+1));
+			if(a.dim()!=2)
+				throw new InvalidOperationException("Solve operator expected left-hand side to be a matrix, got shape " + a);
+			if(b[0].dim()!=1)
+ 				throw new InvalidOperationException("Solve operator expected right-hand side to be a vector, got shape " + b[0]);
+			if(a.get(1)!=b[0].get(0))
+				throw new InvalidOperationException("Shapes do not match: " + a + " and " + b[0]);
+			return new Shape(a.get(0));
 		}
 	},
 	

@@ -38,6 +38,49 @@ public class LUDecomposition extends Algorithm {
 		return expand(mtk.matrix, order);
 	}
 	
+	@Override
+	public MIndexable execute(MathObject... args) {
+		prepare(args);
+		return execute();
+	}
+	
+	/**
+	 * Returns vector {@code x} that solves the equation {@code Ax=b} using the results of the LU decomposition.
+	 * @param b MVector
+	 * @return a MVector which equals {@code x=inv(A)b}
+	 */
+	public MVector solve(MVector b) {
+		if(!prepared) return null;
+		permutations = 0;
+		int[] order = lu();
+		int n = mtk.matrix.length;
+		double[] y = new double[n];
+		//First, we solve Ly=Pb -> Forward solve
+		try {
+			for(int i = 0; i < n; i++) {
+				y[i] = ((MReal)b.get(order[i])).getValue(); //apply matrix P to b
+				/*   /1 0 0 ... 0 \ /y0\    /b[P[0]]\
+				 *   |* 1 0 ... 0 | |y1|  = |b[P[1]]|
+				 * 
+				 *   \* * * ... 1 / \yn/    \b[P[n]]/
+				 */
+				for(int j = 0; j < i; j++)
+					y[i] -= mtk.matrix[i][j]*y[j];
+			}
+			
+			//Solve Ux=y -> backward solve
+			double[] x = y;
+			for(int i = n-1; i >= 0; i--) {
+				for(int j = i+1; j < n; j++)
+					x[i] -= mtk.matrix[i][j]*x[j];
+				x[i] /= mtk.matrix[i][i];
+			}
+			return new MVector(x);
+		} catch(ClassCastException e) {
+			throw new IllegalArgumentException("Could not solve for non-numeric or complex vector");
+		}
+	}
+	
 	/**
 	 * Changes mtk.matrix such that it equals (L-I)+U where L is a lower triangular matrix
 	 * with 1's on the diagonal and U an upper triangular matrix, such that LU=PA, where P is a permutation matrix.
@@ -119,22 +162,6 @@ public class LUDecomposition extends Algorithm {
 	}
 	
 	/**
-	 * Switches the current row (and index {@code col}) with the row containing the absolute highest entry in the same column below it.
-	 * @return the index of the row with which the row at index {@code col} was switched.
-	 */
-	private int pivotColumn(int col) {
-		double max = Math.abs(mtk.matrix[col][col]);
-		int indexMax = col;
-		for(int i = col+1; i < mtk.rows; i++)
-			if(Math.abs(mtk.matrix[i][col])>max) {
-				max = Math.abs(mtk.matrix[i][col]);
-				indexMax = i;
-			}
-		mtk.switchRows(col, indexMax);
-		return indexMax;
-	}
-	
-	/**
 	 * Finds the row at index {@code row>=col} which contains the highest absolute value in column {@code col}.
 	 * This row can be pivoted with the {@code col}-th row for numerical stability.
 	 * @param col the index of the column
@@ -154,12 +181,6 @@ public class LUDecomposition extends Algorithm {
 	
 	public int getPermutationCount() {
 		return permutations;
-	}
-	
-	@Override
-	public MIndexable execute(MathObject... args) {
-		prepare(args);
-		return execute();
 	}
 	
 	@Override
@@ -188,5 +209,4 @@ public class LUDecomposition extends Algorithm {
 		}
 		throw new IllegalArgumentException("Algorithm not defined for shapes " + Tools.join(", ", (Object[]) shapes));
 	}
-
 }

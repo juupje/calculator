@@ -16,6 +16,7 @@ public enum Algorithms {
 	REF(new GaussianElimination()),
 	RREF(new JordanElimination()),
 	LU(new LUDecomposition()),
+	SOLVE(new LUSolver()),
 	QR(new QRDecomposition()),
 	DIAG(new Diagonal()),
 	ID(new MatrixGenerator(MatrixGenerator.Type.ID)),
