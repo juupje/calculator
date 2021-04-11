@@ -301,6 +301,10 @@ public class Parser {
 			p = p.parent;
 			p.right(getFactor());
 			return p;
+		} else if(consume('\\')) {
+			tree.insert(p, new Node<Operator>(SOLVE), Node.LEFT);
+			p = p.parent;
+			p.right(getFactor());
 		/*} else if (consume('^')) {
 			tree.insert(p, new Node<Operator>(POWER), Node.LEFT);
 			p = p.parent;
@@ -345,6 +349,8 @@ public class Parser {
 				d = CROSS.evaluate(d, processFactor());
 			else if (consume('/'))
 				d = DIVIDE.evaluate(d, processFactor());
+			else if(consume('\\'))
+				d = SOLVE.evaluate(d, processFactor());
 			else if (pos < expr.length() && Character.isLetter(ch))
 				d = MULTIPLY.evaluate(d, processFactor());
 			else if (consume('[')) {
