@@ -82,6 +82,23 @@ public class LUDecomposition extends Algorithm {
 	}
 	
 	/**
+	 * Calculates the determinant using the lu decomposition.
+	 * if {@code PA=LU}, then {@code det(P)det(A)=det(L)det(U) => det(A)=det(P)*det(U)}
+	 * because {@code det(L)=prod_i L_ii=1} and {@code det(P)=+-1}.
+	 * The determinant of U can be found by multiplying the diagonal entries together.
+	 * @return the determinant of the matrix
+	 */
+	public double det() {
+		if(!prepared) return Double.NaN;
+		permutations = 0;
+		lu();
+		double dot = permutations%2==0 ? 1 : -1;
+		for(int i = 0; i < mtk.matrix.length; i++)
+			dot *= mtk.matrix[i][i];
+		return dot;
+	}
+	
+	/**
 	 * Changes mtk.matrix such that it equals (L-I)+U where L is a lower triangular matrix
 	 * with 1's on the diagonal and U an upper triangular matrix, such that LU=PA, where P is a permutation matrix.
 	 * The permutation matrix is stored in an integer array which i-th value corresponds to the element in the i-th row 

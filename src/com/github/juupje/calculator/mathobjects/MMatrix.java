@@ -485,7 +485,6 @@ public class MMatrix extends MIndexable {
 	public MScalar det() {
 		if(!isSquare())
 			throw new ShapeException("Determinant is only defined for square matrices. Shape: " + shape);
-		//Decompose the matrix into LU decomposition and use Det(A)=Det(PLU)=Det(P)Det(L)Det(U)=Det(L)Det(U)
 		if(m.length==2) {
 			try {
 				return ((MScalar) m[0][0].evaluate()).multiply((MScalar) m[1][1].evaluate()).subtract(((MScalar)m[0][1].evaluate()).multiply((MScalar)m[1][0].evaluate()));
@@ -493,15 +492,9 @@ public class MMatrix extends MIndexable {
 				throw new InvalidOperationException("Cannot calculate determinant of non-numeric matrix");
 			}
 		}
+		//Decompose the matrix into LU decomposition and use Det(A)=Det(PLU)=Det(P)Det(L)Det(U)=Det(P)Det(U)
 		LUDecomposition decomp = new LUDecomposition(evaluate());
-		MIndexable lup = decomp.execute();
-		MMatrix U = (MMatrix) lup.get(1);
-		//Take the determinant of the permutation matrix into account
-		MReal det = new MReal(decomp.getPermutationCount()%2==0 ? 1 : -1);
-		for(int i = 0; i < U.shape.rows(); i++) {
-			det.multiply((MScalar) U.get(i, i));
-		}
-		return det;	
+		return new MReal(decomp.det());	
 	}
 	
 	public MMatrix pow(int i) {
