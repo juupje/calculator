@@ -9,7 +9,7 @@ The goal of this program is to be an all-round calculator based on console-input
   - A function to evaluate expressions which use the einstein summation convention for indexed objects (like matrices or vectors)
   - Various methods to output object to LaTeX codes, to generate the computational graphs of expressions and functions using GraphViz's Dot language, and to save/restore sessions or specific variables
   - A help function which shows the syntax of available commands and what those commands compute
-  - A simple API system which allows users to add plugins (see my [TeXer](https://github.com/juupje/TeXer) and [Plotter](https://github.com/juupje/Plotter projects))
+  - A simple API system which allows users to add plugins (see my [TeXer](https://github.com/juupje/TeXer) and [Plotter](https://github.com/juupje/Plotter) projects)
   - A collection of physical constants.
  
   For details, look at the [documentation PDF](documentation.pdf) (which is admittedly a bit outdated). Suggestions and bug reports are always welcome!
