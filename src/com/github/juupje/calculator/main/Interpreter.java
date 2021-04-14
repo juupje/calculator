@@ -114,15 +114,7 @@ public class Interpreter {
 					Calculator.errorHandler.handle(e);
 					return;
 				}
-				MathObject old = Variables.get(name);
 				Variables.set(name, result);
-				if(Calculator.dependencyGraph.isCyclic()) {
-					if(old==null)
-						Variables.remove(name);
-					else
-						Variables.set(name, old);
-					throw new CircularDefinitionException(result);
-				}
 			} else
 				Variables.set(name, result);
 			if(!Arguments.getBool(Arguments.SILENT_ANSWERS))

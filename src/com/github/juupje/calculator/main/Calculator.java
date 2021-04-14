@@ -56,6 +56,11 @@ public class Calculator {
 			}
 	}
 	
+	public static void reset() {
+		dependencyGraph.clear();
+		Variables.reset();
+	}
+	
 	public static boolean isRunning() {
 		return running;
 	}

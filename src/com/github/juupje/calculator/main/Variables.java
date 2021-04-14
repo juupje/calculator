@@ -2,6 +2,7 @@ package com.github.juupje.calculator.main;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MSequence;
@@ -20,12 +21,43 @@ public final class Variables {
 		return vars.get(key);
 	}
 	
+	/**
+	 * Stores a variable with name {@code key} and value {@code value} as a key-value pair.
+	 * Additionally, if the value is an expression or sequence, a check is made to see if this
+	 * value is dependend on its own value, using {@code Calculator.dependencyGraph.isCyclic()}
+	 * 
+	 * @param key the name of the variable
+	 * @param value the value of the variable
+	 * @throws CircularDefinitionException if this variable depends on itself
+	 */
 	public static void set(String key, MathObject value) {
+		key = key.trim();
+		Variable toCheckCyclicity = null;
+		MathObject old = null;
 		if(value instanceof MExpression) {
-			Calculator.dependencyGraph.setConnections(new Variable(key), ((MExpression) value).getDependencies());
-		} else if(value instanceof MSequence)
-			Calculator.dependencyGraph.setConnections(new Variable(key), ((MSequence) value).getFunction().getDependencies());			
-		vars.put(key.trim(), value);
+			old = get(key);
+			toCheckCyclicity = new Variable(key);
+			Calculator.dependencyGraph.setConnections(toCheckCyclicity, ((MExpression) value).getDependencies());
+		} else if(value instanceof MSequence) {
+			old = get(key);
+			toCheckCyclicity = new Variable(key);
+			Calculator.dependencyGraph.setConnections(toCheckCyclicity, ((MSequence) value).getFunction().getDependencies());			
+		}
+		//Check if the new variable results in a cyclic definition
+		if(toCheckCyclicity != null) {
+			if(Calculator.dependencyGraph.isCyclic()) {
+				//Yep, it is cyclic: revert the dependencyGraph
+				if(old==null || !(old instanceof MSequence || old instanceof MExpression))
+					Calculator.dependencyGraph.remove(new Variable(key));
+				else
+					Calculator.dependencyGraph.setConnections(new Variable(key),
+							(old instanceof MSequence ? ((MSequence)old).getFunction() : (MExpression) old).getDependencies());
+				throw new CircularDefinitionException(value);
+			}
+		}
+		//Save te variable to the map
+		vars.put(key, value);
+		//Call the change listeners of the objects which depend on this variable
 		Calculator.dependencyGraph.onValueChanged(new Variable(key));
 	}
 	
@@ -35,6 +67,15 @@ public final class Variables {
 
 	public static void remove(String string) {
 		vars.remove(string);
+	}
+	
+	/**
+	 * Remove all variables and the entire answer history.
+	 * Should only be called from {@link Calculator#reset()}.
+	 */
+	public static void reset() {
+		vars.clear();
+		ans.clear();
 	}
 	
 	public static int ans(MathObject mo) {

@@ -147,7 +147,8 @@ public class Printer {
 			StringBuilder sb = new StringBuilder();
 			sb.append("digraph dependencies {").append(newLine);
 			for (Graph<?>.Node n : g.getNodes()) {
-				sb.append(n.hashCode()).append("[label=\"").append(n.toString()).append("\"];").append(newLine);
+				sb.append(n.hashCode()).append("[label=<").append(n.toString())
+				.append("<br/><font point-size=\"10\">").append(n.start).append(" : ").append(n.finish).append("</font>>];").append(newLine);
 				for (Graph<?>.Edge e : n.getEdges())
 					if(e.getA().equals(n))
 						sb.append(e.getA().hashCode()).append("->").append(e.getB().hashCode()).append(newLine);

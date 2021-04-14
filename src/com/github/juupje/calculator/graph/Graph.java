@@ -12,12 +12,17 @@ public class Graph<T> {
 
 	public Node addNode(T var) {
 		Node n = new Node(var);
-		for(Node node : nodes) {
-			if(node.equals(n))
-				return node;
+		if(nodes.contains(n)) {
+			for(Node node : nodes) {
+				if(node.equals(n))
+					return node;
+			}
+			//Shouldn't happen!
+			return null;
+		} else {
+			nodes.add(n);
+			return n;
 		}
-		nodes.add(n);
-		return n;
 	}
 	
 	public void addEdge(Node a, Node b) {
@@ -65,6 +70,10 @@ public class Graph<T> {
 		}
 	}
 	
+	public void clear() {
+		nodes.clear();
+	}
+	
 	public Set<Node> getNodes() {
 		return nodes;
 	}
@@ -82,7 +91,8 @@ public class Graph<T> {
 	private int DFS(Node n, int time) {
 		n.start = time;
 		for(Edge e : n.edges) {
-			if(e.getB().equals(n) && e.getB().start == 0)
+			//This edge goes to another node which hasn't been passed yet
+			if(!e.getB().equals(n) && e.getB().start == 0)
 				time = DFS(e.getB(), time+1);
 		}
 		n.finish = ++time;
@@ -111,6 +121,11 @@ public class Graph<T> {
 		
 		public Node getB() {
 			return b;
+		}
+		
+		@Override
+		public String toString() {
+			return "Edge [" + a.toString() + " -> " + b.toString() + "]";
 		}
 	}
 	
