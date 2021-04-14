@@ -80,7 +80,15 @@ public enum Commands {
 			else
 				Calculator.ioHandler.out(Printer.toText(mo));
 		}
-	}), SETTING(new Command() {
+	}), RESET(new Command() {
+		@Override
+		public void process(String args) {
+			if(args == null || args.length()==0)
+				Calculator.reset();
+			else
+				Calculator.ioHandler.err("reset expected no arguments");
+		}
+	}),	SETTING(new Command() {
 		@Override
 		public void process(String args) {
 			Settings.processCommand(args);

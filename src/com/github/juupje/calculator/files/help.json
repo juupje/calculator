@@ -346,6 +346,12 @@
       "arguments": "a: the name of the variable to be printed to the console.",
       "result": "The variable in text printed to the console."
     },
+    "reset": {
+      "syntax": "reset()",
+      "description": "Resets the current session. This means that all variables (and dependencies) are deleted.",
+      "arguments": "-",
+      "result": "The calculator is put in a state identical to a restart."
+    },
     "setting": {
       "syntax": "setting(key) or setting(key, value)",
       "description": "Prints the setting if only the key is given, or sets the setting to a new value if both key and value are given. If the key equals 'reset' the settings will be reset to their default values. See help(<setting>) or list(setting) for more info.",
