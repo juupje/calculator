@@ -15,7 +15,7 @@ import com.github.juupje.calculator.main.Calculator;
 public class PluginLoader {
 	
 	private static ArrayList<Plugin> loadedPlugins;
-	private static final int minVersion = 4;
+	private static final int minVersion = 5;
 	
 	public static void load(File dir) {
 		if(dir == null)
