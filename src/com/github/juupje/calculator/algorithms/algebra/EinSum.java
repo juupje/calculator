@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
 import com.github.juupje.calculator.algorithms.algebra.range.*;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.EinSumException;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
@@ -31,6 +30,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
+import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.tree.DFSTask;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
@@ -305,7 +305,7 @@ public class EinSum extends Algorithm {
 
 				// The indices of the element operator should be a single node
 				if (n.right().isInternal())
-					throw new EinSumException("The indices of '" + Printer.nodeToText(n) + "' are not independent");
+					throw new EinSumException("The indices of '" + TextPrinter.nodeToText(n) + "' are not independent");
 
 				n.addIndices(leftIndices);
 				// We need to find the shape of the left child
@@ -313,10 +313,10 @@ public class EinSum extends Algorithm {
 				try {
 					leftShape = getShape(n.left());
 				} catch (TreeException | ShapeException e) {
-					throw new EinSumException("Cannot determine the shape of '" + Printer.nodeToText(n.left()) + "'");
+					throw new EinSumException("Cannot determine the shape of '" + TextPrinter.nodeToText(n.left()) + "'");
 				}
 				if (leftShape.isScalar())
-					throw new EinSumException("Object '" + Printer.nodeToText(n.left()) + "' not indexable");
+					throw new EinSumException("Object '" + TextPrinter.nodeToText(n.left()) + "' not indexable");
 
 				// Now we find the indices added to this node by the right child (which contains
 				// the indices of the left child)
@@ -384,7 +384,7 @@ public class EinSum extends Algorithm {
 							} else if (entry.getValue() > 2)
 								// no indices should appear more than twice
 								throw new EinSumException(entry.getKey().toString() + " occurs " + entry.getValue()
-										+ " times in term '" + Printer.nodeToText(n) + "'");
+										+ " times in term '" + TextPrinter.nodeToText(n) + "'");
 						}
 					}
 				}
@@ -404,7 +404,7 @@ public class EinSum extends Algorithm {
 							} else if (entry.getValue() > 2)
 								// no indices should appear more than twice
 								throw new EinSumException(entry.getKey().toString() + " occurs " + entry.getValue()
-										+ " times in term '" + Printer.nodeToText(n) + "'");
+										+ " times in term '" + TextPrinter.nodeToText(n) + "'");
 						}
 						// throw an error if any index remains.
 						if (n.getIndices().size() != 0) {

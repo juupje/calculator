@@ -1,10 +1,10 @@
 package com.github.juupje.calculator.mathobjects;
 
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
+import com.github.juupje.calculator.printer.TextPrinter;
 
 public class MIndexedObject extends MIndexable {
 	
@@ -151,7 +151,7 @@ public class MIndexedObject extends MIndexable {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(this);
+		return TextPrinter.toText(this);
 	}
 
 }

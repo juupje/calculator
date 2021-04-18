@@ -4,13 +4,13 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Parser;
 import com.github.juupje.calculator.main.Variable;
+import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.tree.DFSTask;
 import com.github.juupje.calculator.tree.Node;
 
@@ -33,7 +33,7 @@ public class MRecSequence extends MSequence {
 
 	static final Pattern pat = Pattern.compile("\\[(.+?)\\]");
 	public static MRecSequence parseRecursive(String expr) {
-		//definition using recursion: r{[n]=expr([n-k]...[n-1]), *,*} where * represents the values of [1]...[k]
+		//definition using recursion: r{[n]=expr([n-k]...[n-1]), *} where * represents the values of [1]...[k]
 		if(expr.startsWith("{")) {
 			if(expr.endsWith("}"))
 				expr = expr.substring(1,expr.length()-1);
@@ -74,7 +74,7 @@ public class MRecSequence extends MSequence {
 							Node<?> sibling = n.parent.right;
 							if(!(sibling.data.equals(Operator.SUBTRACT) && sibling.left.data.equals(new Variable(indexName))
 										&& sibling.right.data instanceof MReal && ((MReal) sibling.right.data).isInteger()))
-								throw new UnexpectedCharacterException("Expected index to match '" + indexName + "-*', but got " + Printer.nodeToText(sibling));
+								throw new UnexpectedCharacterException("Expected index to match '" + indexName + "-*', but got " + TextPrinter.nodeToText(sibling));
 						}
 					}
 				});
@@ -99,7 +99,7 @@ public class MRecSequence extends MSequence {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(this);
+		return TextPrinter.toText(this);
 	}
 	
 	@Override

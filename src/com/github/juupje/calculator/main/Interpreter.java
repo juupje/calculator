@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import com.github.juupje.calculator.commands.Command;
 import com.github.juupje.calculator.commands.Commands;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
@@ -22,6 +21,7 @@ import com.github.juupje.calculator.mathobjects.MSequence;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
+import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.settings.Arguments;
 
 public class Interpreter {
@@ -48,7 +48,7 @@ public class Interpreter {
 			if(result != null) {
 				Variables.ans(result.copy());
 				if(!Arguments.getBool(Arguments.SILENT_ANSWERS))
-					Calculator.ioHandler.out(Printer.toText(result));
+					Calculator.ioHandler.out(TextPrinter.toText(result));
 			}
 		}
 	}

@@ -3,7 +3,6 @@ package com.github.juupje.calculator.mathobjects;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
@@ -14,6 +13,7 @@ import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Parser;
 import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.main.Variables;
+import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.tree.DFSTask;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
@@ -373,13 +373,13 @@ public class MFunction extends MExpression {
 	}
 
 	/**
-	 * Calls {@link Printer#toText(MExpression)} and returns the result
+	 * Calls {@link TextPrinter#toText(MExpression)} and returns the result
 	 * 
-	 * @return {@code Printer.toText(this);}
+	 * @return {@code TextPrinter.toText(this);}
 	 */
 	@Override
 	public String toString() {
-		return Printer.toText(this);
+		return TextPrinter.toText(this);
 	}
 
 	private class FunctionTree extends Tree {

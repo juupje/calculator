@@ -1,11 +1,11 @@
 package com.github.juupje.calculator.mathobjects;
 
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.main.Parser;
+import com.github.juupje.calculator.printer.TextPrinter;
 
 public class MSequence extends MIndexable {
 	
@@ -135,7 +135,7 @@ public class MSequence extends MIndexable {
 	public static MSequence parse(String expr, boolean defined) {
 		if(expr.startsWith("r{"))
 			return MRecSequence.parseRecursive(expr.substring(1));
-		//definition: {i=1:n, i/n}
+		//definition: {i=1:n, expr(i)}
 		else if(expr.startsWith("{")) {
 			if(expr.endsWith("}"))
 				expr = expr.substring(1,expr.length()-1);
@@ -162,6 +162,6 @@ public class MSequence extends MIndexable {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(this);
+		return TextPrinter.toText(this);
 	}
 }

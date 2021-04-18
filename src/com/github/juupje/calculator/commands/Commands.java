@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.github.juupje.calculator.algorithms.linalg.MatrixToolkit;
 import com.github.juupje.calculator.helpers.Helper;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.Timer;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.CircularDefinitionException;
@@ -21,6 +20,8 @@ import com.github.juupje.calculator.main.Parser;
 import com.github.juupje.calculator.main.Variables;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MathObject;
+import com.github.juupje.calculator.printer.Printer;
+import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.settings.Settings;
 
 public enum Commands {
@@ -78,7 +79,7 @@ public enum Commands {
 			if (mo == null)
 				Calculator.ioHandler.err("There exists no variable with that name.");
 			else
-				Calculator.ioHandler.out(Printer.toText(mo));
+				Calculator.ioHandler.out(TextPrinter.toText(mo));
 		}
 	}), RESET(new Command() {
 		@Override

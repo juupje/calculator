@@ -3,11 +3,11 @@ package com.github.juupje.calculator.mathobjects;
 import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.Norm;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
+import com.github.juupje.calculator.printer.TextPrinter;
 
 public class MVector extends MIndexable {
 	MathObject[] v;
@@ -360,7 +360,7 @@ public class MVector extends MIndexable {
 	
 	@Override
 	public String toString() {
-		return Printer.toText(this) + (transposed ? "'" : "");
+		return TextPrinter.toText(this) + (transposed ? "'" : "");
 	}
 	
 	//###### static methods #####	

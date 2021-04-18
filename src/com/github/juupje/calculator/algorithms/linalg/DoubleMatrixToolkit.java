@@ -1,9 +1,9 @@
 package com.github.juupje.calculator.algorithms.linalg;
 
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
+import com.github.juupje.calculator.printer.TextPrinter;
 
 public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 
@@ -358,7 +358,7 @@ public class DoubleMatrixToolkit extends MatrixToolkit<Double> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		Printer.toText(sb, matrix, rstart, rend, cstart, cend);
+		TextPrinter.toText(sb, matrix, rstart, rend, cstart, cend);
 		return sb.toString();
 	}
 }

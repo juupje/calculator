@@ -5,11 +5,11 @@ import java.util.function.Function;
 
 import com.github.juupje.calculator.algorithms.linalg.JordanElimination;
 import com.github.juupje.calculator.algorithms.linalg.LUDecomposition;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
+import com.github.juupje.calculator.printer.TextPrinter;
 
 public class MMatrix extends MIndexable {
 
@@ -612,7 +612,7 @@ public class MMatrix extends MIndexable {
 
 	@Override
 	public String toString() {
-		return Printer.toText(this);
+		return TextPrinter.toText(this);
 	}
 
 	/**

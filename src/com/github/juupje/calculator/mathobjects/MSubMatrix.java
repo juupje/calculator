@@ -1,12 +1,12 @@
 package com.github.juupje.calculator.mathobjects;
 
 import com.github.juupje.calculator.algorithms.linalg.JordanElimination;
-import com.github.juupje.calculator.helpers.Printer;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.mathobjects.MMatrix.Slice;
+import com.github.juupje.calculator.printer.TextPrinter;
 
 public class MSubMatrix extends MIndexable {
 	private int rstart, rend, cstart, cend;
@@ -380,7 +380,7 @@ public class MSubMatrix extends MIndexable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		Printer.toText(sb, p.m, rstart, rend-1, cstart, cend-1);
+		TextPrinter.toText(sb, p.m, rstart, rend-1, cstart, cend-1);
 		return sb.toString();
 	}
 }

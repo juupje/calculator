@@ -135,7 +135,7 @@ public class IOHandler {
 	}
 	
 	/**
-	 * Prints the given String to a file with the given name.
+	 * Prints the given String to a file with the given name using {@link #writeToFile(File, String, boolean)}.
 	 * 
 	 * @param path     the path of the file to which the content will be printed, relative to the default path.
 	 * @param content  the content which will be printed to the file.
