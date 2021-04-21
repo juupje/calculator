@@ -16,6 +16,8 @@ public class MIndexedObject extends MIndexable {
 			length *= shape.get(i);
 		if(m.length == length)
 			values = m;
+		else
+			throw new ShapeException("List of length " + m.length + " cannot be case into shape " + shape);
 		this.shape = shape;
 	}
 	

@@ -55,13 +55,13 @@ public class ExportPrinter {
 			sb.append(']');
 		} else if(mo instanceof MIndexedObject) {
 			MathObject[] v = ((MIndexedObject) mo).elements();
-			sb.append('{');
+			sb.append('[');
 			for(int i = 0; i < v.length; i++) {
 				export(sb, v[i]);
 				sb.append(",");
 			}
 			sb.setLength(sb.length()-1);
-			sb.append('}').append(((MIndexedObject) mo).shape());
+			sb.append(']').append(((MIndexedObject) mo).shape());
 		} else if(mo instanceof MRecSequence) {
 			MRecSequence rseq = (MRecSequence) mo;
 			sb.append("r{[").append(rseq.getIndexName()).append("]=");

@@ -19,12 +19,15 @@ import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MIndexable;
+import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
+import com.github.juupje.calculator.mathobjects.MVectorFunction;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
+import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.tree.Node;
 import com.github.juupje.calculator.tree.Tree;
 
@@ -157,7 +160,7 @@ public class Parser {
 			if(ch == '[') count++;
 			if(ch == ']') count--;
 			nextChar();
-		}	
+		}
 		return new VectorParser(expr.substring(position, pos-1), extraVariables).parse(defined);
 	}
 	
@@ -169,8 +172,23 @@ public class Parser {
 			if(ch == '(') count++;
 			if(ch == ')') count--;
 			nextChar();
-		}	
-		return (MVector) new VectorParser(expr.substring(position, pos-1), extraVariables).parse(false);
+		}
+		try {
+			return (MVector) new VectorParser(expr.substring(position, pos-1), extraVariables).parse(false);
+		} catch(ClassCastException e) {
+			throw new UnexpectedCharacterException("Unexpected ';' in parameters");
+		}
+	}
+	
+	protected MIndexedObject toIndexedObject(MVector v, MVector shape) {
+		int[] dims = new int[shape.size()];
+		for(int i = 0; i < dims.length; i++) {
+			if(shape.get(i) instanceof MReal && ((MReal) shape.get(i)).isPosInteger())
+				dims[i] = (int) ((MReal) shape.get(i)).getValue();
+			else
+				throw new ShapeException("Unexpected value in shape argument " + TextPrinter.toText(shape));
+		}
+		return new MIndexedObject(new Shape(dims), v.elements());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -183,7 +201,11 @@ public class Parser {
 			return null;
 		else if (ch == '[') {
 			consume('[');
-			n = new Node<MathObject>(getVector(true));
+			MathObject v = getVector(true);
+			if(v instanceof MVector && !(v instanceof MVectorFunction) && consume('(')) {
+				v = toIndexedObject((MVector)v, getParameters());
+			}
+			n = new Node<MathObject>(v);
 		} else if (ch == ']')
 			return null;
 		else if(consume('&')) {
@@ -382,6 +404,9 @@ public class Parser {
 			consume(')');
 		} else if(consume('[')) {
 			d = getVector(false); //no need to evaluate, as the parameter false ensures that no expressions are in the vector
+			if(d instanceof MVector && consume('(')) {
+				d = toIndexedObject((MVector)d, getParameters());
+			}
 		} else if (consume('|')) {
 			d = Functions.Function.ABS.evaluate(processExpression());
 			consume('|');
