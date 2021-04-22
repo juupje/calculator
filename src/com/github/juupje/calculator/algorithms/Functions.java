@@ -5,6 +5,7 @@ import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MConst;
+import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MScalar;
@@ -141,12 +142,6 @@ public class Functions {
 					throw new IllegalArgumentException("Expected two scalar values, got " + m.get(0) + " and " + m.get(1));
 				}
 			}
-			
-			@Override
-			public MMatrix evaluate(MMatrix m) {
-				throw new IllegalArgumentException(
-						"This method should be called with an MVector, please contact the developer.");
-			}
 		},
 		ABS {
 			@Override
@@ -198,14 +193,6 @@ public class Functions {
 		},
 		DET {
 			@Override
-			public MScalar evaluate(MScalar m) {
-				throw new IllegalArgumentException("DET is not defined for scalars.");
-			}
-			@Override
-			public MScalar evaluate(MVector m) {
-				throw new IllegalArgumentException("DET is not defined for vectors.");
-			}
-			@Override
 			public MScalar evaluate(MMatrix m) {
 				return det(m);
 			}
@@ -216,26 +203,68 @@ public class Functions {
 					return Shape.SCALAR.copy();
 				throw new ShapeException("DET is only defined for square matrices, got shape " + s);
 			}
+		},
+		TOMATRIX {
+			@Override
+			public MMatrix evaluate(MScalar s) {
+				return new MMatrix(new MathObject[][] {{s.copy()}});
+			}
+			@Override
+			public MMatrix evaluate(MVector v) {
+				return v.toMatrix();
+			}
+			@Override
+			public MMatrix evaluate(MMatrix m) {
+				return m.copy();
+			}
+			@Override
+			public MMatrix evaluate(MIndexedObject m) {
+				return m.toMatrix();
+			}
+		},
+		TOVECTOR {
+			@Override
+			public MVector evaluate(MScalar s) {
+				return new MVector(s);
+			}
+			@Override
+			public MVector evaluate(MVector v) {
+				return v.copy();
+			}
+			@Override
+			public MVector evaluate(MMatrix m) {
+				if(m.shape().rows()==1)
+					return m.getRow(0).transpose();
+				if(m.shape().cols()==1)
+					return m.getColumn(0);
+				throw new ShapeException("Cannot interpret shape " + m.shape() + " as vector");
+			}
+			@Override
+			public MVector evaluate(MIndexedObject m) {
+				return m.toVector();
+			}
 		};
 
-		public abstract MScalar evaluate(MScalar s);
+		public MathObject evaluate(MScalar s) {
+			throw new IllegalArgumentException(toString() + " is not defined for scalars");			
+		}
+		
 		public MathObject evaluate(MVector v) {
-			Function f = this;
+			/*Function f = this;
 			return v.copy().forEach(new java.util.function.Function<MathObject, MathObject>() {
 				@Override
 				public MathObject apply(MathObject m) {
 					return f.evaluate(m);
 				}
-			});
+			});*/
+			throw new IllegalArgumentException(toString() + " is not defined for vectors");
 		}
 		public MathObject evaluate(MMatrix m) {
-			Function f = this;
-			return m.copy().forEach(new java.util.function.Function<MathObject, MathObject>() {
-				@Override
-				public MathObject apply(MathObject m) {
-					return f.evaluate(m);
-				}
-			});
+			throw new IllegalArgumentException(toString() + " is not defined for matrices");
+		}
+		
+		public MathObject evaluate(MIndexedObject m) {
+			throw new IllegalArgumentException(toString() + " is not defined for indexed object");			
 		}
 		
 		public MathObject evaluate(MathObject m) {
@@ -245,10 +274,11 @@ public class Functions {
 				return evaluate((MVector) m);
 			else if(m instanceof MMatrix)
 				return evaluate((MMatrix) m);
+			else if(m instanceof MIndexedObject)
+				return evaluate((MIndexedObject) m);
 			else
-				throw new IllegalArgumentException(name() + " is only defined for scalars, vectors and matrices, got " + Tools.type(m));
+				throw new IllegalArgumentException(toString() + " is not defined for " + Tools.type(m) + ", see help("+toString()+")");
 		}
-		
 		
 		public Shape shape(Shape s) {
 			return s.copy();

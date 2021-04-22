@@ -40,6 +40,8 @@ public class ExportPrinter {
 			}
 			sb.setLength(sb.length()-1);
 			sb.append(']');
+			if(((MVector) mo).isTransposed())
+				sb.append("'");
 		} else if(mo instanceof MMatrix) {
 			MathObject[][] m = ((MMatrix)mo).elements();
 			sb.append('[');

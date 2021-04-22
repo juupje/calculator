@@ -125,16 +125,21 @@ public class MIndexedObject extends MIndexable {
 				for(int j = 0; j < matrix[0].length; j++, k++)
 					matrix[i][j] = values[k] ;
 			return new MMatrix(matrix);
-		}
+		} else if(shape.dim()==1) {
+			MathObject[][] matrix = new MathObject[shape.get(0)][1];
+			for(int j = 0; j < matrix.length; j++)
+				matrix[j][0] = values[j];
+			return new MMatrix(matrix);
+		} else if(shape.dim()==0)
+			return new MMatrix(new MathObject[][] {{values[0]}});
 		throw new ShapeException("Cannot interpret object of shape " + shape + " as a matrix");
 	}
 	
 	public MVector toVector() {
-		if(shape.dim()==1)
+		if(shape.dim()<=1)
 			return new MVector(values);
 		else if(shape.dim()==2 && shape.get(0)==1)
 			return new MVector(true, values);
-			
 		throw new ShapeException("Cannot interpret object of shape " + shape + " as a vector");
 	}
 

@@ -339,6 +339,15 @@ public class MVector extends MIndexable {
 		return shape;
 	}
 	
+	public MMatrix toMatrix() {
+		if(transposed)
+			return new MMatrix(new MathObject[][] {v});
+		MathObject[][] m = new MathObject[v.length][1];
+		for(int i = 0; i < v.length; i++)
+			m[i][0] = v[i];
+		return new MMatrix(m);
+	}
+	
 	/**
 	 * Returns a new <tt>MMatrix</tt> consisting of the evaluated elements in <tt>this</tt>.
 	 * @
@@ -360,7 +369,7 @@ public class MVector extends MIndexable {
 	
 	@Override
 	public String toString() {
-		return TextPrinter.toText(this) + (transposed ? "'" : "");
+		return TextPrinter.toText(this);
 	}
 	
 	//###### static methods #####	

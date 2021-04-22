@@ -142,6 +142,9 @@ public class TextPrinter {
 	 */
 	public static void toText(StringBuilder sb, MVector mo) {
 		toText(sb, mo.elements());
+		if(!mo.isTransposed())
+			 //non-transposed vectors are column vectors, however the vector is printed as a row
+			sb.append("'");
 	}
 	
 	/**
@@ -174,7 +177,7 @@ public class TextPrinter {
 			int rows = shape.get(1);
 			int cols = shape.get(2);
 			for(int i = 0; i < k; i++) {
-				toMatrixString(sb, mo.elements(), k*rows*cols, rows, cols);
+				toMatrixString(sb, mo.elements(), i*rows*cols, rows, cols);
 				sb.append(",\n");
 			}
 			sb.append("]");
