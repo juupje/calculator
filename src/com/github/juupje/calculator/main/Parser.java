@@ -397,7 +397,6 @@ public class Parser {
 			return CONJUGATE.evaluate(processFactor());
 
 		MathObject d = null;
-		int p = pos;
 
 		if (consume('(')) { // new expression within the parentheses
 			d = processExpression();
@@ -411,6 +410,7 @@ public class Parser {
 			d = Functions.Function.ABS.evaluate(processExpression());
 			consume('|');
 		} else if ((ch >= '0' && ch <= '9') || ch == '.') {// number
+			int p = pos;
 			while ((ch >= '0' && ch <= '9') || ch == '.')
 				nextChar();
 			d = new MReal(Double.parseDouble(expr.substring(p, pos)));
@@ -420,10 +420,22 @@ public class Parser {
 				if(b instanceof MReal)
 					d = MFraction.create((MReal) d, (MReal) b);
 				else
-					throw new UnexpectedCharacterException("Can't create a fractions from " + d + " and " + b);
+					throw new UnexpectedCharacterException("Can't create a fraction from " + d + " and " + b);
 			}
-			if (consume('E'))
-				d = MULTIPLY.evaluate(d, POWER.evaluate(new MReal(10), processFactor()));
+			if (ch == 'E' || ch=='e') {
+				p = pos;
+				do {
+					nextChar();
+				} while(ch>='0' && ch<= '9' || ch=='-' || ch=='+');
+				try {					
+					d = MULTIPLY.evaluate(d, new MReal(Math.pow(10, Integer.parseInt(expr.substring(p+1,pos)))));
+				} catch(NumberFormatException e) {
+					if(expr.charAt(p) == 'E')
+						throw new UnexpectedCharacterException(expr, p,pos);
+					pos = p;
+					ch = expr.charAt(pos);
+				}
+			}
 			if(consume('i')) {
 				if(((MScalar) d).isComplex())
 					((MScalar) d).multiply(MConst.i.evaluate());
@@ -432,6 +444,7 @@ public class Parser {
 			}
 			// Letter, which is part of a variable or function
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_') {
+			int p = pos;
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' || ch >= '0' && ch <= '9')
 				nextChar();
 			String letters = expr.substring(p, pos);

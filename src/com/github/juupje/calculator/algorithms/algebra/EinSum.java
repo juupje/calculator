@@ -104,7 +104,7 @@ public class EinSum extends Algorithm {
 		 * sides. All other indices which are present only on the right or left should
 		 * one of the free indices.
 		 */
-		tree.expand();
+		tree.expand();		
 		int size = 1;
 		for (Index index : freeIndices)
 			size *= index.getRange().length();

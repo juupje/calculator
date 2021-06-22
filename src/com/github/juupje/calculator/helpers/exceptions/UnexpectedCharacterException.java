@@ -15,8 +15,8 @@ public class UnexpectedCharacterException extends RuntimeException {
 		super(composeMessage(expr, begin, end));
 	}
 	private static String composeMessage(String expr, int begin, int end) {
-		String msg = "Encountered an unexpected character" + (end-begin<1 ? "" : " sequence") + ":\n" + expr+"\n";
-		for(int i = 0; i < begin-1; i++)
+		String msg = "Encountered an unexpected character" + (end-begin<=1 ? "" : " sequence") + ":\n" + expr+"\n";
+		for(int i = 0; i < begin; i++)
 			msg += " ";
 		for(int i = begin; i < end; i++)
 			msg += "^";
