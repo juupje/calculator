@@ -40,7 +40,7 @@ public class Sum extends Algorithm {
 			if(first instanceof MScalar) {
 				MScalar sum = (MScalar) first;
 				for(int i = begin+1; i <= end; i++)
-					sum.add((MScalar) sequence.get(i));
+					sum = sum.add((MScalar) sequence.get(i));
 				return sum;
 			} else if(first instanceof MVector) {
 				MVector sum = (MVector) first;

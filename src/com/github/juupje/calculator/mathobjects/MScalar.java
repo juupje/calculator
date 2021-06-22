@@ -21,7 +21,7 @@ public abstract class MScalar implements MathObject {
 	/**
 	 * Adds the value of the given {@code MScalar} to the value of this one.
 	 * @param other the {@code MScalar} containing the value to be added.
-	 * @return {@code this}
+	 * @return {@code this} or a new {@code MScalar} if {@code this} is an {@code MReal} and {@code other} is complex.
 	 */
 	public abstract MScalar add(MScalar other);
 	
@@ -35,7 +35,7 @@ public abstract class MScalar implements MathObject {
 	/**
 	 * Subtracts the value of the given {@code MScalar} off the value of this one.
 	 * @param other the {@code MScalar} containing the value to be subtracted.
-	 * @return {@code this}
+	 * @return {@code this} or a new {@code MScalar} if {@code this} is an {@code MReal} and {@code other} is complex.
 	 */
 	public abstract MScalar subtract(MScalar other);
 	
@@ -49,7 +49,7 @@ public abstract class MScalar implements MathObject {
 	/**
 	 * Multiplies the value of this {@code MScalar} with the value of the given one.
 	 * @param other the {@code MScalar} containing the value be multiplied with.
-	 * @return {@code this}
+	 * @return {@code this} or a new {@code MScalar} if {@code this} is an {@code MReal} and {@code other} is complex.
 	 */
 	public abstract MScalar multiply(MScalar other);
 	
@@ -63,7 +63,7 @@ public abstract class MScalar implements MathObject {
 	/**
 	 * Divides the value of this {@code MScalar} by the value of the given one.
 	 * @param other the {@code MScalar} containing the value of the quotient.
-	 * @return {@code this}
+	 * @return {@code this} or a new {@code MScalar} if {@code this} is an {@code MReal} and {@code other} is complex.
 	 */
 	public abstract MScalar divide(MScalar other);
 	
@@ -77,7 +77,7 @@ public abstract class MScalar implements MathObject {
 	/**
 	 * Raises the value of this {@code MScalar} to the power of the value of the given one.
 	 * @param other the {@code MScalar} containing the value of the exponent.
-	 * @return {@code this}
+	 * @return {@code this} or a new {@code MScalar} if {@code this} is an {@code MReal} and {@code other} is complex.
 	 */
 	public abstract MScalar power(MScalar other);
 	
@@ -99,6 +99,9 @@ public abstract class MScalar implements MathObject {
 	
 	@Override
 	public boolean isNumeric() {return true;}
+	
+	public boolean isFraction() {return false;}
+	public boolean hasError() {return false;}
 	
 	public abstract MScalar copy();
 	

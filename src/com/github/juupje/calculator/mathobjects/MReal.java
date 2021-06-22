@@ -187,7 +187,7 @@ public class MReal extends MScalar {
 	
 	/**
 	 * Seriously? Checking the JavaDoc for a getter? What do you think this does?!
-	 * @return Dude... think for yourself for once.
+	 * @return Dude... (or girl..., who knows) think for yourself for once.
 	 */
 	public double getValue() {
 		return value;
@@ -232,7 +232,7 @@ public class MReal extends MScalar {
 
 	@Override
 	public double abs() {
-		return value < 0 ? -1*value : value;
+		return Math.abs(getValue());
 	}
 	
 	/**
@@ -241,7 +241,8 @@ public class MReal extends MScalar {
 	 */
 	@Override
 	public double abs2() {
-		return value*value;
+		double v = getValue(); //for future compatibility with subclasses
+		return v*v;
 	}
 	
 	
@@ -258,7 +259,6 @@ public class MReal extends MScalar {
 		return copy();
 	}
 	
-	//######## static methods #####
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof MReal)
@@ -277,6 +277,7 @@ public class MReal extends MScalar {
 		return Double.isNaN(getValue());
 	}
 	
+	//############### Static functions ##############
 	public static final MReal NaN() {
 		return NaN.copy();
 	}

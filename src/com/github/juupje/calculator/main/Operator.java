@@ -13,6 +13,7 @@ import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MExpression;
+import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MIndexable;
 import com.github.juupje.calculator.mathobjects.MIndexedObject;
@@ -142,6 +143,12 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only multiply exactly two MathObjects, got " + (1 + b.length));
+			if(a instanceof MScalar && b[0] instanceof MScalar) {
+				if(a instanceof MFraction) {
+					return a.copy().multiply((MScalar)b[0]);
+				} else if(b[0] instanceof MFraction)
+					return b[0].multiply((MScalar) a);
+			}
 			if(a instanceof MScalar)
 				return b[0].copy().multiply((MScalar) a);
 			if(b[0] instanceof MScalar)

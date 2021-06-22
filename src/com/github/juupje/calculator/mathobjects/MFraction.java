@@ -7,6 +7,11 @@ public class MFraction extends MReal {
 		this.a = a;
 		this.b = b;
 	}
+	
+	@Override
+	public double real() {
+		return getValue();
+	}	
 
 	@Override
 	public MScalar add(MScalar other) {
@@ -127,6 +132,18 @@ public class MFraction extends MReal {
 		}
 		return this;
 	}
+	
+	@Override
+	public MScalar sqrt() {
+		double new_a = Math.sqrt(a);
+		double new_b = Math.sqrt(b);
+		if(isInteger(new_a) && isInteger(new_b)) {
+			a = (int)new_a;
+			b = (int)new_b;
+			return this;
+		} else
+			return new MReal(new_a/new_b);
+	}
 
 	@Override
 	public MReal mod(MReal other) {
@@ -141,6 +158,16 @@ public class MFraction extends MReal {
 	@Override
 	public boolean isInteger() {
 		return Math.abs(b) == 1 || (int) Math.abs(a)%(int) Math.abs(b)==0;
+	}
+	
+	@Override
+	public boolean isPosInteger() {
+		return isInteger() && a*b>0;
+	}
+	
+	@Override
+	public boolean isFraction() {
+		return true;
 	}
 
 	@Override

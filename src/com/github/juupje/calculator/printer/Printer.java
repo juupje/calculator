@@ -11,6 +11,7 @@ import com.github.juupje.calculator.main.Variable;
 import com.github.juupje.calculator.main.Variables;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MExpression;
+import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.settings.Settings;
@@ -220,6 +221,9 @@ public class Printer {
 				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
 						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "i" : "");
 			}
+		} else if(scalar.isFraction()) {
+			MFraction frac = (MFraction) scalar;
+			return frac.getNominator()+"//"+frac.getDenominator();
 		}
 		return numToString(scalar.real());
 	}

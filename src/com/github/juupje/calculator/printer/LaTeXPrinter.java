@@ -6,6 +6,7 @@ import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MConst;
 import com.github.juupje.calculator.mathobjects.MExpression;
+import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
@@ -363,6 +364,9 @@ public class LaTeXPrinter {
 				return (!stra.equals("0") ? stra : "") + (!strb.equals("0") ? (strb.startsWith("-") ? "" : (stra.equals("0") ? "" : "+")) + 
 						(strb.equals("1") ? "" : (strb.equals("-1") ? "-" : strb)) + "i" : "");
 			}
+		} else if(s.isFraction()) {
+			MFraction frac = (MFraction) s;
+			return "\\frac{"+frac.getNominator()+"}{"+frac.getDenominator()+"}";
 		}
 		return numToLatex(s.real());
 	}
