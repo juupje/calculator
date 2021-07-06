@@ -13,11 +13,16 @@ public class MFraction extends MReal {
 		return getValue();
 	}	
 
+	public MFraction add(MFraction other) {
+		b*= other.b;
+		a = a*other.b + other.a*b;
+		return this;
+	}
+	
 	@Override
 	public MScalar add(MScalar other) {
 		if(other instanceof MFraction) {
-			b*= ((MFraction) other).b;
-			a = a*((MFraction) other).b + ((MFraction) other).a*b;
+			return add((MFraction) other);
 		} else if(other.isInteger())
 			return add((int) other.real());
 		return toMReal().add(other);

@@ -2,7 +2,7 @@ package com.github.juupje.calculator.mathobjects;
 
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 
-public class MRealError extends MScalar {
+public class MRealError extends MReal {
 	double err = 0;
 	double value = 0;
 	public MRealError(double d, double err) {
@@ -173,7 +173,7 @@ public class MRealError extends MScalar {
 	
 	public void setValue(double d, double e) {
 		value = d;
-		err = e;
+		err = Math.abs(e);
 	}
 
 	/**
@@ -238,39 +238,8 @@ public class MRealError extends MScalar {
 		return Math.sqrt(a*a+b*b);
 	}
 
-	@Override
-	public double real() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double imag() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public MScalar add(double d) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public MScalar subtract(double d) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public MScalar negate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isNaN() {
-		// TODO Auto-generated method stub
-		return false;
+	public static MRealError power(MReal a, MRealError b) {
+		double value = Math.pow(a.getValue(),b.getValue());
+		return new MRealError(value, value*Math.log(a.getValue())*b.err()); //absolute value is calculated in the constructor
 	}
 }
