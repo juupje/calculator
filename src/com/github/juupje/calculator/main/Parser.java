@@ -191,7 +191,6 @@ public class Parser {
 		return new MIndexedObject(new Shape(dims), v.elements());
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Node<?> getFactor() throws UnexpectedCharacterException {
 		Node<?> n = null;
 		int position = pos;
@@ -213,6 +212,8 @@ public class Parser {
 			n.left(getFactor());
 		}
 		else if (Character.isDigit(ch) || ch == '.' || ch == '-') {
+			n = new Node<MScalar>(getNumber());
+			/*
 			do {
 				nextChar();
 			} while (Character.isDigit(ch) || ch == '.' || ch=='E' || (ch=='-' && getPrevChar()=='E'));
@@ -230,6 +231,7 @@ public class Parser {
 				n = new Node<MScalar>(new MReal(Double.valueOf(s1)));
 			if(consume('i'))
 				((Node<MScalar>) n).setData(new MComplex(0,((MReal) n.getData()).getValue()));
+			*/
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z' || ch=='_')) {
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch=='_' || (ch>='0' && ch<='9'))
 				nextChar();
@@ -410,39 +412,8 @@ public class Parser {
 			d = Functions.Function.ABS.evaluate(processExpression());
 			consume('|');
 		} else if ((ch >= '0' && ch <= '9') || ch == '.') {// number
-			int p = pos;
-			while ((ch >= '0' && ch <= '9') || ch == '.')
-				nextChar();
-			d = new MReal(Double.parseDouble(expr.substring(p, pos)));
-			if(pos+2<expr.length() && expr.substring(pos, pos+2).equals("//")) {
-				nextChar();nextChar();
-				MathObject b = processFactor();
-				if(b instanceof MReal)
-					d = MFraction.create((MReal) d, (MReal) b);
-				else
-					throw new UnexpectedCharacterException("Can't create a fraction from " + d + " and " + b);
-			}
-			if (ch == 'E' || ch=='e') {
-				p = pos;
-				do {
-					nextChar();
-				} while(ch>='0' && ch<= '9' || ch=='-' || ch=='+');
-				try {					
-					d = MULTIPLY.evaluate(d, new MReal(Math.pow(10, Integer.parseInt(expr.substring(p+1,pos)))));
-				} catch(NumberFormatException e) {
-					if(expr.charAt(p) == 'E')
-						throw new UnexpectedCharacterException(expr, p,pos);
-					pos = p;
-					ch = expr.charAt(pos);
-				}
-			}
-			if(consume('i')) {
-				if(((MScalar) d).isComplex())
-					((MScalar) d).multiply(MConst.i.evaluate());
-				else
-					d = new MComplex(0, ((MReal) d).getValue());
-			}
-			// Letter, which is part of a variable or function
+			d = getNumber();
+		// Letter, which is part of a variable or function
 		} else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_') {
 			int p = pos;
 			while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' || ch >= '0' && ch <= '9')
@@ -588,5 +559,50 @@ public class Parser {
 			return new MathObject[] {a, b};
 		}
 		return null;
+	}
+	
+	private MScalar getNumber() {
+		int p = pos;
+		while ((ch >= '0' && ch <= '9') || ch == '.')
+			nextChar();
+		MScalar d = new MReal(Double.parseDouble(expr.substring(p, pos)));
+		if(pos+2<expr.length() && expr.substring(pos, pos+2).equals("//")) {
+			nextChar();nextChar();
+			MathObject b = processFactor();
+			if(b instanceof MReal)
+				d = MFraction.create((MReal) d, (MReal) b);
+			else
+				throw new UnexpectedCharacterException("Can't create a fraction from " + d + " and " + b);
+		}
+		if (ch == 'E' || ch=='e') {
+			p = pos;
+			nextChar();
+			if(ch=='-' || ch=='+' || (ch>='0' && ch<='9')) {
+				do {
+					nextChar();
+				} while(ch>='0' && ch<= '9');
+			}
+			if(p != pos) {
+				try {					
+					d = d.multiply(Math.pow(10, Integer.parseInt(expr.substring(p+1,pos))));
+				} catch(NumberFormatException e) {
+					if(expr.charAt(p) == 'E')
+						throw new UnexpectedCharacterException(expr, p,pos);
+					pos = p;
+					ch = expr.charAt(pos);
+				}
+			} else {
+				if(expr.charAt(p) == 'E')
+					throw new UnexpectedCharacterException(expr, p);
+				ch = expr.charAt(pos);
+			}
+		}
+		if(consume('i')) {
+			if(((MScalar) d).isComplex())
+				((MScalar) d).multiply(MConst.i.evaluate());
+			else
+				d = new MComplex(0, ((MReal) d).getValue());
+		}
+		return d;
 	}
 }
