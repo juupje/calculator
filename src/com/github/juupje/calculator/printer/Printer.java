@@ -12,6 +12,7 @@ import com.github.juupje.calculator.main.Variables;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFraction;
+import com.github.juupje.calculator.mathobjects.MRealError;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.settings.Settings;
@@ -224,6 +225,9 @@ public class Printer {
 		} else if(scalar.isFraction()) {
 			MFraction frac = (MFraction) scalar;
 			return frac.getNominator()+"//"+frac.getDenominator();
+		} else if(scalar.hasError()) {
+			// take a look at the Tools.py script to implement a proper representation
+			return numToString(scalar.real())+"?"+numToString(((MRealError) scalar).err());
 		}
 		return numToString(scalar.real());
 	}

@@ -4,7 +4,6 @@ import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException
 
 public class MRealError extends MReal {
 	double err = 0;
-	double value = 0;
 	public MRealError(double d, double err) {
 		value = d;
 		this.err = Math.abs(err);
@@ -150,25 +149,27 @@ public class MRealError extends MReal {
 	}
 	
 	@Override
-	public boolean isComplex() {
-		return false;
-	}
-	
-	@Override
 	public boolean isInteger() {
 		return false;
 	}
 	
-	/**
-	 * Seriously? Checking the JavaDoc for a getter? What do you think this does?!
-	 * @return Dude... (or girl..., who knows) think for yourself for once.
-	 */
-	public double getValue() {
-		return value;
+	@Override
+	public boolean isPosInteger() {
+		return false;
+	}
+	
+	@Override
+	public boolean hasError() {
+		return true;
 	}
 	
 	public double err() {
 		return err;
+	}
+	
+	@Override
+	public void setValue(double d) {
+		throw new InvalidOperationException("Cannot set value without uncertainty");
 	}
 	
 	public void setValue(double d, double e) {

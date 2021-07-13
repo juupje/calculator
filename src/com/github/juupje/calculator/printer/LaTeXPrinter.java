@@ -367,6 +367,8 @@ public class LaTeXPrinter {
 		} else if(s.isFraction()) {
 			MFraction frac = (MFraction) s;
 			return "\\frac{"+frac.getNominator()+"}{"+frac.getDenominator()+"}";
+		} else if(s.hasError()) {
+			//TODO: implement a conversion to LaTeX string
 		}
 		return numToLatex(s.real());
 	}
