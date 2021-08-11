@@ -242,6 +242,6 @@ public abstract class MScalar implements MathObject {
 			return MRealError.power(a, (MRealError)b);
 		if(a.isFraction())
 			return a.copy().power(b);
-		return a.copy().divide(b);
+		return a.copy().power(b);
 	}
 }

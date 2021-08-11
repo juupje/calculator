@@ -1,6 +1,7 @@
 {
     "notation": 1,
     "precision": 3,
+   	"error_significance":2,
     "int_def_steps": 16,
     "timer_def_runs": 100,
 	"abc_show_text": true,

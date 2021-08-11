@@ -368,7 +368,13 @@ public class LaTeXPrinter {
 			MFraction frac = (MFraction) s;
 			return "\\frac{"+frac.getNominator()+"}{"+frac.getDenominator()+"}";
 		} else if(s.hasError()) {
-			//TODO: implement a conversion to LaTeX string
+			String str = Printer.numToString(s);
+			str.replace("?", "\\pm");
+			int idx = str.indexOf("e");
+			if(idx == -1) return str;
+			
+			String exp = str.substring(idx+1);
+			return str.substring(0,idx) + "\\cdot10^{"+(exp.charAt(0)=='+'? exp.substring(1) : exp)+"}";
 		}
 		return numToLatex(s.real());
 	}

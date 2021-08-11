@@ -14,8 +14,8 @@ public class MFraction extends MReal {
 	}	
 
 	public MFraction add(MFraction other) {
-		b*= other.b;
 		a = a*other.b + other.a*b;
+		b*= other.b;
 		return this;
 	}
 	
@@ -43,8 +43,8 @@ public class MFraction extends MReal {
 	@Override
 	public MScalar subtract(MScalar other) {
 		if(other instanceof MFraction) {
-			b*= ((MFraction) other).b;
 			a = a*((MFraction) other).b - ((MFraction) other).a*b;
+			b*= ((MFraction) other).b;
 			return this;
 		} else if(other.isInteger())
 			return subtract((int) other.real());
