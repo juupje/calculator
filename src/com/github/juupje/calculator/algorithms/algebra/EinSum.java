@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ import com.github.juupje.calculator.mathobjects.MReal;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.mathobjects.Shape;
+import com.github.juupje.calculator.printer.DotPrinter;
 import com.github.juupje.calculator.printer.TextPrinter;
 import com.github.juupje.calculator.tree.DFSTask;
 import com.github.juupje.calculator.tree.Node;
@@ -211,6 +213,7 @@ public class EinSum extends Algorithm {
 		return new Shape(shape);
 	}
 
+	AtomicInteger atomic = new AtomicInteger();
 	class EinSumTree extends Tree {
 		EinSumTree(Tree tree) {
 			root = (EinSumNode<?>) tree.copy(new Function<Node<?>, EinSumNode<?>>() {
@@ -265,9 +268,10 @@ public class EinSum extends Algorithm {
 					plus[i - 1].right(plus[i]);
 			}
 			plus[plus.length - 1].right(copyWithIndex(n, index.getName(), index.getRange().next()));
-			if (n != root)
+			if (n != root) {
+				DotPrinter.printDot(this, "temp-"+atomic.getAndIncrement());
 				n.replace(plus[0]);
-			else
+			} else
 				root = plus[0];
 			return plus[0];
 		}
@@ -401,6 +405,7 @@ public class EinSum extends Algorithm {
 								EinSumNode<?> copy = expand(n, entry.getKey());
 								iter.remove();
 								copy.setIndices(n.getIndices());
+								n = copy;
 							} else if (entry.getValue() > 2)
 								// no indices should appear more than twice
 								throw new EinSumException(entry.getKey().toString() + " occurs " + entry.getValue()
