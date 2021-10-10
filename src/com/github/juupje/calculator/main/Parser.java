@@ -569,10 +569,12 @@ public class Parser {
 	}
 	
 	private MScalar getNumber() {
+		int sign = (consume('-') ? -1 : 1);
 		int p = pos;
 		while ((ch >= '0' && ch <= '9') || ch == '.')
+			//can't include '-' here as it would include a minus operator too
 			nextChar();
-		MScalar d = new MReal(Double.parseDouble(expr.substring(p, pos)));
+		MScalar d = new MReal(Double.parseDouble(expr.substring(p, pos))*sign);
 		if(pos+2<expr.length() && expr.substring(pos, pos+2).equals("//")) {
 			nextChar();nextChar();
 			MathObject b = processFactor();
