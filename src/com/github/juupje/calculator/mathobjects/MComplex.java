@@ -227,7 +227,7 @@ public class MComplex extends MScalar {
 	 * @return {@code this}
 	 */
 	@Override
-	public MScalar subtract(double d) {
+	public MComplex subtract(double d) {
 		if(!cartesian)
 			updateCartesian();
 		a -= d;
@@ -310,7 +310,7 @@ public class MComplex extends MScalar {
 	 * @return {@code this}
 	 */
 	@Override
-	public MScalar divide(MScalar other) {
+	public MComplex divide(MScalar other) {
 		if(polar) {
 			if(other.isComplex()) {
 				r /= ((MComplex) other).getR();

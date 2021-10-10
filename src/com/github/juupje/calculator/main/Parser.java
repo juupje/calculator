@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.github.juupje.calculator.algorithms.Algorithms;
-import com.github.juupje.calculator.algorithms.Functions;
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
@@ -246,8 +245,8 @@ public class Parser {
 			String str = expr.substring(position, pos);
 			if (MConst.isConstant(str))
 				n = new Node<MConst>(MConst.get(str));
-			else if (Functions.isFunction(str)) {
-				n = new Node<Function>(Functions.getFunction(str));
+			else if (Function.isFunction(str)) {
+				n = new Node<Function>(Function.getFunction(str));
 				n.left(getFactor());
 			} else if(str.equals("inf")) {
 				n = new Node<MReal>(new MReal(Double.POSITIVE_INFINITY));
@@ -417,7 +416,7 @@ public class Parser {
 				d = toIndexedObject((MVector)d, getParameters());
 			}
 		} else if (consume('|')) {
-			d = Functions.Function.ABS.evaluate(processExpression());
+			d = Function.ABS.evaluate(processExpression());
 			consume('|');
 		} else if ((ch >= '0' && ch <= '9') || ch == '.') {// number
 			d = getNumber();
@@ -458,11 +457,11 @@ public class Parser {
 				} else
 					d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
-				if(Functions.isFunction(letters)) {
+				if(Function.isFunction(letters)) {
 					if(!consume('('))
 						throw new UnexpectedCharacterException("Expected '(' after a function name instead of '" + (char) ch + "'.");
 					d = new Parser(findEndOfBrackets()).evaluate(); // Gets the factor inside the function
-					d = Functions.getFunction(letters).evaluate(d);
+					d = Function.getFunction(letters).evaluate(d);
 				} else if(letters.equals("inv"))
 					d = Operator.INVERT.evaluate(processFactor());
 				else

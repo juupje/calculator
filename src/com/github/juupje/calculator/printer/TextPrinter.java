@@ -1,6 +1,6 @@
 package com.github.juupje.calculator.printer;
 
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.mathobjects.MConst;

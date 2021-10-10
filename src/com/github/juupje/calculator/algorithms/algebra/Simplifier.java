@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.main.Variable;
