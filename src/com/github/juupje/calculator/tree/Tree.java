@@ -1,6 +1,6 @@
 package com.github.juupje.calculator.tree;
 
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
 import com.github.juupje.calculator.main.Calculator;
 import com.github.juupje.calculator.main.Operator;

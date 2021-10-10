@@ -16,6 +16,7 @@ public enum Settings {
 	//Calculation stuff
 	PRECISION(Integer.class),
 	COMPLEX_ENABLED(Boolean.class),
+	ERROR_SIGNIFICANCE(Integer.class),
 
 	//Algoritm stuff
 	TIMER_DEF_RUNS(Integer.class),

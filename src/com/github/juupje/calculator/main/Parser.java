@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.github.juupje.calculator.algorithms.Algorithms;
-import com.github.juupje.calculator.algorithms.Functions;
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidFunctionException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.helpers.exceptions.TreeException;
+import com.github.juupje.calculator.helpers.exceptions.UndefinedException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MConst;
@@ -22,6 +22,7 @@ import com.github.juupje.calculator.mathobjects.MIndexable;
 import com.github.juupje.calculator.mathobjects.MIndexedObject;
 import com.github.juupje.calculator.mathobjects.MMatrix;
 import com.github.juupje.calculator.mathobjects.MReal;
+import com.github.juupje.calculator.mathobjects.MRealError;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MVector;
 import com.github.juupje.calculator.mathobjects.MVectorFunction;
@@ -40,7 +41,7 @@ public class Parser {
 	Map<String, Class<? extends MathObject>> extraVariables;
 	
 	public Parser(String s) {
-		expr = s;
+		expr = s.replace(" ", "");
 	}
 	
 	/**
@@ -67,8 +68,14 @@ public class Parser {
 		return ch;
 	}
 	
-	protected int getPrevChar() {
-		return expr.charAt(pos-1);
+	protected int getCharBefore(int pos) {
+		if(pos == 0) return -1;
+		int c = -1;
+		do {
+			pos -= 1;
+			c = expr.charAt(pos);
+		} while(pos>0 && c==' ');
+		return c==' ' ? -1 : c;
 	}
 
 	/**
@@ -238,8 +245,8 @@ public class Parser {
 			String str = expr.substring(position, pos);
 			if (MConst.isConstant(str))
 				n = new Node<MConst>(MConst.get(str));
-			else if (Functions.isFunction(str)) {
-				n = new Node<Function>(Functions.getFunction(str));
+			else if (Function.isFunction(str)) {
+				n = new Node<Function>(Function.getFunction(str));
 				n.left(getFactor());
 			} else if(str.equals("inf")) {
 				n = new Node<MReal>(new MReal(Double.POSITIVE_INFINITY));
@@ -409,7 +416,7 @@ public class Parser {
 				d = toIndexedObject((MVector)d, getParameters());
 			}
 		} else if (consume('|')) {
-			d = Functions.Function.ABS.evaluate(processExpression());
+			d = Function.ABS.evaluate(processExpression());
 			consume('|');
 		} else if ((ch >= '0' && ch <= '9') || ch == '.') {// number
 			d = getNumber();
@@ -450,11 +457,11 @@ public class Parser {
 				} else
 					d = Algorithms.getAlgorithm(letters).execute(getArguments(findEndOfBrackets()));
 			} else {
-				if(Functions.isFunction(letters)) {
+				if(Function.isFunction(letters)) {
 					if(!consume('('))
 						throw new UnexpectedCharacterException("Expected '(' after a function name instead of '" + (char) ch + "'.");
 					d = new Parser(findEndOfBrackets()).evaluate(); // Gets the factor inside the function
-					d = Functions.getFunction(letters).evaluate(d);
+					d = Function.getFunction(letters).evaluate(d);
 				} else if(letters.equals("inv"))
 					d = Operator.INVERT.evaluate(processFactor());
 				else
@@ -575,25 +582,25 @@ public class Parser {
 				throw new UnexpectedCharacterException("Can't create a fraction from " + d + " and " + b);
 		}
 		if (ch == 'E' || ch=='e') {
-			p = pos;
+			int p2 = pos;
 			nextChar();
 			if(ch=='-' || ch=='+' || (ch>='0' && ch<='9')) {
 				do {
 					nextChar();
 				} while(ch>='0' && ch<= '9');
 			}
-			if(p != pos) {
-				try {					
-					d = d.multiply(Math.pow(10, Integer.parseInt(expr.substring(p+1,pos))));
+			if(p2 != pos) {
+				try {
+					d = d.multiply(Math.pow(10, Integer.parseInt(expr.substring(p2+1,pos))));
 				} catch(NumberFormatException e) {
-					if(expr.charAt(p) == 'E')
-						throw new UnexpectedCharacterException(expr, p,pos);
-					pos = p;
+					if(expr.charAt(p2) == 'E')
+						throw new UnexpectedCharacterException(expr, p2,pos);
+					pos = p2;
 					ch = expr.charAt(pos);
 				}
 			} else {
-				if(expr.charAt(p) == 'E')
-					throw new UnexpectedCharacterException(expr, p);
+				if(expr.charAt(p2) == 'E')
+					throw new UnexpectedCharacterException(expr, p2);
 				ch = expr.charAt(pos);
 			}
 		}
@@ -602,6 +609,37 @@ public class Parser {
 				((MScalar) d).multiply(MConst.i.evaluate());
 			else
 				d = new MComplex(0, ((MReal) d).getValue());
+		} else if(consume('?')) {
+			try {
+				MScalar err = getNumber();
+				if(!d.isComplex() && !err.isComplex())
+					d = new MRealError(d.real(), err.real());
+				else
+					throw new UndefinedException("Cannot create a complex number with an error");
+				if(getCharBefore(p)=='(' && ch==')' && (expr.charAt(pos+1)=='e' || expr.charAt(p)=='E')) {
+					int p2 = pos;
+					nextChar();
+					nextChar();
+					if(ch=='-' || ch=='+' || (ch>='0' && ch<='9')) {
+						do {
+							nextChar();
+						} while(ch>='0' && ch<= '9');
+					}
+					if(p2 != pos) {
+						try {
+							d = d.multiply(Math.pow(10, Integer.parseInt(expr.substring(p2+2,pos))));
+						} catch(NumberFormatException e) {
+							//select the brackets
+							pos = p2;
+							ch = expr.charAt(pos);
+						}
+					} else {
+						throw new UnexpectedCharacterException(expr, p2+1); //marks the e or E
+					}
+				}
+			} catch(Exception e) {
+				throw new UnexpectedCharacterException(expr, p);
+			}
 		}
 		return d;
 	}

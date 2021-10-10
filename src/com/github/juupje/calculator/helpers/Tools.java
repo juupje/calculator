@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.juupje.calculator.algorithms.Algorithms;
-import com.github.juupje.calculator.algorithms.Functions;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.commands.Commands;
 import com.github.juupje.calculator.helpers.exceptions.SyntaxException;
 import com.github.juupje.calculator.helpers.exceptions.UnexpectedCharacterException;
@@ -137,7 +137,7 @@ public class Tools {
 	
 	public static boolean checkNameValidity(String name, boolean internal) {
 		if(((name.startsWith("_") || name.startsWith("$")) && !internal) ||  Character.isDigit(name.codePointAt(0))) return false;
-		if(name.equals("pi") || name.equals("e") || name.equals("i") || Functions.isFunction(name) || Algorithms.isAlgorithm(name) || Commands.isCommand(name)) return false;
+		if(name.equals("pi") || name.equals("e") || name.equals("i") || Function.isFunction(name) || Algorithms.isAlgorithm(name) || Commands.isCommand(name)) return false;
 		for(int i = 0; i < name.length(); i++) {
 			int c = name.codePointAt(i);
 			if(!((c>='0' && c<='9') || (c>='A' && c<='Z') || (c>='a' && c<='z') || c=='_'))

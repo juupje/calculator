@@ -13,7 +13,6 @@ import com.github.juupje.calculator.helpers.exceptions.IndexException;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;
 import com.github.juupje.calculator.mathobjects.MExpression;
-import com.github.juupje.calculator.mathobjects.MFraction;
 import com.github.juupje.calculator.mathobjects.MFunction;
 import com.github.juupje.calculator.mathobjects.MIndexable;
 import com.github.juupje.calculator.mathobjects.MIndexedObject;
@@ -66,7 +65,7 @@ public enum Operator {
 									+ " to a vector.");
 			} else if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
-					return ((MScalar) a.copy()).add((MScalar) b[0]);
+					return MScalar.add((MScalar)a, (MScalar)b[0]);
 				else
 					throw new InvalidOperationException(
 							"Only other scalars can be added to scalars. You're trying to add " + Tools.type(b[0])
@@ -110,7 +109,7 @@ public enum Operator {
 									+ Tools.type(b[0]) + " off a vector.");
 			} else if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
-					return ((MScalar) a.copy()).subtract((MScalar) b[0]);
+					return MScalar.subtract((MScalar)a, (MScalar)b[0]);
 				else
 					throw new InvalidOperationException(
 							"Only other scalars can be subtracted off scalars. You're trying to subtract "
@@ -144,10 +143,7 @@ public enum Operator {
 				throw new IllegalArgumentException(
 						"You can only multiply exactly two MathObjects, got " + (1 + b.length));
 			if(a instanceof MScalar && b[0] instanceof MScalar) {
-				if(a instanceof MFraction) {
-					return a.copy().multiply((MScalar)b[0]);
-				} else if(b[0] instanceof MFraction)
-					return b[0].multiply((MScalar) a);
+				return MScalar.multiply((MScalar) a, (MScalar)b[0]);
 			}
 			if(a instanceof MScalar)
 				return b[0].copy().multiply((MScalar) a);
@@ -211,18 +207,11 @@ public enum Operator {
 			if (b.length != 1)
 				throw new IllegalArgumentException(
 						"You can only divide exactly two MathObjects, got " + (1 + b.length));
-			if(b[0] instanceof MScalar)
+			if(b[0] instanceof MScalar) {
+				if(a instanceof MScalar)
+					return MScalar.divide((MScalar) a, (MScalar)b[0]);
 				return a.copy().multiply(((MScalar) b[0]).invert());
-			/*if (a instanceof MVector) {
-				if (b[0] instanceof MScalar)
-					return ((MVector) a.copy()).divide((MScalar) b[0]);
-			} else if (a instanceof MScalar) {
-				if (b[0] instanceof MScalar)
-					return ((MScalar) a.copy()).divide((MScalar) b[0]);
-			} else if (a instanceof MMatrix) {
-				if (b[0] instanceof MScalar)
-					return ((MMatrix) a.copy()).divide((MScalar) b[0]);
-			}*/ else if(a instanceof MExpression || b[0] instanceof MExpression)
+			} else if(a instanceof MExpression || b[0] instanceof MExpression)
 				return applyOnExpression(a, b[0], this);
 			throw new InvalidOperationException(
 					"DIVIDE operator is not defined for " + Tools.type(a) + " and " + Tools.type(b[0]));
@@ -244,7 +233,7 @@ public enum Operator {
 						+ (1 + b.length) + " arguments, expected 2");
 			if (a instanceof MScalar) {
 				if (b[0] instanceof MScalar)
-					return ((MScalar) a.copy()).power((MScalar) b[0]);
+					return MScalar.power((MScalar)a, (MScalar)b[0]);
 			} else if (a instanceof MMatrix) {
 				if (b[0] instanceof MReal) {
 					if (((MReal) b[0]).getValue() == -1)

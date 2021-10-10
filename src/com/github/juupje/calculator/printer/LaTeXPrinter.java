@@ -1,6 +1,6 @@
 package com.github.juupje.calculator.printer;
 
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Operator;
 import com.github.juupje.calculator.mathobjects.MComplex;
@@ -367,6 +367,14 @@ public class LaTeXPrinter {
 		} else if(s.isFraction()) {
 			MFraction frac = (MFraction) s;
 			return "\\frac{"+frac.getNominator()+"}{"+frac.getDenominator()+"}";
+		} else if(s.hasError()) {
+			String str = Printer.numToString(s);
+			str.replace("?", "\\pm");
+			int idx = str.indexOf("e");
+			if(idx == -1) return str;
+			
+			String exp = str.substring(idx+1);
+			return str.substring(0,idx) + "\\cdot10^{"+(exp.charAt(0)=='+'? exp.substring(1) : exp)+"}";
 		}
 		return numToLatex(s.real());
 	}

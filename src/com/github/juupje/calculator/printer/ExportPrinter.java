@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.graph.Graph;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.main.Calculator;

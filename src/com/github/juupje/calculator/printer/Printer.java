@@ -12,6 +12,8 @@ import com.github.juupje.calculator.main.Variables;
 import com.github.juupje.calculator.mathobjects.MComplex;
 import com.github.juupje.calculator.mathobjects.MExpression;
 import com.github.juupje.calculator.mathobjects.MFraction;
+import com.github.juupje.calculator.mathobjects.MReal;
+import com.github.juupje.calculator.mathobjects.MRealError;
 import com.github.juupje.calculator.mathobjects.MScalar;
 import com.github.juupje.calculator.mathobjects.MathObject;
 import com.github.juupje.calculator.settings.Settings;
@@ -224,6 +226,42 @@ public class Printer {
 		} else if(scalar.isFraction()) {
 			MFraction frac = (MFraction) scalar;
 			return frac.getNominator()+"//"+frac.getDenominator();
+		} else if(scalar.hasError()) {
+			double x = scalar.real();
+			double sx = ((MRealError) scalar).err();
+			int errorDigits = Settings.getInt(Settings.ERROR_SIGNIFICANCE);
+			int a = 0, b = 0;
+			if(sx==0) {
+				//handle special case of no error separately
+				if(x==0)
+					return String.format(locale, "%."+errorDigits+"f ? %."+errorDigits+"f", 0, 0);
+				int oomToShow = Settings.getInt(Settings.PRECISION);
+				b = (int) Math.floor(Math.log10(Math.abs(x)));
+				double oom = Math.pow(10, b);
+				if(b!=0)
+					return String.format(locale, "(%."+oomToShow+"f ? %."+oomToShow+"f)e%d", x/oom, sx/oom, b);
+				return String.format(locale, "%."+oomToShow+"f ? %."+oomToShow+"f", x/oom, sx/oom);
+			} else
+				 a = (int) Math.floor(Math.log10(sx))-errorDigits+1;
+			
+			if(x==0) {
+				//handle special case of x=0 separately
+				if(sx>=1 && sx<10)
+					return String.format(locale, "%."+(errorDigits-1)+"f ? %."+(errorDigits-1)+"f", 0, sx);
+				a += errorDigits-1;
+				return String.format(locale, "(%."+(errorDigits-1)+"f ? %."+(errorDigits-1)+"f)e%d", 0, sx/Math.pow(10, a), a);
+			} else
+				b = (int) Math.floor(Math.log10(Math.abs(x)));
+			int oomToShow = b-a;
+			if(a>=b) {
+				//if the error is larger than the value
+				oomToShow = 1; //one digit will be in front of the decimal in the error
+				b = a;
+			}
+			double oom = Math.pow(10, b);
+			if(b!=0)
+				return String.format(locale, "(%."+oomToShow+"f?%."+oomToShow+"f)e%d", x/oom, sx/oom, b);
+			return String.format(locale, "%."+oomToShow+"f?%."+oomToShow+"f", x/oom, sx/oom);
 		}
 		return numToString(scalar.real());
 	}
@@ -240,7 +278,7 @@ public class Printer {
 		if(num==0) return "0";
 		switch(Settings.getInt(Settings.NOTATION)) {
 		case Settings.NORMAL:
-			if(Math.abs(num) >= 0.001 && Math.abs(num)<100000) {
+			if((Math.abs(num) >= 0.001 && Math.abs(num)<1000) || MReal.isInteger(num)) {
 				s = String.format(locale, "%." + Settings.getInt(Settings.PRECISION) + "f", num);
 				while (s.endsWith("0"))
 					s = s.substring(0, s.length() - 1);

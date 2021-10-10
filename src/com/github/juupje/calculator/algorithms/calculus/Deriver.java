@@ -1,7 +1,7 @@
 package com.github.juupje.calculator.algorithms.calculus;
 
 import com.github.juupje.calculator.algorithms.Algorithm;
-import com.github.juupje.calculator.algorithms.Functions.Function;
+import com.github.juupje.calculator.algorithms.functions.Function;
 import com.github.juupje.calculator.helpers.Tools;
 import com.github.juupje.calculator.helpers.exceptions.InvalidOperationException;
 import com.github.juupje.calculator.helpers.exceptions.ShapeException;

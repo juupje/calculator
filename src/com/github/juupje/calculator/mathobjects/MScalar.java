@@ -114,7 +114,7 @@ public abstract class MScalar implements MathObject {
 	 */
 	public abstract double abs2();
 	
-	public abstract boolean isComplex();
+	public boolean isComplex() { return false;}
 	
 	public abstract boolean isInteger();
 	
@@ -139,5 +139,109 @@ public abstract class MScalar implements MathObject {
 		if(z instanceof MReal)
 			return (T)z.copy();
 		return (T) new MComplex(z.real(),-z.imag());
+	}
+	
+	/**
+	 * Computes the sum of two MScalars
+	 * @param a
+	 * @param b
+	 * @return a+b
+	 */
+	public static MScalar add(MScalar a, MScalar b) {
+		if(a.hasError())
+			return a.copy().add(b);
+		if(b.hasError())
+			return b.copy().add(a);
+		if(a.isFraction())
+			return a.copy().add(b);
+		if(b.isFraction())
+			return b.copy().add(a);
+		if(!a.isComplex())
+			return a.copy().add(b);
+		if(!b.isComplex())
+			return b.copy().add(a);
+		return a.copy().add(b);
+	}
+	
+	/**
+	 * Computes the difference of two MScalars
+	 * @param a
+	 * @param b
+	 * @return a-b
+	 */
+	public static MScalar subtract(MScalar a, MScalar b) {
+		if(a.hasError())
+			return a.copy().subtract(b);
+		if(b.hasError())
+			return b.copy().subtract(a).negate();
+		if(a.isFraction())
+			return a.copy().subtract(b);
+		if(b.isFraction())
+			return b.copy().subtract(a).negate();
+		if(!a.isComplex())
+			return a.copy().subtract(b);
+		if(!b.isComplex())
+			return b.copy().subtract(a).negate();
+		return a.copy().subtract(b);
+	}
+	
+	/**
+	 * Computes the product of two MScalars
+	 * @param a
+	 * @param b
+	 * @return a*b
+	 */
+	public static MScalar multiply(MScalar a, MScalar b) {
+		if(a.hasError())
+			return a.copy().multiply(b);
+		if(b.hasError())
+			return b.copy().multiply(a);
+		if(a.isFraction())
+			return a.copy().multiply(b);
+		if(b.isFraction())
+			return b.copy().multiply(a);
+		if(!a.isComplex())
+			return a.copy().multiply(b);
+		if(!b.isComplex())
+			return b.copy().multiply(a);
+		return a.copy().multiply(b);
+	}
+	
+	/**
+	 * Computes the product of two MScalars
+	 * @param a
+	 * @param b
+	 * @return a/b
+	 */
+	public static MScalar divide(MScalar a, MScalar b) {
+		if(a.hasError())
+			return a.copy().divide(b);
+		if(b.hasError())
+			return b.copy().divide(a).invert();
+		if(a.isFraction())
+			return a.copy().divide(b);
+		if(b.isFraction())
+			return b.copy().divide(a).invert();
+		if(!a.isComplex())
+			return a.copy().divide(b);
+		if(!b.isComplex())
+			return b.copy().divide(a).invert();
+		return a.copy().divide(b);
+	}
+	
+	/**
+	 * Computes the product of two MScalars
+	 * @param a
+	 * @param b
+	 * @return a/b
+	 */
+	public static MScalar power(MScalar a, MScalar b) {
+		if(a.hasError())
+			return a.copy().power(b);
+		if(b.hasError())
+			return MRealError.power(a, (MRealError)b);
+		if(a.isFraction())
+			return a.copy().power(b);
+		return a.copy().power(b);
 	}
 }
